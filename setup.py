@@ -39,5 +39,7 @@ setup(name='gisweb.utils',
       ],
       entry_points="""
       # -*- Entry points: -*-
+      [z3c.autoinclude.plugin]
+      target = plone
       """,
       )
