@@ -48,7 +48,7 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **filte
     
     items = plominoDocument.getItems()
     # cerco prima nel documento "genitore"
-    for target in target:
+    for target in targets:
         if target in items:
             out[target] = plominoDocument.getItem(target)
     
@@ -61,10 +61,11 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **filte
         
         # nel caso le chiavi in filters non fossero state indicizzate
         #+ evito i documenti che sarebbero stati scartati dalla ricerca
+        #+ DA RIVEDERE E CORREGGERE
         if all([pd.getItem(k)==filters.get(k) for k in pd.getForm().getFormFields() if k in filters]):
 
             items = pd.getItems()
-            for target in target:
+            for target in targets:
                 if target in items:
                     if target in out:
                         out[target] += [plominoDocument.getItem(target)]
