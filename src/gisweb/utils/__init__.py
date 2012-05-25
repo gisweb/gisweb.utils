@@ -429,7 +429,7 @@ def plominoPrint(plominoDocument, form_name, default_css=None, use_command=False
     rel_path = '..'
     abs_path = '%s' % plominoDatabase.absolute_url()
     html_content = html_content.replace(rel_path, abs_path)
-    u_html_content = UnicodeDammit(html_content).unicode.encode('UTF-8')
+#    u_html_content = UnicodeDammit(html_content).unicode.encode('iso-8859-15')
 
     if use_command:
         SRC = '/tmp/test_in.html'
@@ -443,12 +443,12 @@ def plominoPrint(plominoDocument, form_name, default_css=None, use_command=False
 #        output_file.close()
     else:
         pdf = xhtml2pdf.CreatePDF(
-            u_html_content,
+            html_content,
             default_css=default_css,
             )
         xml = pdf.dest.getvalue()
     
-    return xml
+    return UnicodeDammit(xml).unicode.encode('utf-8')
 
 
 ############################################################### CF P.IVA UTILS #
