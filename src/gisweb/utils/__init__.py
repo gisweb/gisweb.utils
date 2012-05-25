@@ -423,8 +423,6 @@ def plominoPrint(plominoDocument, form_name, default_css=None, use_command=False
     form = plominoDatabase.getForm(form_name)
     html_content = plominoDocument.openWithForm(form)
     
-    import ipdb; ipdb.set_trace()
-    
     if default_css:
         default_css = pisa_css + default_css
 
