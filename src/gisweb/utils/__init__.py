@@ -445,10 +445,11 @@ def plominoPrint(plominoDocument, form_name, default_css=None, use_command=False
         pdf = xhtml2pdf.CreatePDF(
             html_content,
             default_css=default_css,
+            encoding = 'utf-8'
             )
         xml = pdf.dest.getvalue()
     
-    return UnicodeDammit(xml).unicode.encode('utf-8')
+    return xml
 
 
 ############################################################### CF P.IVA UTILS #
