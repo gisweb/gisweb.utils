@@ -429,7 +429,8 @@ def plominoPrint(plominoDocument, form_name, default_css=None, use_command=False
     rel_path = '..'
     abs_path = '%s' % plominoDatabase.absolute_url()
     html_content = html_content.replace(rel_path, abs_path)
-#    u_html_content = UnicodeDammit(html_content).unicode.encode('iso-8859-15')
+    u_html_content = UnicodeDammit(html_content)
+    encoding = u_html_content.originalEncoding
 
     if use_command:
         SRC = '/tmp/test_in.html'
@@ -445,7 +446,7 @@ def plominoPrint(plominoDocument, form_name, default_css=None, use_command=False
         pdf = xhtml2pdf.CreatePDF(
             html_content,
             default_css=default_css,
-            encoding = 'utf-8'
+            encoding = encoding
             )
         xml = pdf.dest.getvalue()
     
