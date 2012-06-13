@@ -39,13 +39,11 @@ def plominoSqlSync(session, plominoDocument, **table_infos):
     """
     
     if isinstance(session, basestring):
-        session = get_session(session)
+        session = named_scoped_session(session)
     
     engine = session.get_bind()
-#    scopedSession = scoped_session(named_scoped_session(sessionname))
     
-
-    db = SqlSoup(engine) #, session=session)
+    db = SqlSoup(engine, session=session)
     
     table_name = plominoDocument.Form
     main_table = db.entity(table_name, **table_infos)
