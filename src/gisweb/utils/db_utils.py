@@ -18,19 +18,17 @@ def get_session(sessionname):
     factory = named_scoped_session(sessionname)
     return factory()
 
-def sql_test(session, tname):
-    if isinstance(session, basestring):
-        session = get_session(session)
-    
-    meta = MetaData()
-    engine = session.get_bind()
-    schema, name = tname.split('.')
-    
-    table = Table(name, meta, autoload=True, autoload_with=engine, schema=schema)
-    
-    import ipdb; ipdb.set_trace()
-    
-    return 1
+#def sql_test(session, tname):
+#    if isinstance(session, basestring):
+#        session = get_session(session)
+#    
+#    meta = MetaData()
+#    engine = session.get_bind()
+#    schema, name = tname.split('.')
+#    
+#    table = Table(name, meta, autoload=True, autoload_with=engine, schema=schema)
+#    
+#    return 1
 
 
 def plominoSqlSync(session, plominoDocument, **table_infos):
@@ -90,7 +88,6 @@ def plominoSqlSync(session, plominoDocument, **table_infos):
                             vals[key] = record[idx]
                     vals[u'parentId'] = plominoDocument.id
                     grid_table.insert(**vals)
-    db.commit()
     return                 
 
 

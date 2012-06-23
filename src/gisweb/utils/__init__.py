@@ -3,10 +3,8 @@
 from AccessControl import allow_module
 from z3c.saconfig import named_scoped_session
 
-import simplejson as json
-
-
 allow_module('gisweb.utils')
+allow_module('gisweb.utils.plominoKin')
 
 def initialize(con):
     "Being a Zope2 Product we ensure this file will be imported at startup"
@@ -15,15 +13,14 @@ def initialize(con):
 ################################################################ PLOMINO UTILS #
 
 from plomino_utils import get_parent_plominodb
-
+from plomino_utils import attachThis
+from plomino_utils import ondelete_parent, oncreate_child, onsave_child, ondelete_child
+from plomino_utils import get_children_list, get_parent
+from plomino_utils import get_docLinkInfo
 
 ################################################################### JSON UTILS #
 
-def json_dumps(pyobj=''):
-    return json.dumps(pyobj)
-
-def json_loads(string, **kwargs):
-    return json.loads(string, **kwargs)
+from json_utils import json_dumps, json_loads
 
 
 ################################################################### ZOPE UTILS #
@@ -40,16 +37,33 @@ from acl_utils import get_users_info
 ################################################################## PRINT UTILS #
 
 from print_utils import plominoPrint
+from print_utils import UnicodeDammit
 
 
 ##################################################################### DB UTILS #
 
-from db_utils import get_session, sql_test, plominoSqlSync
+from db_utils import get_session, plominoSqlSync
 
 
 ############################################################### CF P.IVA UTILS #
 
 from anagrafica_utils import is_valid_cf, is_valid_piva
+
+
+#################################################################### URL UTILS #
+
+from urllib import urlencode
+from urllib2 import urlopen
+def openUrl(url, timeout=None, **kwargs):
+    data = urlencode(kwargs)
+    error = ''
+    try:
+        out = urlopen(url, data, timeout=timeout).read()
+    except Exception, err:
+        error = str(err)
+        return ('', error)
+    else:
+        return (out, '')
 
 
 ################################################################### MAIL UTILS #

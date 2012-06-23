@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from Products.CMFPlomino.interfaces import IPlominoDatabase
+from Products.CMFPlomino.PlominoDocument import PlominoDocument
 
 def get_parent_plominodb(obj):
     ''' Return the current plominoDatabase. Is enough to pass the context from
@@ -66,3 +67,214 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **filte
                 out[target] = out[target][0]
 
     return out
+
+def attachThis(plominoDocument, submittedValue, itemname, filename=''):
+    '''
+    Funcion with the aim to simplify the setting of a file as an attachment of a plominoDocument
+    Usage sample:
+    submittedValue = plominoPrint(plominoDocument, 'stampa_autorizzazione')
+    attachThis(plominoDocument, submittedValue, 'autorizzazione', filename='stampa_autorizzazione.pdf')
+    '''
+    (new_file, contenttype) = plominoDocument.setfile(submittedValue, filename=filename, overwrite=True)
+    if not contenttype:
+        import cStringIO
+        from plone.app.blob.utils import guessMimetype
+        tmpFile = cStringIO.StringIO()
+        tmpFile.write(submittedValue)
+        contenttype = guessMimetype(tmpFile, filename)
+        tmpFile.close()
+    current_files = plominoDocument.getItem(itemname, {}) or {}
+    current_files[new_file] = contenttype or 'sconosciuto'
+    plominoDocument.setItem(itemname, current_files)
+    return
+
+################################################################################
+
+from json_utils import json_dumps
+
+def get_docLinkInfo(context, form_name, *field_names, **request):
+
+    request['Form'] = form_name
+    
+    db = context.getParentDatabase()
+    idx = db.getIndex()
+    
+    if not field_names:
+        form = db.getForm(form_name)
+        field_names = [i.id for i in form.getFormFields(includesubforms=True) if i in idx.indexes()]
+    else:
+        field_names = [i for i in field_names if i in idx.indexes()]
+
+    request['nome'] = 'marco'
+    res = idx.dbsearch(request)
+    out = list()
+    for rec in res:
+        obj = dict()
+        for k in field_names:
+            obj[k] = rec[k] or ''
+                
+        jobj = json_dumps(obj)
+        out += ['%s' % (jobj)]
+    
+    print out
+    return out
+
+
+################################################################################
+
+def getPath(doc, virtual=False):
+    if isinstance(doc, basestring):
+        doc = self.db.getDocument(doc)
+
+    if virtual:
+        pd_path_list = doc.REQUEST.physicalPathToVirtualPath(doc.doc_path())
+    else:
+        pd_path_list = doc.doc_path()
+
+    return '/'.join(pd_path_list)
+
+
+class plominoKin(object):
+
+    def __init__(self, context, **kwargs):
+    
+        self.parentKey = kwargs.get('parentKey') or 'parentDocument'
+        self.parentLinkKey = kwargs.get('parentLinkKey') or 'linkToParent'
+        self.childrenList_name = kwargs.get('childrenList_name') or 'elenco_%s'
+        if hasattr(context, 'getParentDatabase'):
+            self.db = context.getParentDatabase()
+        else:
+            self.db = get_parent_plominodb(context)
+            
+        if kwargs.get('pid'):
+            self.doc = self.db.getDocument(pid)
+        elif isinstance(context, PlominoDocument):
+            self.doc = context
+        else:
+            self.doc = None
+            
+        if not self.doc:
+            raise Exception('No plominoDocument found!!')
+
+        self.idx = self.db.getIndex()
+        for fieldname in (self.parentKey, 'CASCADE', ):
+            if fieldname not in self.idx.indexes():
+                self.idx.createSelectionIndex(fieldname, refresh=True)
+    
+    def setParenthood(self, parent_id, CASCADE=True, setDocLink=False):
+        child = self.doc
+        child.setItem(self.parentKey, parent_id)
+        child.setItem('CASCADE', CASCADE)
+        if setDocLink:
+            child.setItem(self.parentLinkKey, getPath(doc))
+    
+    def getParentDoc(self):
+        return self.db.getDocument(self.doc.getItem(self.parentKey))
+    
+    def ondelete_parent(self):
+        parent = self.doc
+        idx = self.db.getIndex()
+        request = {self.parentKey: parent.id}
+        res = idx.dbsearch(request)
+        toRemove = []
+        for rec in res:
+            if obj.CASCADE:
+                toRemove += [rec.id]
+            else:
+                rec.getObject().removeItem(self.parentKey)
+        self.db.deleteDocuments(ids=toRemove, massive=False)
+    
+    def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
+        child = self.doc
+        
+        if not parent_id:
+            parent_id = child.REQUEST.get(self.parentKey)
+        
+        self.setParenthood(parent_id, **kwargs)
+        parent = self.db.getDocument(child.REQUEST.get(self.parentKey))
+        childrenList_name = self.childrenList_name % child.Form
+        childrenList = parent.getItem(childrenList_name, []) or []
+        url = getPath(child)
+        parent.setItem(childrenList_name, childrenList+[url])
+        
+        if backToParent:
+            backUrl = parent.absolute_url()
+            if backToParent == 'anchor':
+                backUrl = '%s#%s' % (backUrl, childrenList_name)
+            child.setItem('plominoredirecturl', backUrl)
+        
+    def onsave_child(self):
+        child = self.doc
+        if not child.isNewDocument():
+            if child.getItem('plominoredirecturl'):
+                child.removeItem('plominoredirecturl')
+        
+    def ondelete_child(self, anchor=True):
+        child = self.doc
+        parent = self.db.getDocument(child.getItem(self.parentKey))
+        childrenList_name = self.childrenList_name % child.Form
+        childrenList = parent.getItem(childrenList_name, []) or []
+        url = getPath(child)
+        childrenList.remove(url)
+        parent.setItem(childrenList_name, childrenList)
+        
+        backUrl = parent.absolute_url()
+        if anchor:
+            backUrl = '%s#%s' % (backUrl, childrenList_name)
+        child.REQUEST.set('returnurl', backUrl)
+
+    def get_children_list(self, form_name, etichetta):
+        '''
+        es: etichetta = '%(qualifica)s modello: %(modello)s con targa: %(targa)s'
+        '''
+#        import ipdb; ipdb.set_trace()
+        parent = self.doc
+        lista = list()
+        res = self.idx.dbsearch({'Form': form_name, self.parentKey: parent.id})
+        
+#        form = self.db.getForm(form_name)
+#        fieldlist = form.objectValues(spec='PlominoField')
+#        for rec in res:
+#            dizionario = dict()
+#            for k in [tt for tt in self.idx.indexes() if rec.has_key(tt)]:
+#                if k in fieldlist:
+#                    obj = rec.getObject()
+#                    dizionario[k] = obj.getRenderedItem(k)
+##                    dizionario[k] = getFieldRender(form, None, False, creation=False, request={k: rec[k]})
+#                else:
+#                    dizionario[k] = rec[k]
+            
+#        if form_name=='allegati':
+#            import ipdb; ipdb.set_trace()
+        for rec in res:
+            obj = rec.getObject()
+            dizionario = dict()
+            for k in obj.getItems():
+                try:
+                    dizionario[k] = obj.getRenderedItem(k).strip()
+                except AttributeError:
+                    dizionario[k] = obj.getItem(k)
+
+            etichetta1 = etichetta % dizionario
+#            import ipdb; ipdb.set_trace()
+            lista.append('%s|%s' % (etichetta1, getPath(obj)))
+        return lista
+        
+
+def ondelete_parent(doc):
+    plominoKin(doc).ondelete_parent()
+
+def oncreate_child(doc, **kwargs):
+    plominoKin(doc).oncreate_child(**kwargs)
+
+def onsave_child(doc):
+    plominoKin(doc).onsave_child()
+
+def ondelete_child(doc, **kwargs):
+    plominoKin(doc).ondelete_child(**kwargs)
+
+def get_children_list(doc, form_name, etichetta):
+    return plominoKin(doc).get_children_list(form_name, etichetta)
+
+def get_parent(doc):
+    return plominoKin(doc).getParentDoc()
