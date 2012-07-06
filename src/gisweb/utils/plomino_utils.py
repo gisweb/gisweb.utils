@@ -106,7 +106,7 @@ def get_aaData(brain, field_names, sortindex, reverse, enum, linked, field_rende
                 value = ''
             else:
                 if k in field_renderes:
-                    v = field_renderes[k]
+                    v = field_renderes[k](v)
                 if linked:
                     value = '<a href="%(url)s">%(label)s</a>' % dict(url=rec.getURL(), label=json_dumps(value).replace('"', ''))
             row.append(value)
