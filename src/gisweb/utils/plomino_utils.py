@@ -13,7 +13,7 @@ def get_parent_plominodb(obj):
         current = current.aq_parent
     return hasattr(current, 'aq_parent') and current
 
-def search_around(plominoDocument, parentKey='parentDocument', *targets, **filters):
+def search_around(plominoDocument, parentKey='parentDocument', *targets, **flts):
     '''
     DA TESTARE
     
@@ -21,7 +21,7 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **filte
     per esse è stato trovato almeno un valore tra i documenti collegati al
     plominoDocument (compreso lo stesso). Se i valori trovati per la chiave
     richiesta fossero più di uno questi vengono messi in una lista. Per ottenere
-    meno valori è possibile affinare la ricerca fornendo le chiavi "filters" che
+    meno valori è possibile affinare la ricerca fornendo le chiavi "flts" che
     vengono usate per le ricerche nel plominoIndex e per la selezione dei
     documenti da cui attingere i valori.
     ATTENZIONE! NON sono contemplate condizioni di confronto per le ricerche che
@@ -46,15 +46,15 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **filte
     
     # poi cerco nei documenti figli
     plominoIndex = plominoDocument.getParentDatabase().getIndex()
-    filters[parentKey] = plominoDocument.id
-    res = plominoIndex.dbsearch(**filters)
+    flts[parentKey] = plominoDocument.id
+    res = plominoIndex.dbsearch(**flts)
     for rec in res:
         pd = rec.getObject()
         
-        # nel caso le chiavi in filters non fossero state indicizzate
+        # nel caso le chiavi in flts non fossero state indicizzate
         #+ evito i documenti che sarebbero stati scartati dalla ricerca
         #+ DA RIVEDERE E CORREGGERE
-        if all([pd.getItem(k)==filters.get(k) for k in pd.getForm().getFormFields() if k in filters]):
+        if all([pd.getItem(k)==flts.get(k) for k in pd.getForm().getFormFields() if k in flts]):
 
             items = pd.getItems()
             for target in targets:
@@ -90,12 +90,54 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
 
 ################################################################################
 
+def get_aaData(brain, field_names, sortindex, reverse, enum, linked):
+
+    aaData = []
+    
+    for num,rec in enumerate(brain):
+        if enum:
+            row = [num+1]
+        else:
+            row = []
+        for k in field_names:
+            value = rec[k]
+            
+            if not value:
+                value = ''
+            else:
+                if linked:
+                    value = '<a href="%(url)s">%(label)s</a>' % dict(url=rec.getURL(), label=json_dumps(value).replace('"', ''))
+            row.append(value)
+        
+        rendered_value = '%s| ' % json_dumps(row)
+        if sortindex:
+            aaData.append((rec[sortindex], rendered_value, ))
+        else:
+            aaData.append(rendered_value)
+        
+    if sortindex:
+        aaData.sort()
+    
+    if reverse:
+        aaData.reverse()
+    
+    if sortindex:
+        return [rec[-1] for rec in aaData]
+    else:
+        return aaData
+    
+
 from json_utils import json_dumps
 
-def get_docLinkInfo(context, form_name, *field_names, **request):
+def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, linked=True, slow_flt=None, field_names=[], request={}):
+    """
+    Warning: sortindex has to be unique or none (or equivalent; i.e. 0 et sim.)
+    slow_flt: "slow filter", must be a function or at least a lambda that takes
+    a dictionary with the requested field_names as keys, test the values and
+    returns a boolean.
+    Warning: sortindex values has not to be missing
+    """
 
-    request['Form'] = form_name
-    
     db = context.getParentDatabase()
     idx = db.getIndex()
     
@@ -103,22 +145,32 @@ def get_docLinkInfo(context, form_name, *field_names, **request):
         form = db.getForm(form_name)
         field_names = [i.id for i in form.getFormFields(includesubforms=True) if i in idx.indexes()]
     else:
-        field_names = [i for i in field_names if i in idx.indexes()]
-
-    request['nome'] = 'marco'
-    res = idx.dbsearch(request)
-    out = list()
-    for rec in res:
-        obj = dict()
-        for k in field_names:
-            obj[k] = rec[k] or ''
-                
-        jobj = json_dumps(obj)
-        out += ['%s' % (jobj)]
+        fl = list()
+        for f in field_names:
+            if f in idx.indexes():
+                fl.append(f)
+            else:
+                raise Exception('%s is not an index' % f)
+        field_names = fl
     
-    print out
-    return out
-
+    res = []
+    if isinstance(request, dict):
+        request = [request]
+    
+    for num in range(len(request)):
+        request[num]['Form'] = form_name
+    
+    
+    res_list = [idx.dbsearch(req, sortindex=sortindex, reverse=reverse) for req in request]
+    res = sum(res_list[1:], res_list[0])
+    if slow_flt != None:
+        res = [rec for rec in res if slow_flt(rec)]
+    
+    if len(request) > 1:
+        sortindex = None
+    
+    return get_aaData(res, field_names, sortindex, reverse, enum, linked)
+        
 
 ################################################################################
 
@@ -227,7 +279,6 @@ class plominoKin(object):
         '''
         es: etichetta = '%(qualifica)s modello: %(modello)s con targa: %(targa)s'
         '''
-#        import ipdb; ipdb.set_trace()
         parent = self.doc
         lista = list()
         res = self.idx.dbsearch({'Form': form_name, self.parentKey: parent.id})
@@ -244,8 +295,6 @@ class plominoKin(object):
 #                else:
 #                    dizionario[k] = rec[k]
             
-#        if form_name=='allegati':
-#            import ipdb; ipdb.set_trace()
         for rec in res:
             obj = rec.getObject()
             dizionario = dict()
@@ -256,7 +305,6 @@ class plominoKin(object):
                     dizionario[k] = obj.getItem(k)
 
             etichetta1 = etichetta % dizionario
-#            import ipdb; ipdb.set_trace()
             lista.append('%s|%s' % (etichetta1, getPath(obj)))
         return lista
         

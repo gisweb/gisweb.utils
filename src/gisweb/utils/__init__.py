@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from AccessControl import allow_module
-from z3c.saconfig import named_scoped_session
+#from z3c.saconfig import named_scoped_session
 
 allow_module('gisweb.utils')
 allow_module('gisweb.utils.plominoKin')
