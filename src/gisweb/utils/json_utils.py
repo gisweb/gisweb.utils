@@ -1,6 +1,9 @@
 import simplejson as json
 import locale
-locale.setlocale(locale.LC_TIME, 'it_IT.utf8')
+try:
+    locale.setlocale(locale.LC_TIME, 'it_IT.utf8')
+except:
+    locale.setlocale(locale.LC_TIME, '')
 
 def handler(obj):
     if hasattr(obj, 'strftime'):
