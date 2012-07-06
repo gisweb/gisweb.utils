@@ -8,9 +8,10 @@ except:
 def handler(obj):
     if hasattr(obj, 'strftime'):
         if obj.strftime('%H:%M:%S') == '00:00:00':
-            srepr = '%a %d %b %Y'
+            srepr = '%d/%m/%Y'
+#            srepr = '%a %d %b %Y'
         else:
-            srepr = '%a %d %b %Y, %H:%M'
+            srepr = '%d/%m/%Y %H:%M'
         return obj.strftime(srepr)
     else:
         return None

@@ -90,7 +90,7 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
 
 ################################################################################
 
-def get_aaData(brain, field_names, sortindex, reverse, enum, linked):
+def get_aaData(brain, field_names, sortindex, reverse, enum, linked, field_renderes):
 
     aaData = []
     
@@ -105,6 +105,8 @@ def get_aaData(brain, field_names, sortindex, reverse, enum, linked):
             if not value:
                 value = ''
             else:
+                if k in field_renderes:
+                    v = field_renderes[k]
                 if linked:
                     value = '<a href="%(url)s">%(label)s</a>' % dict(url=rec.getURL(), label=json_dumps(value).replace('"', ''))
             row.append(value)
@@ -129,7 +131,7 @@ def get_aaData(brain, field_names, sortindex, reverse, enum, linked):
 
 from json_utils import json_dumps
 
-def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, linked=True, slow_flt=None, field_names=[], request={}):
+def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, linked=True, slow_flt=None, field_names=[], request={}, field_renderes={}):
     """
     Warning: sortindex has to be unique or none (or equivalent; i.e. 0 et sim.)
     slow_flt: "slow filter", must be a function or at least a lambda that takes
@@ -169,7 +171,7 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
     if len(request) > 1:
         sortindex = None
     
-    return get_aaData(res, field_names, sortindex, reverse, enum, linked)
+    return get_aaData(res, field_names, sortindex, reverse, enum, linked, field_renderes)
         
 
 ################################################################################
