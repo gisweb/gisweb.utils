@@ -164,7 +164,7 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
     
     
     res_list = [idx.dbsearch(req, sortindex=sortindex, reverse=reverse) for req in request]
-    res = sum(res_list[1:], res_list[:0])
+    res = sum(res_list[1:], res_list[0])
     if slow_flt != None:
         res = [rec for rec in res if slow_flt(rec)]
     
