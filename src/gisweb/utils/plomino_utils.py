@@ -164,12 +164,12 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
     
     
     res_list = [idx.dbsearch(req, sortindex=sortindex, reverse=reverse) for req in request]
-    res = sum(res_list[1:], res_list[0])
+    res = sum(res_list[1:], res_list[:0])
     if slow_flt != None:
         res = [rec for rec in res if slow_flt(rec)]
     
-    if len(request) > 1:
-        sortindex = None
+#    if len(request) > 1:
+#        sortindex = None
     
     return get_aaData(res, field_names, sortindex, reverse, enum, linked, field_renderes)
         
@@ -246,7 +246,12 @@ class plominoKin(object):
         self.setParenthood(parent_id, **kwargs)
         parent = self.db.getDocument(child.REQUEST.get(self.parentKey))
         childrenList_name = self.childrenList_name % child.Form
-        childrenList = parent.getItem(childrenList_name, []) or []
+        if not childrenList_name parent.getItems():
+            parent.setItem(childrenList_name, [])
+            childrenList = []
+        else:
+            childrenList = parent.getItem(childrenList_name, []) or []
+
         url = getPath(child)
         parent.setItem(childrenList_name, childrenList+[url])
         
