@@ -191,7 +191,6 @@ def getPath(doc, virtual=False):
 class plominoKin(object):
 
     def __init__(self, context, **kwargs):
-    
         self.parentKey = kwargs.get('parentKey') or 'parentDocument'
         self.parentLinkKey = kwargs.get('parentLinkKey') or 'linkToParent'
         self.childrenList_name = kwargs.get('childrenList_name') or 'elenco_%s'
@@ -232,7 +231,7 @@ class plominoKin(object):
         res = idx.dbsearch(request)
         toRemove = []
         for rec in res:
-            if obj.CASCADE:
+            if rec.CASCADE:
                 toRemove += [rec.id]
             else:
                 rec.getObject().removeItem(self.parentKey)
