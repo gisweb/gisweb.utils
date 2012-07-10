@@ -246,7 +246,7 @@ class plominoKin(object):
         self.setParenthood(parent_id, **kwargs)
         parent = self.db.getDocument(child.REQUEST.get(self.parentKey))
         childrenList_name = self.childrenList_name % child.Form
-        if not childrenList_name parent.getItems():
+        if not childrenList_name in parent.getItems():
             parent.setItem(childrenList_name, [])
             childrenList = []
         else:
