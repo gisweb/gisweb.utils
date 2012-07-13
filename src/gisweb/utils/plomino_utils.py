@@ -4,6 +4,14 @@
 from Products.CMFPlomino.interfaces import IPlominoDatabase
 from Products.CMFPlomino.PlominoDocument import PlominoDocument
 
+from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate
+
+def StartDayofMonth(d):
+    return StringToDate(DateToString(d,'%m-%Y'),'%m-%Y')
+
+def LastDayofMonth(d):
+    return StringToDate(DateToString(StartDayofMonth(d)+32,'%m-%Y'),'%m-%Y')-1
+
 def get_parent_plominodb(obj):
     ''' Return the current plominoDatabase. Is enough to pass the context from
         within a scipt or a plominoDocument python formula.
@@ -161,7 +169,6 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
     
     for num in range(len(request)):
         request[num]['Form'] = form_name
-    
     
     res_list = [idx.dbsearch(req, sortindex=sortindex, reverse=reverse) for req in request]
     res = sum(res_list[1:], res_list[0])
