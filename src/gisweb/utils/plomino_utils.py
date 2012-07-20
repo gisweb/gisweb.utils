@@ -248,7 +248,7 @@ class plominoKin(object):
         self.idx = self.db.getIndex()
         for fieldname in (self.parentKey, 'CASCADE', ):
             if fieldname not in self.idx.indexes():
-                self.idx.createSelectionIndex(fieldname, refresh=True)
+                self.idx.createFieldIndex(fieldname, 'TEXT', refresh=True)
     
     def searchAndFetch(self, fields={}, mainRequest={}, sideRequests={}):
         """
@@ -263,7 +263,6 @@ class plominoKin(object):
         )
         enum = <numbering key>
         """
-
         import itertools
         
         if not 'Form' in mainRequest:
@@ -274,47 +273,50 @@ class plominoKin(object):
         # sideResults = dict(<plominoId> = dict(<form_name> = [{**kwargs}, ...], ...))
         sideResults = dict()
         for form_name, sideRequest in sideRequests.items():
-            if 'Form' not in request:
-                request['Form'] = form_name
-            request[self.parentKey] = {'query': [i.id for i in mainResults], 'operator': 'or'}
+            if 'Form' not in sideRequest:
+                sideRequest['Form'] = form_name
+            sideRequest[self.parentKey] = {'query': [i.id for i in mainResults], 'operator': 'or'}
             
             sideResult = self.idx.dbsearch(sideRequest, sortindex=self.parentKey)
             
             for sideRecord in sideResult:
             
-                d = dict([(i[-1], sideRecord[i[0]] or sideRecord.getObject().getItem(i[0], '')) for i in fields.get(form_name, [])])
+                tmp_dict = dict([(i[-1], sideRecord[i[0]] or sideRecord.getObject().getItem(i[0], '')) for i in fields.get(form_name, [])])
                 
                 if sideRecord[self.parentKey] not in sideResults:
-                    sideResults[sideRecord[self.parentKey]] = {form_name: [d]}
+                    sideResults[sideRecord[self.parentKey]] = {form_name: [tmp_dict]}
                 else:
                     if form_name not in sideResults[sideRecord[self.parentKey]]:
-                        sideResults[sideRecord[self.parentKey]][form_name] = [d]
+                        sideResults[sideRecord[self.parentKey]][form_name] = [tmp_dict]
                     else:
-                        sideResults[sideRecord[self.parentKey]][form_name].append(d)
+                        sideResults[sideRecord[self.parentKey]][form_name].append(tmp_dict)
         
         # sideResults2 = dict(<plominoId> = [[{**kwargs}, ...], ...], ...)    
-        sideResults2 = dict([(k,v) for k in sideResults \
-            for v in [x for x in itertools.product(*sideResults[k].values())]
-        ])
+        sideResults2 = dict()
+        for key,value in sideResults.items():
+            sideResults2[key] = [x for x in itertools.product(*sideResults[key].values())]
         
         sideResults3 = dict()
-        for k,p in sideResults2.items():
-            for l in p:
-                it = [i.items() for i in l]
+        for key,prod in sideResults2.items():
+            for lista in prod:
+                it = [i.items() for i in lista]
                 s = sum(it[1:], it[0])
-                v = dict([(k,v) for k,v in s])
-                if not k in sideResults3:
-                    sideResults3[k] = [v]
+                v = dict([(key,v) for k,v in s])
+                if not key in sideResults3:
+                    sideResults3[key] = [v]
                 else:
-                    sideResults3[k].append(v)
-        
-            it = [i.items() for i in p]
-            s = sunm(it[1:], it[0])
+                    sideResults3[key].append(v)
+
+            it = []
+            for tt in prod:
+                mit = [i.items() for i in tt]
+                somma = sum(mit[1:], mit[0])
+                it.append(dict([(k,v) for k,v in somma]))
             
-            sideResults3[k] = dict([(k,v) for k,v in s])
+            sideResults3[key] = it
         
         aaData = []
-        for mainId,v in sideRecord3.items():
+        for mainId,v in sideResults3.items():
         
             mainDict = dict()
             if mainRequest['Form'] in fields:
@@ -325,11 +327,8 @@ class plominoKin(object):
             for i in v:
                 it = i.items() + mainDict.items()
                 aaData.append(dict([(k,v) for k,v in it]))
-                
+        
         return aaData  
-                
-                
-                
                 
     
     def setParenthood(self, parent_id, CASCADE=True, setDocLink=False):
