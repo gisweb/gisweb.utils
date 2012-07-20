@@ -250,7 +250,7 @@ class plominoKin(object):
             if fieldname not in self.idx.indexes():
                 self.idx.createSelectionIndex(fieldname, refresh=True)
     
-    def searchAndFetch(self, fields={}, mainRequest={}, sideRequest={}):
+    def searchAndFetch(self, fields={}, mainRequest={}, sideRequests={}):
         """
         dbsearch(self, request, sortindex, reverse=0)
         mainRequest = dict(Form = <form_name>, **kwargs)
