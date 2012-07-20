@@ -21,7 +21,6 @@ from plomino_utils import get_docLinkInfo
 from plomino_utils import StartDayofMonth
 from plomino_utils import LastDayofMonth
 
-
 ################################################################### JSON UTILS #
 
 from json_utils import json_dumps, json_loads

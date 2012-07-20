@@ -4,9 +4,10 @@
 from Products.CMFPlomino.interfaces import IPlominoDatabase
 from Products.CMFPlomino.PlominoDocument import PlominoDocument
 
-from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate
+from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate, DateTime
 
 def StartDayofMonth(d):
+    # return DateTime(d.year(), d.month(), 1)
     return StringToDate(DateToString(d,'%m-%Y'),'%m-%Y')
 
 def LastDayofMonth(d):
@@ -98,6 +99,30 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
 
 ################################################################################
 
+def get_aaData2(brain, field_names, sortindex, reverse, enum, field_renderes):
+    
+    aaData = list()
+    
+    for num,rec in enumerate(brain):
+        aaRec = dict([(k, rec[k] or rec.getObject().getItem(k, '')) for k in field_names])
+        if enum:
+            aaRec['_order'] = num
+        
+        if sortindex:
+            aaData.append((rec[k] or rec.getObject().getItem(k, ''), aaRec, ))
+        else:
+            aaData.append(aaRec)
+    
+    if sortindex:
+        aaData.sort()
+    if reverse:
+        aaData.reverse()
+    
+    if sortindex:
+        return [rec[-1] for rec in aaData]
+    else:
+        return aaData
+
 def get_aaData(brain, field_names, sortindex, reverse, enum, linked, field_renderes):
 
     aaData = []
@@ -135,11 +160,11 @@ def get_aaData(brain, field_names, sortindex, reverse, enum, linked, field_rende
         return [rec[-1] for rec in aaData]
     else:
         return aaData
-    
+
 
 from json_utils import json_dumps
 
-def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, linked=True, slow_flt=None, field_names=[], request={}, field_renderes={}):
+def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, linked=True, slow_flt=None, field_names=[], request={}, field_renderes={}, deprecated=True):
     """
     Warning: sortindex has to be unique or none (or equivalent; i.e. 0 et sim.)
     slow_flt: "slow filter", must be a function or at least a lambda that takes
@@ -147,7 +172,6 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
     returns a boolean.
     Warning: sortindex values has not to be missing
     """
-
     db = context.getParentDatabase()
     idx = db.getIndex()
     
@@ -177,9 +201,13 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
     
 #    if len(request) > 1:
 #        sortindex = None
-    
-    return get_aaData(res, field_names, sortindex, reverse, enum, linked, field_renderes)
-        
+    if deprecated:
+        return get_aaData(res, field_names, sortindex, reverse, enum, linked, field_renderes)
+    else:
+        return get_aaData2(res, field_names, sortindex, reverse, enum, field_renderes)
+
+
+
 
 ################################################################################
 
@@ -201,11 +229,12 @@ class plominoKin(object):
         self.parentKey = kwargs.get('parentKey') or 'parentDocument'
         self.parentLinkKey = kwargs.get('parentLinkKey') or 'linkToParent'
         self.childrenList_name = kwargs.get('childrenList_name') or 'elenco_%s'
+
         if hasattr(context, 'getParentDatabase'):
             self.db = context.getParentDatabase()
         else:
             self.db = get_parent_plominodb(context)
-            
+
         if kwargs.get('pid'):
             self.doc = self.db.getDocument(pid)
         elif isinstance(context, PlominoDocument):
@@ -220,6 +249,88 @@ class plominoKin(object):
         for fieldname in (self.parentKey, 'CASCADE', ):
             if fieldname not in self.idx.indexes():
                 self.idx.createSelectionIndex(fieldname, refresh=True)
+    
+    def searchAndFetch(self, fields={}, mainRequest={}, sideArgs={}):
+        """
+        dbsearch(self, request, sortindex, reverse=0)
+        mainRequest = dict(Form = <form_name>, **kwargs)
+        sideRequests = dict(
+            <form_name> = dict(**kwargs)
+        )
+        fields = dict(
+            <form_name> = [(<field_name>, <unique_name>, ), (<field_name>, ), ...]
+            ...
+        )
+        enum = <numbering key>
+        """
+
+        import itertools
+        
+        if not 'Form' in mainRequest:
+            raise IOError('GISWEB.UTILS ERROR: A kay for the parent form is required!')
+        
+        mainResults = self.idx.dbsearch(mainRequest)
+
+        # sideResults = dict(<plominoId> = dict(<form_name> = [{**kwargs}, ...], ...))
+        sideResults = dict()
+        for form_name, request in sideRequests.items():
+            if 'Form' not in request:
+                request['Form'] = form_name
+            request[self.parentKey] = {'query': [i.id for i in mainResults], 'operator': 'or'}
+            
+            sideResult = self.idx.dbsearch(sideRequest, sortindex=self.parentKey)
+            
+            for sideRecord in sideResult:
+            
+                d = dict([(i[-1], sideRecord[i[0]] or sideRecord.getObject().getItem(i[0], '')) for i in fields.get(form_name, [])])
+                
+                if sideRecord[self.parentKey] not in sideResults:
+                    sideResults[sideRecord[self.parentKey]] = {form_name: [d]}
+                else:
+                    if form_name not in sideResults[sideRecord[self.parentKey]]:
+                        sideResults[sideRecord[self.parentKey]][form_name] = [d]
+                    else:
+                        sideResults[sideRecord[self.parentKey]][form_name].append(d)
+        
+        # sideResults2 = dict(<plominoId> = [[{**kwargs}, ...], ...], ...)    
+        sideResults2 = dict([(k,v) for k in sideResults \
+            for v in [x for x in itertools.product(*sideResults[k].values())]
+        ])
+        
+        sideResults3 = dict()
+        for k,p in sideResults2.items():
+            for l in p:
+                it = [i.items() for i in l]
+                s = sum(it[1:], it[0])
+                v = dict([(k,v) for k,v in s])
+                if not k in sideResults3:
+                    sideResults3[k] = [v]
+                else:
+                    sideResults3[k].append(v)
+        
+            it = [i.items() for i in p]
+            s = sunm(it[1:], it[0])
+            
+            sideResults3[k] = dict([(k,v) for k,v in s])
+        
+        aaData = []
+        for mainId,v in sideRecord3.items():
+        
+            mainDict = dict()
+            if mainRequest['Form'] in fields:
+                mainDoc = self.db.getDocument(mainId)
+                for x in fields[mainRequest['Form']]:
+                    mainDict[x[-1]] = mainDoc.getItem(x[0], '')
+        
+            for i in v:
+                it = i.items() + mainDict.items()
+                aaData.append(dict([(k,v) for k,v in it]))
+                
+        return aaData  
+                
+                
+                
+                
     
     def setParenthood(self, parent_id, CASCADE=True, setDocLink=False):
         child = self.doc
@@ -339,3 +450,6 @@ def get_children_list(doc, form_name, etichetta):
 
 def get_parent(doc):
     return plominoKin(doc).getParentDoc()
+
+def fetchDocs(context, **kwargs):
+    return plominoKin(context).searchAndFetch(**kwargs)
