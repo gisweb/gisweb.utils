@@ -273,7 +273,7 @@ class plominoKin(object):
 
         # sideResults = dict(<plominoId> = dict(<form_name> = [{**kwargs}, ...], ...))
         sideResults = dict()
-        for form_name, request in sideRequests.items():
+        for form_name, sideRequest in sideRequests.items():
             if 'Form' not in request:
                 request['Form'] = form_name
             request[self.parentKey] = {'query': [i.id for i in mainResults], 'operator': 'or'}
