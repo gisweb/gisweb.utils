@@ -13,6 +13,29 @@ def StartDayofMonth(d):
 def LastDayofMonth(d):
     return StringToDate(DateToString(StartDayofMonth(d)+32,'%m-%Y'),'%m-%Y')-1
 
+def addToDate(date, addend=0, unit='months'):
+    year = date.year()
+    month = date.month()
+    day = date.day()
+    if unit == 'months':
+        year += int(addend)/12
+        month = int(month+addend)%12
+        try:
+            out = DateTime(year, month, day) - 1
+        except:
+            day -= 1
+            test = True
+            while test:
+                try:
+                    out = DateTime(year, month, day)
+                except:
+                    day -= 1
+                else:
+                    test = False
+    else:
+        raise Exception('units %s is not yet implemented' % unit)
+    return out
+        
 def get_parent_plominodb(obj):
     ''' Return the current plominoDatabase. Is enough to pass the context from
         within a scipt or a plominoDocument python formula.
