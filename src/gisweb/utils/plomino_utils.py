@@ -250,7 +250,7 @@ class plominoKin(object):
             if fieldname not in self.idx.indexes():
                 self.idx.createFieldIndex(fieldname, 'TEXT', refresh=True)
     
-    def searchAndFetch(self, fields={}, mainRequest={}, sideRequests={}):
+    def searchAndFetch(self, fields={}, mainRequest={}, sideRequests={}, json=False):
         """
         dbsearch(self, request, sortindex, reverse=0)
         mainRequest = dict(Form = <form_name>, **kwargs)
@@ -264,13 +264,12 @@ class plominoKin(object):
         enum = <numbering key>
         """
         import itertools
-        
         if not 'Form' in mainRequest:
             raise IOError('GISWEB.UTILS ERROR: A kay for the parent form is required!')
         
         mainResults = self.idx.dbsearch(mainRequest)
 
-        # sideResults = dict(<plominoId> = dict(<form_name> = [{**kwargs}, ...], ...))
+        # sideResults = dict(<parentId> = dict(<form_name> = [{**kwargs}, ...], ...))
         sideResults = dict()
         for form_name, sideRequest in sideRequests.items():
             if 'Form' not in sideRequest:
@@ -280,8 +279,13 @@ class plominoKin(object):
             sideResult = self.idx.dbsearch(sideRequest, sortindex=self.parentKey)
             
             for sideRecord in sideResult:
-            
-                tmp_dict = dict([(i[-1], sideRecord[i[0]] or sideRecord.getObject().getItem(i[0], '')) for i in fields.get(form_name, [])])
+                tmp_dict = dict()
+                for i in fields.get(form_name, []):
+                    try:
+                        value = sideRecord[i[0]]
+                    except:
+                        value = sideRecord.getObject().getItem(i[0], '')
+                    tmp_dict[i[-1]] = value
                 
                 if sideRecord[self.parentKey] not in sideResults:
                     sideResults[sideRecord[self.parentKey]] = {form_name: [tmp_dict]}
@@ -290,6 +294,18 @@ class plominoKin(object):
                         sideResults[sideRecord[self.parentKey]][form_name] = [tmp_dict]
                     else:
                         sideResults[sideRecord[self.parentKey]][form_name].append(tmp_dict)
+        
+        for rec in mainResults:
+            mainForm = rec.getObject().Form
+            tmp_dict = dict([(i[-1], rec.get(i[0]) or rec.getObject().getItem(i[0], '')) for i in fields.get(mainForm, [])])
+            if rec.id not in sideResults:
+                sideResults[rec.id] = {mainForm: [tmp_dict]}
+            else:
+                if mainForm not in sideResults[rec.id]:
+                    sideResults[rec.id][mainForm] = [tmp_dict]
+                else:
+                    sideResults[rec.id][mainForm].append(tmp_dict)
+        
         
         # sideResults2 = dict(<plominoId> = [[{**kwargs}, ...], ...], ...)    
         sideResults2 = dict()
@@ -328,7 +344,10 @@ class plominoKin(object):
                 it = i.items() + mainDict.items()
                 aaData.append(dict([(k,v) for k,v in it]))
         
-        return aaData  
+        if json:
+            return json_dumps(aaData)
+        else:
+            return aaData  
                 
     
     def setParenthood(self, parent_id, CASCADE=True, setDocLink=False):
