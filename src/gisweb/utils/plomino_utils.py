@@ -4,7 +4,10 @@
 from Products.CMFPlomino.interfaces import IPlominoDatabase
 from Products.CMFPlomino.PlominoDocument import PlominoDocument
 
-from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate, DateTime
+from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate
+
+from DateTime import DateTime
+from DateTime.interfaces import DateError
 
 def StartDayofMonth(d):
     # return DateTime(d.year(), d.month(), 1)
@@ -13,28 +16,49 @@ def StartDayofMonth(d):
 def LastDayofMonth(d):
     return StringToDate(DateToString(StartDayofMonth(d)+32,'%m-%Y'),'%m-%Y')-1
 
-def addToDate(date, addend=0, unit='months'):
+def lookForValidDate(year, month, day, timeargs=[0, 0, 0], start=1):
+    try:
+        return DateTime(year, month, day, *timeargs) - start
+    except DateError, error:
+        day -= 1
+        test = True
+        while test:
+            try:
+                return DateTime(year, month, day, *timeargs)
+            except DateError, error:
+                day -= 1
+            else:
+                test = False
+
+def addToDate(date, addend, units='months', start=1):
+    """A DateTime may be added to a number and a number may be
+    added to a DateTime and the number is supposed to represent a number of days
+    to add to the date in the sum.
+    You can use this function to easily add other time units such as months or years.
+    Form internal conventuion is returned the first valid date before the one
+    you could expect.
+    """
+    
+    if units == 'days':
+        return date + addend
+
     year = date.year()
     month = date.month()
     day = date.day()
-    if unit == 'months':
-        year += int(addend)/12
-        month = int(month+addend)%12
-        try:
-            out = DateTime(year, month, day) - 1
-        except:
-            day -= 1
-            test = True
-            while test:
-                try:
-                    out = DateTime(year, month, day)
-                except:
-                    day -= 1
-                else:
-                    test = False
+    
+    timeargs = [date.hour(), date.minute(), date.second(), date.timezone()]
+    
+    if units == 'months':
+        new_year = year + int(addend)/12
+        new_month = int(month+addend)%12
+        return lookForValidDate(new_year, new_month, day, timeargs, start=start)
+
+    elif units == 'years':
+        new_year = year + addend
+        return lookForValidDate(new_year, month, day, timeargs, start=start)
+        
     else:
-        raise Exception('units %s is not yet implemented' % unit)
-    return out
+        raise Exception('units %s is not yet implemented' % units)
         
 def get_parent_plominodb(obj):
     ''' Return the current plominoDatabase. Is enough to pass the context from
@@ -109,6 +133,7 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
     '''
     (new_file, contenttype) = plominoDocument.setfile(submittedValue, filename=filename, overwrite=True)
     if not contenttype:
+        # then try a guess
         import cStringIO
         from plone.app.blob.utils import guessMimetype
         tmpFile = cStringIO.StringIO()

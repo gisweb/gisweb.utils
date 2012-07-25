@@ -20,7 +20,7 @@ from plomino_utils import get_docLinkInfo
 from plomino_utils import fetchDocs
 
 from plomino_utils import StartDayofMonth
-from plomino_utils import LastDayofMonth, addToDate
+from plomino_utils import LastDayofMonth, addToDate, lookForValidDate
 
 ################################################################### JSON UTILS #
 
