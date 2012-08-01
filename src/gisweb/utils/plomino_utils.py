@@ -215,10 +215,10 @@ from json_utils import json_dumps
 def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, linked=True, slow_flt=None, field_names=[], request={}, field_renderes={}, deprecated=True):
     """
     Warning: sortindex has to be unique or none (or equivalent; i.e. 0 et sim.)
-    slow_flt: "slow filter", must be a function or at least a lambda that takes
-    a dictionary with the requested field_names as keys, test the values and
-    returns a boolean.
-    Warning: sortindex values has not to be missing
+    slow_flt: "slow filter", must be a function or at least a lambda (or a list
+    of functions) that takes a dictionary with the requested field_names as keys,
+    test the values and returns a boolean.
+    Warning: sortindex values has not to be missing.
     """
     db = context.getParentDatabase()
     idx = db.getIndex()
@@ -245,7 +245,15 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
     res_list = [idx.dbsearch(req, sortindex=sortindex, reverse=reverse) for req in request]
     res = sum(res_list[1:], res_list[0])
     if slow_flt != None:
-        res = [rec for rec in res if slow_flt(rec)]
+        if isinstance(slow_flt, list):
+            res = [rec for rec in res if all([fun(rec) for fun in slow_flt])]
+#            new_res = list()
+#            for rec in res:
+#                if all([fun(rec) for fun in slow_flt]):
+#                    new_res.append(rec)
+#            res = new_res
+        else:
+            res = [rec for rec in res if slow_flt(rec)]
     
 #    if len(request) > 1:
 #        sortindex = None
@@ -426,6 +434,9 @@ class plominoKin(object):
         
         if not parent_id:
             parent_id = child.REQUEST.get(self.parentKey)
+        
+        if not parent_id:
+            raise IOError('GISWEB.UTILS ERROR: No parent id parent id given.')
         
         self.setParenthood(parent_id, **kwargs)
         parent = self.db.getDocument(child.REQUEST.get(self.parentKey))
