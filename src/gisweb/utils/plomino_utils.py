@@ -145,6 +145,14 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
     plominoDocument.setItem(itemname, current_files)
     return
 
+def fiatDoc(request, form, applyhidewhen=False):
+    db = form.getParentDatabase()
+    doc = db.createDocument()
+    form.readInputs(doc, request, applyhidewhen=applyhidewhen)
+    doc.runFormulaScript("form_%s_oncreate" % form.id, doc, form.onCreateDocument)
+    doc.save()
+    return doc.id
+
 ################################################################################
 
 def get_aaData2(brain, field_names, sortindex, reverse, enum, field_renderes):
@@ -268,8 +276,6 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
 ################################################################################
 
 def getPath(doc, virtual=False):
-    if isinstance(doc, basestring):
-        doc = self.db.getDocument(doc)
 
     if virtual:
         pd_path_list = doc.REQUEST.physicalPathToVirtualPath(doc.doc_path())
@@ -299,7 +305,7 @@ class plominoKin(object):
             self.doc = None
             
         if not self.doc:
-            raise Exception('No plominoDocument found!!')
+            raise Exception('GISWEB.UTILS ERROR: No plominoDocument found!!')
 
         self.idx = self.db.getIndex()
         for fieldname in (self.parentKey, 'CASCADE', ):
@@ -398,7 +404,14 @@ class plominoKin(object):
         
             for i in v:
                 it = i.items() + mainDict.items()
-                aaData.append(dict([(k,v) for k,v in it]))
+                aaRecord = dict()
+                for key,value in it:
+                    vtype = '%s' % type(value) # could be better to use isinstance for the test
+                    if vtype == "<type 'Missing.Value'>":
+                        value = None
+                    aaRecord[key] = value
+#                aaRecord = dict([(key,value) for key,value in it])
+                aaData.append(aaRecord)
         
         if json:
             return json_dumps(aaData)
@@ -406,8 +419,11 @@ class plominoKin(object):
             return aaData  
                 
     
-    def setParenthood(self, parent_id, CASCADE=True, setDocLink=False):
-        child = self.doc
+    def setParenthood(self, parent_id, child_id='', CASCADE=True, setDocLink=False):
+        if not child_id:
+            child = self.doc
+        else:
+            child = self.db.getDocument(child_id)
         child.setItem(self.parentKey, parent_id)
         child.setItem('CASCADE', CASCADE)
         if setDocLink:
@@ -429,17 +445,9 @@ class plominoKin(object):
                 rec.getObject().removeItem(self.parentKey)
         self.db.deleteDocuments(ids=toRemove, massive=False)
     
-    def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
-        child = self.doc
-        
-        if not parent_id:
-            parent_id = child.REQUEST.get(self.parentKey)
-        
-        if not parent_id:
-            raise IOError('GISWEB.UTILS ERROR: No parent id parent id given.')
-        
-        self.setParenthood(parent_id, **kwargs)
-        parent = self.db.getDocument(child.REQUEST.get(self.parentKey))
+    def setChildhood(self, parent_id, child_id, backToParent='anchor'):
+        parent = self.db.getDocument(parent_id)
+        child = self.db.getDocument(child_id)
         childrenList_name = self.childrenList_name % child.Form
         if not childrenList_name in parent.getItems():
             parent.setItem(childrenList_name, [])
@@ -455,6 +463,25 @@ class plominoKin(object):
             if backToParent == 'anchor':
                 backUrl = '%s#%s' % (backUrl, childrenList_name)
             child.setItem('plominoredirecturl', backUrl)
+    
+    def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
+        child = self.doc
+        
+        # if no parent_id passed
+        # first take from the child itself
+        if not parent_id:
+            parent_id = child.getItem(self.parentKey)
+        
+        # second take from the request
+        if not parent_id:
+            parent_id = child.REQUEST.get(self.parentKey)
+        
+        # no way
+        if not parent_id:
+            raise IOError('GISWEB.UTILS ERROR: Parent id not found!')
+        
+        self.setParenthood(parent_id, child.id, **kwargs)
+        self.setChildhood(parent_id, child.id, backToParent)
         
     def onsave_child(self):
         child = self.doc
@@ -508,13 +535,28 @@ class plominoKin(object):
             etichetta1 = etichetta % dizionario
             lista.append('%s|%s' % (etichetta1, getPath(obj)))
         return lista
-        
+    
+    def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
+        """Use it to create a child document from scripts
+        """
+        parent = self.doc
+        form = self.db.getForm(form_name)
+        doc = self.db.createDocument()
+        doc.setItem('Form', form_name)
+        form.readInputs(doc, request, applyhidewhen=applyhidewhen)
+        self.setParenthood(parent.id, doc.id, **kwargs)
+        self.setChildhood(parent.id, doc.id)
+        doc.save()
+        return doc.id
 
 def ondelete_parent(doc):
     plominoKin(doc).ondelete_parent()
 
 def oncreate_child(doc, **kwargs):
     plominoKin(doc).oncreate_child(**kwargs)
+
+def create_child(context, **kwargs):
+    plominoKin(context).create_child(**kwargs)
 
 def onsave_child(doc):
     plominoKin(doc).onsave_child()
