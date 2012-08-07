@@ -9,6 +9,8 @@ from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate
 from DateTime import DateTime
 from DateTime.interfaces import DateError
 
+import Missing
+
 def StartDayofMonth(d):
     # return DateTime(d.year(), d.month(), 1)
     return StringToDate(DateToString(d,'%m-%Y'),'%m-%Y')
@@ -406,6 +408,7 @@ class plominoKin(object):
                 it = i.items() + mainDict.items()
                 aaRecord = dict()
                 for key,value in it:
+#                    if isinstance(value, Missing.Value): # to be tested
                     vtype = '%s' % type(value) # could be better to use isinstance for the test
                     if vtype == "<type 'Missing.Value'>":
                         value = None
@@ -420,6 +423,9 @@ class plominoKin(object):
                 
     
     def setParenthood(self, parent_id, child_id='', CASCADE=True, setDocLink=False):
+        '''
+        Set parent reference in child document
+        '''
         if not child_id:
             child = self.doc
         else:
@@ -446,6 +452,9 @@ class plominoKin(object):
         self.db.deleteDocuments(ids=toRemove, massive=False)
     
     def setChildhood(self, parent_id, child_id, backToParent='anchor'):
+        '''
+        Set child reference on parent document
+        '''
         parent = self.db.getDocument(parent_id)
         child = self.db.getDocument(child_id)
         childrenList_name = self.childrenList_name % child.Form
@@ -537,7 +546,8 @@ class plominoKin(object):
         return lista
     
     def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
-        """Use it to create a child document from scripts
+        """
+        Use it to create a child document from scripts
         """
         parent = self.doc
         form = self.db.getForm(form_name)
