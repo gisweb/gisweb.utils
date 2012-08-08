@@ -70,6 +70,12 @@ def openUrl(url, timeout=None, **kwargs):
         return (out, '')
 
 
+################################################################### MISC UTILS #
+
+def Type(arg):
+    return '%s' % type(arg)
+
+
 ################################################################### MAIL UTILS #
 
 #def test_mail(to, mail_text=''):

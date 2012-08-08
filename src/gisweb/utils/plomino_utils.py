@@ -51,7 +51,7 @@ def addToDate(date, addend, units='months', start=1):
     timeargs = [date.hour(), date.minute(), date.second(), date.timezone()]
     
     if units == 'months':
-        new_year = year + int(addend)/12
+        new_year = year + int(month+addend)/12
         new_month = int(month+addend)%12
         return lookForValidDate(new_year, new_month, day, timeargs, start=start)
 
