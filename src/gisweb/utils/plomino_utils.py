@@ -41,6 +41,9 @@ def addToDate(date, addend, units='months', start=1):
     you could expect.
     """
     
+    if not isinstance(addend, int):
+        addend = int(addend)
+    
     if units == 'days':
         return date + addend
 
@@ -49,10 +52,14 @@ def addToDate(date, addend, units='months', start=1):
     day = date.day()
     
     timeargs = [date.hour(), date.minute(), date.second(), date.timezone()]
+    months = range(1, 13)
+    month_id = months.index(month)
+    
     
     if units == 'months':
         new_year = year + int(month+addend)/12
-        new_month = int(month+addend)%12
+        mew_month_id = (month_id+addend)%12
+        new_month = months[mew_month_id]# int(month+addend)%12
         return lookForValidDate(new_year, new_month, day, timeargs, start=start)
 
     elif units == 'years':
