@@ -19,6 +19,13 @@ def LastDayofMonth(d):
     return StringToDate(DateToString(StartDayofMonth(d)+32,'%m-%Y'),'%m-%Y')-1
 
 def lookForValidDate(year, month, day, timeargs=[0, 0, 0], start=1):
+
+    if month not in range(1, 13):
+        raise Exception('GISWEB:UTILS ERROR: Not a valid month passed: %s' % month)
+    
+    if day not in range(1, 32):
+        raise Exception('GISWEB:UTILS ERROR: Not a valid day passed: %s' % month)
+
     try:
         return DateTime(year, month, day, *timeargs) - start
     except DateError, error:
@@ -31,6 +38,24 @@ def lookForValidDate(year, month, day, timeargs=[0, 0, 0], start=1):
                 day -= 1
             else:
                 test = False
+
+def toDate(str_d):
+    formats=['%d/%m/%Y','%d-%m-%Y','%Y/%m/%d','%Y-%m-%d']
+    for format in formats:
+        try:
+            return StringToDate(data, format)
+        except:
+            pass
+            
+
+#def StringToDate2():
+#    """
+#    StringToDate in PlominoUtils seams to fail in case of the guess in line 84 in
+#    https://github.com/plomino/Plomino/blob/github-main/Products/CMFPlomino/PlominoUtils.py
+#    > dt = strptime(DateTime(str_d).ISO(), '%Y-%m-%d %H:%M:%S')
+#    the function exits with message:
+#    ValueError: time data '2012-02-09T00:00:00' does not match format '%Y-%m-%d %H:%M:%S'
+#    """
 
 def addToDate(date, addend, units='months', start=1):
     """A DateTime may be added to a number and a number may be
@@ -55,11 +80,10 @@ def addToDate(date, addend, units='months', start=1):
     months = range(1, 13)
     month_id = months.index(month)
     
-    
     if units == 'months':
         new_year = year + (month_id+addend)/12
         mew_month_id = (month_id+addend)%12
-        new_month = months[mew_month_id]# int(month+addend)%12
+        new_month = months[mew_month_id]
         return lookForValidDate(new_year, new_month, day, timeargs, start=start)
 
     elif units == 'years':
@@ -313,8 +337,8 @@ class plominoKin(object):
         else:
             self.doc = None
             
-        if not self.doc:
-            raise Exception('GISWEB.UTILS ERROR: No plominoDocument found!!')
+#        if not self.doc:
+#            raise Exception('GISWEB.UTILS ERROR: No plominoDocument found!!')
 
         self.idx = self.db.getIndex()
         for fieldname in (self.parentKey, 'CASCADE', ):
