@@ -363,7 +363,6 @@ class plominoKin(object):
             raise IOError('GISWEB.UTILS ERROR: A kay for the parent form is required!')
         
         mainResults = self.idx.dbsearch(mainRequest)
-
         # sideResults = dict(<parentId> = dict(<form_name> = [{**kwargs}, ...], ...))
         sideResults = dict()
         for form_name, sideRequest in sideRequests.items():
@@ -445,7 +444,8 @@ class plominoKin(object):
                         value = None
                     aaRecord[key] = value
 #                aaRecord = dict([(key,value) for key,value in it])
-                aaData.append(aaRecord)
+                if aaRecord:
+                    aaData.append(aaRecord)
         
         if json:
             return json_dumps(aaData)
