@@ -1,5 +1,13 @@
 <configure xmlns="http://namespaces.zope.org/zope"
-           xmlns:five="http://namespaces.zope.org/five">
+           xmlns:five="http://namespaces.zope.org/five"
+           xmlns:browser="http://namespaces.zope.org/browser">
+
+  <browser:page
+      name="reset-html-filters"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class=".browser.ResetFilters"
+      permission="cmf.ManagePortal"
+      />
 
   <five:registerPackage
       package="."
