@@ -277,7 +277,16 @@ def plominoPrint(plominoDocument, form_name=None, default_css=None, use_command=
         form_name = plominoDocument.Form
     form = plominoDatabase.getForm(form_name)
     html_content = plominoDocument.openWithForm(form)
-    
+#    html_content = '''
+#<html>
+#<head>#
+	#<link rel="stylesheet" href="/++theme++pippo/bootstrap/css/bootstrap.min.css">
+	#<link rel="stylesheet" href="/++theme++pippo/bootstrap/css/bootstrap-responsive.min.css">
+#</head>
+#<body>
+#%s
+#</body>
+#</html>''' %html_content
     if default_css:
         default_css = pisa_css + default_css
 
@@ -295,7 +304,7 @@ def plominoPrint(plominoDocument, form_name=None, default_css=None, use_command=
         input_file.write(html_content)
         input_file.close()
         xml = os.popen("xhtml2pdf --encoding %s %s -" % (encoding, SRC)).read()
-        os.remove(SRC)
+#        os.remove(SRC)
 #        output_file = open('/tmp/test_out.pdf', 'w')
 #        output_file.write(xml)
 #        output_file.close()
@@ -308,3 +317,17 @@ def plominoPrint(plominoDocument, form_name=None, default_css=None, use_command=
         xml = pdf.dest.getvalue()
     
     return xml
+
+def printToPdf(html='',default_css=None):
+#    if default_css:
+#        default_css = pisa_css + default_css
+    u_html = UnicodeDammit(html)
+    encoding = u_html.originalEncoding
+    pdf = xhtml2pdf.CreatePDF(
+        html,
+#        default_css=pisa_css,
+#        encoding = encoding
+    )
+    xml = pdf.dest.getvalue()
+    return xml
+
