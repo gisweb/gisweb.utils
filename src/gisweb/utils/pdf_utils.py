@@ -3,6 +3,7 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, KeepInFrame
+from reportlab.lib.enums import TA_CENTER
 import os
 import tempfile
 
@@ -34,6 +35,7 @@ def process_fields(data, canvas, fields, pagesize, options):
         style = ParagraphStyle(name=fieldname,
             fontSize = 12,
             fontname='Arial',
+            alignment=TA_CENTER,
             # borderWidth=4,
             # borderColor='black'
         )
@@ -43,6 +45,8 @@ def process_fields(data, canvas, fields, pagesize, options):
         k = KeepInFrame(width*mm, height*mm, [p], mode='shrink')
         w,h = k.wrapOn(canvas, bbox_tl[1]*mm, bbox_tl[0]*mm )
         vpos = pagesize[1] - bbox_tl[1]*mm - h
+        # Adjust vpos: we want vertical alignment
+        vpos -= (height*mm - h)/2.0
         k.drawOn(canvas, bbox_tl[0]*mm, vpos)
     canvas.showPage()
 
@@ -59,33 +63,53 @@ def show_in_evince(filecontents):
     os.unlink(outfile)
 
 if __name__ == '__main__':
+    # Row 1, top; Row 1, bottom
+    R1T, R1B = 41, 49
+    R2T, R2B = 63, 71 # Row 2
+    R3T, R3B = 79, 87 # Ok, you can figure it out all by yourself
+    R4T, R4B = 98, 106
+    R5T, R5B = 116, 124
+    # Firma is not dynamic, thus I don't consider it a row at all
+    R6T, R6B = 177, 185
+
+    RR = 201 # right margin (many fields aling on this margin)
+
     SANREMO_LAYOUT = {
-        'n_permesso_top': ((153, 20), (200, 27)),
-        'rilasciato': ((28,38), (53,47)),
-        'scadenza': ((74, 38), (105, 47)),
-        'categoria': ((132, 38), (158, 47)),
-        'procura': ((170, 38), (205, 47)),
-        'cognome': ((25, 61), (73, 70)),
-        'nome': ((86, 61), (137, 70)),
-        'nato_a': ((152, 61), (173, 70)),
-        'nato_il': ((178, 61), (205, 70)),
-        'numero_ff': ((28, 76), (49, 85)),
-        # 'indirizzo': ()
-        # 'civico'
-        # 'targa'
-        # 'marca'
-        # 'modello'
-        # 'colore'
-        # 'verificato'
-        # 'pagato'
-        # 'autocertificazione'
-        # 'data_ritiro'
-        # 'zona'
-        # 'data_rilascio'
-        # 'n_permesso_bottom'
-        # 'data_rilascio_bottom'
-        # 'scadenza_bottom'
-        # 'targa_bottom'
+        'n_permesso_top': ((153, 20), (RR, 27)),
+
+        'rilasciato': ((23,R1T), (57,R1B)),
+        'scadenza': ((70, R1T), (105, R1B)),
+        'categoria': ((127, R1T), (153, R1B)),
+        'procura': ((164, R1T), (RR, R1B)),
+
+        'cognome': ((25, R2T), (73, R2B)),
+        'nome': ((86, R2T), (137, R2B)),
+        'nato_a': ((147, R2T), (168, R2B)),
+        'nato_il': ((173, R2T), (RR, R2B)),
+
+        'numero_ff': ((22, R3T), (44, R3B)),
+        'indirizzo': ((56,R3T), (165,R3B)),
+        'civico': ((175,R3T), (RR,R3B)),
+
+        'targa': ((18,R4T), (57,R4B)),
+        'marca': ((66,R4T), (105,R4B)),
+        'modello': ((117,R4T), (153,R4B)),
+        'colore': ((162,R4T), (RR,R4B)),
+
+        'verificato': ((22,R5T), (56,R5B)),
+        'pagato': ((68,R5T), (104,R5B)),
+        'autocertificazione': ((127,R5T), (152,R5B)),
+        'data_ritiro': ((166,R5T), (RR,R5B)),
+
+        'zona': ((15,R6T), (99,R6B)),
+        'data_rilascio': ((115,R6T), (RR,R6B)),
+
+        'n_permesso_middle': ((156, 166), (204, 173)),
+
+        'n_permesso_bottom': ((45,244), (73,251)),
+        'data_rilascio_bottom': ((12,254), (39,258)),
+        'scadenza_bottom': ((49,254), (73,258)),
+        'targa_bottom': ((24,261), (74,270)),
     }
     test_data = {
         'n_permesso_top' : '344666',
@@ -96,27 +120,35 @@ if __name__ == '__main__':
                      'perfino questa pratica sarebbe scaduta'),
         'categoria': 'PIPPO',
         'procura': 'NO',
+
         'cognome': "Serbelloni Mazzanti Viendalmare",
         'nome': "Contessa",
         'nato_a': 'Principato degli Ulivi',
         'nato_il': '1/7/1916',
+
         'numero_ff': 'NONso',
-        # 'indirizzo':
-        # 'civico'
-        # 'targa'
-        # 'marca'
-        # 'modello'
-        # 'colore'
-        # 'verificato'
-        # 'pagato'
-        # 'autocertificazione'
-        # 'data_ritiro'
-        # 'zona'
-        # 'data_rilascio'
-        # 'n_permesso_bottom'
-        # 'data_rilascio_bottom'
-        # 'scadenza_bottom'
-        # 'targa_bottom'
+        'indirizzo': 'Testo di esempio',
+        'civico': 'Testo di esempio',
+
+        'targa': 'Testo di esempio',
+        'marca': 'Testo di esempio',
+        'modello': 'Testo di esempio',
+        'colore': 'Testo di esempio',
+
+        'verificato': 'Testo di esempio',
+        'pagato': 'Testo di esempio',
+        'autocertificazione': 'Testo di esempio',
+        'data_ritiro': 'Testo di esempio',
+
+        'n_permesso_middle': '344666',
+
+        'zona': 'Testo di esempio',
+        'data_rilascio': 'Testo di esempio',
+
+        'n_permesso_bottom': '344666',
+        'data_rilascio_bottom': 'Testo di esempio',
+        'scadenza_bottom': 'Testo di esempio',
+        'targa_bottom': 'Testo di esempio',
     }
     pdf_file = generate_pdf(test_data, SANREMO_LAYOUT)
     show_in_evince(pdf_file)
