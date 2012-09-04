@@ -270,7 +270,7 @@ class UnicodeDammit:
 def plominoPrint(plominoDocument, form_name=None, default_css=None, use_command=False):
     '''This function is for printing data from plominoDocuments rendered with the
         specified form. In the case no form is supplied the one specified in the
-        "From" propertiy is used.
+        "Form" propertiy is used.
     '''
     plominoDatabase = plominoDocument.getParentDatabase()
     if not form_name:

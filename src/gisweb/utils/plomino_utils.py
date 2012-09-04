@@ -126,7 +126,7 @@ def get_related_info(plominoDocument, clues, default=None, debug=False):
         if isinstance(clue, dict):
         
             if 'source' in clue:
-                source = db.getDocument(clue[source](plominoDocument))
+                source = db.getDocument(clue['source'](plominoDocument))
             if 'field_name' in clue:
                 field_name = clue['field_name']
         

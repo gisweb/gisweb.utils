@@ -39,7 +39,7 @@ def process_fields(data, canvas, fields, pagesize, options):
             # borderWidth=4,
             # borderColor='black'
         )
-        p = Paragraph(data[fieldname],style)
+        p = Paragraph(data.get(fieldname) or '',style)
         width = bbox_br[0] - bbox_tl[0]
         height = bbox_br[1] - bbox_tl[1]
         k = KeepInFrame(width*mm, height*mm, [p], mode='shrink')
@@ -50,8 +50,7 @@ def process_fields(data, canvas, fields, pagesize, options):
         k.drawOn(canvas, bbox_tl[0]*mm, vpos)
     canvas.showPage()
 
-def show_in_evince(filecontents):
-    bgpdf = '/tmp/abbonamento.pdf'
+def show_in_evince(filecontents, bgpdf='/tmp/abbonamento.pdf'):
     (_, outfile) = tempfile.mkstemp('page.pdf')
     (_, mypdf) = tempfile.mkstemp('page.pdf')
     with open(mypdf, 'w') as fh:
