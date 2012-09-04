@@ -92,7 +92,59 @@ def addToDate(date, addend, units='months', start=1):
         
     else:
         raise Exception('units %s is not yet implemented' % units)
+
+def get_related_info(plominoDocument, clues, default=None, debug=False):
+    '''
+    get item values from one plominoDocument itself and the related ones.
+    clues description: {<alias>: 
+        {
+            'field_name': <field_name>, # OPTIONAL
+            'source': <lambda to get source document id> # OPTIONAL
+        }
+    }
+    
+    the given lambda represent the relation between documents
+    
+    clues example: {
+        'nome': None,
+        'data1': {'field_name': 'data_nato', 
+            'source': lambda pd: pd.getItem('parentDocument')
+        },
+        'data2': {'field_name': 'data_consegna', 
+            'source': lambda pd: pd.getItem('elenco_consegne')[0]
+        }
+    }
+    return: {<alias>: <field value>}
+    '''
+    db = plominoDocument.getParentDatabase()
+    
+    out = dict()
+    for alias,clue in clues.items():
+    
+        source = None
+        field_name = None
+        if isinstance(clue, dict):
         
+            if 'source' in clue:
+                source = db.getDocument(clue[source](plominoDocument))
+            if 'field_name' in clue:
+                field_name = clue['field_name']
+        
+        if not source:
+            source = plominoDocument # at least get item from the plominoDocument itself
+        
+        if not field_name:
+            field_name = alias # at least the field name is equivalent to alias
+        
+        if debug:
+            if not field_name in source.items():
+                raise IOError('Document %s does not contain field %s' % (source.getId(), field_name))
+        
+        out[alias] = source.getItem(field_name, default)
+        
+    return out
+    
+    
 def get_parent_plominodb(obj):
     ''' Return the current plominoDatabase. Is enough to pass the context from
         within a scipt or a plominoDocument python formula.
@@ -356,7 +408,6 @@ class plominoKin(object):
             <form_name> = [(<field_name>, <unique_name>, ), (<field_name>, ), ...]
             ...
         )
-        enum = <numbering key>
         """
         import itertools
         if not 'Form' in mainRequest:

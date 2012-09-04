@@ -21,6 +21,7 @@ from plomino_utils import fetchDocs
 
 from plomino_utils import StartDayofMonth
 from plomino_utils import LastDayofMonth, addToDate, lookForValidDate
+from plomino_utils import get_related_info
 
 ################################################################### JSON UTILS #
 
@@ -42,6 +43,11 @@ from acl_utils import get_users_info
 
 from print_utils import plominoPrint
 from print_utils import UnicodeDammit
+
+
+#################################################################### PDF UTILS #
+
+from pdf_utils import generate_pdf
 
 
 ##################################################################### DB UTILS #
