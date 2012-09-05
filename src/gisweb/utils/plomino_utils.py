@@ -240,7 +240,7 @@ def fiatDoc(request, form, applyhidewhen=False):
 
 ################################################################################
 
-def get_aaData2(brains, field_names, sortindex, reverse, enum):
+def get_aaData2(brains, field_names, sortindex=None, reverse=None, enum=None):
     
     aaData = list()
     
