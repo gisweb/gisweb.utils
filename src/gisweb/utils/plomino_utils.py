@@ -245,7 +245,7 @@ def get_aaData2(brains, field_names, sortindex=None, reverse=None, enum=None):
     aaData = list()
     
     for num,rec in enumerate(brains):
-        aaRec = dict([(k, rec[k] or rec.getObject().getItem(k, '')) for k in field_names])
+        aaRec = dict([(k, rec.get(k) or rec.getObject().getItem(k, '')) for k in field_names])
         if enum:
             aaRec['_order'] = num
         
