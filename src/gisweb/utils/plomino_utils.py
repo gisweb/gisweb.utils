@@ -240,11 +240,11 @@ def fiatDoc(request, form, applyhidewhen=False):
 
 ################################################################################
 
-def get_aaData2(brain, field_names, sortindex, reverse, enum, field_renderes):
+def get_aaData2(brains, field_names, sortindex, reverse, enum):
     
     aaData = list()
     
-    for num,rec in enumerate(brain):
+    for num,rec in enumerate(brains):
         aaRec = dict([(k, rec[k] or rec.getObject().getItem(k, '')) for k in field_names])
         if enum:
             aaRec['_order'] = num

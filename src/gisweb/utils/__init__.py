@@ -16,7 +16,7 @@ from plomino_utils import get_parent_plominodb
 from plomino_utils import attachThis
 from plomino_utils import ondelete_parent, oncreate_child, onsave_child, ondelete_child, create_child
 from plomino_utils import get_children_list, get_parent
-from plomino_utils import get_docLinkInfo
+from plomino_utils import get_docLinkInfo, get_aaData2
 from plomino_utils import fetchDocs
 
 from plomino_utils import StartDayofMonth
@@ -80,6 +80,20 @@ def openUrl(url, timeout=None, **kwargs):
 
 def Type(arg):
     return '%s' % type(arg)
+
+
+################################################################### DATE UTILS #
+
+import locale
+def strftime(date, format, custom_locale):
+    '''
+    '''
+    err = None
+    try:
+        locale.setlocale(locale.LC_ALL, custom_locale)
+    except Exception, err:
+        pass
+    return date.strftime(format), err
 
 
 ################################################################### MAIL UTILS #
