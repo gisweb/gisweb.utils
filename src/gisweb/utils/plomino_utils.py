@@ -153,6 +153,46 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
     return html
 
 
+def det_gridDataFor(plominoDocument, grid_name, form_grid_name, form_fields=None, as_dict=False):
+    '''
+    formula di popolamento oggetto con dati per la mappa del tipo
+    [['label', <lat>, <lon>], ...]
+    '''
+    
+    data = []
+    
+    if plominoDocument.isNewDocument():
+        return []
+    else:
+        grid_value = plominoDocument.getItem(grid_name)
+    
+    if not grid_value:
+        return []
+    
+    db = plominoDocument.getParentDatabase()
+    grid_form = db.getForm(form_grid_name)
+    html_form =  grid_form._get_html_content()
+    r = re.compile('<span class="plominoFieldClass">([^<]+)</span>')
+    ordered_fields = [i.strip() for i in r.findall(html_form)]
+    
+    # if no form_fields list is provided all the fields are considered
+    #+ this case could be useful for converting the DataGrid native list of list
+    #+ value into a list of dictionaries passing as_dict=True
+    if form_fields:
+        idxs = [ordered_fields.index(field_name) for field_name in form_fields]
+    else:
+        idxs = range(len(ordered_fields))
+    
+    for rec in grid_value:
+        if as_dict:
+            obj = dict([(ordered_fields[n],rec[i]) for n,i in enumerate(idxs)])
+        else:
+            obj = [rec[i] for i in idx]
+        data.append(obj)
+    
+    return data
+
+
 def get_related_info(plominoDocument, clues, default=None, debug=False):
     '''
     get item values from one plominoDocument itself and the related ones.
