@@ -82,6 +82,7 @@ def openUrl(url, timeout=None, **kwargs):
 def Type(arg):
     return '%s' % type(arg)
 
+from re import compile as re_compile
 
 ################################################################### DATE UTILS #
 
