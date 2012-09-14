@@ -23,7 +23,7 @@ from plomino_utils import StartDayofMonth
 from plomino_utils import LastDayofMonth, addToDate, lookForValidDate
 from plomino_utils import get_related_info
 from plomino_utils import render_as_dataTable
-from plomino_utils import det_gridDataFor
+from plomino_utils import get_gridDataFor
 
 ################################################################### JSON UTILS #
 
