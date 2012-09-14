@@ -23,6 +23,7 @@ from plomino_utils import StartDayofMonth
 from plomino_utils import LastDayofMonth, addToDate, lookForValidDate
 from plomino_utils import get_related_info
 from plomino_utils import render_as_dataTable
+from plomino_utils import det_gridDataFor
 
 ################################################################### JSON UTILS #
 
@@ -81,8 +82,6 @@ def openUrl(url, timeout=None, **kwargs):
 
 def Type(arg):
     return '%s' % type(arg)
-
-from re import compile as re_compile
 
 ################################################################### DATE UTILS #
 
