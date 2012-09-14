@@ -169,8 +169,11 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, a
     
     if not form_name:
         form_name = plominoDocument.Form
-    grid_field = db.getForm(form_name).getFormField(grid_name)
-    grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
+    
+    if grid_name:
+        grid_field = db.getForm(form_name).getFormField(grid_name)
+        grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
+    
     if not items:
         if grid_name:
             items = [f.id for f in grid_form.getFormFields()]
