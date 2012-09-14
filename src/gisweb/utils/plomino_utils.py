@@ -11,6 +11,8 @@ from DateTime.interfaces import DateError
 
 import Missing
 
+from json_utils import json_dumps
+
 def StartDayofMonth(d):
     # return DateTime(d.year(), d.month(), 1)
     return StringToDate(DateToString(d,'%m-%Y'),'%m-%Y')
@@ -40,13 +42,22 @@ def lookForValidDate(year, month, day, timeargs=[0, 0, 0], start=1):
                 test = False
 
 def toDate(str_d):
-    formats=['%d/%m/%Y','%d-%m-%Y','%Y/%m/%d','%Y-%m-%d']
+    formats=['%d/%m/%Y', '%d-%m-%Y', '%Y/%m/%d', '%Y-%m-%d']
     for format in formats:
         try:
             return StringToDate(data, format)
         except:
             pass
-            
+
+def getItemOr(plominoDocument, item_name, default=None):
+
+    try:
+        value = plominoDocument.getItem(item_name)
+    except AttributeError, err:
+        value = default
+    
+    return value or default
+        
 
 #def StringToDate2():
 #    """
@@ -92,6 +103,55 @@ def addToDate(date, addend, units='months', start=1):
         
     else:
         raise Exception('units %s is not yet implemented' % units)
+
+def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
+    '''
+    useful params examples:
+    oLanguage = {'sUrl': '/'.join(context.getParentDatabase().absolute_url().split('/')[:-1] + ['DataTables', 'getLanguagePat'])}
+    rawparams examples:
+    """aoColumns = [
+        { "sTitle": "N° Aut.", "mDataProp": "numero_autorizzazione" },
+        { "sTitle": "Inizio validità", "mDataProp": "data_inizio_valido" },
+        { "sTitle": "Fine validità", "mDataProp": "data_fine_valido" },
+        { "mDataProp": "id", "fnRender": function (aaData, value) {return '<a href="../'+ value +'">'+ "vai all'autorizzazione" +'</a>'} }
+    ]"""
+    Warning: rawparams code will be simply queued to other parameters, do not
+    use rawparams for passing paramters already in params or in default_params such as:
+    bJQueryUI, bPaginate, bLengthChange, bFilter, bSort, bInfo, bAutoWidth.
+    '''
+    # default Plomino dataTable parameters
+    defautl_params = {
+        'bJQueryUI': True,
+        'bPaginate': True,
+        'bLengthChange': True,
+        'bFilter': True,
+        'bSort': True,
+        'bInfo': True,
+        'bAutoWidth': False
+    }
+    
+    defautl_params.update(params)
+    defautl_params = json_dumps(defautl_params)
+
+    if rawparams:
+        defautl_params = defautl_params[:-1] + ', %s' + '}'
+        defautl_params = defautl_params % rawparams
+
+    aaData = json_dumps(aaData)
+    
+    html = """<script type="text/javascript" charset="utf-8">
+        var aaData = %(aaData)s;
+        var o_%(fieldid)s_DynamicTable;
+        jq(document).ready(function() {
+        o_%(fieldid)s_DynamicTable = jq('#%(fieldid)s_table').dataTable( {
+            'aaData': %(aaData)s,
+            %(default_params)s
+            } );
+        });  
+    </script><table id='%(fieldid)s_table' class="display"></table><div style="clear: both"></div>""" % locals()
+
+    return html
+
 
 def get_related_info(plominoDocument, clues, default=None, debug=False):
     '''

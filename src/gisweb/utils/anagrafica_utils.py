@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 def is_valid_cf(cf):
-    ''' Verify the validity of an (italian) fiscal code '''
+    ''' Verify the validity of an (italian) fiscal code 
+    courtesy of: http://www.icosaedro.it/cf-pi/index.html
+    '''
 
     cf = str(cf)
 
@@ -40,7 +43,9 @@ def is_valid_cf(cf):
     return cf[-1].upper()==r1
     
 def is_valid_piva(piva):
-    ''' Vefify the validity of "partita IVA" '''
+    ''' Vefify the validity of "partita IVA"  
+    courtesy of: http://www.icosaedro.it/cf-pi/index.html
+    '''
     
     piva = str(piva)
     if len(piva) <> 11: return False
