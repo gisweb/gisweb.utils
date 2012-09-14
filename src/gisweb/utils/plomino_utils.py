@@ -9,6 +9,8 @@ from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate
 from DateTime import DateTime
 from DateTime.interfaces import DateError
 
+import re
+
 import Missing
 
 from json_utils import json_dumps
