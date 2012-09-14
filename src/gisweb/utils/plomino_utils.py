@@ -208,13 +208,15 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, a
 
     for rec in grid_value:
     
-        complete_obj = dict([(ordered_fields[i], grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])) for i in all_idxs])
+        foo = lambda i: grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])
+    
+        complete_obj = dict([(ordered_fields[i], foo(i)) for i in all_idxs])
         if smart_filter(complete_obj):
     
             if as_dict:
-                obj = dict([(ordered_fields[i], grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])) for i in idxs])
+                obj = dict([(ordered_fields[i], foo(i)) for i in idxs])
             else:
-                obj = [grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])) for i in idxs]
+                obj = [foo(i) for i in idxs]
         
             data.append(obj)
     
