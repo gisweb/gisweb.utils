@@ -173,7 +173,9 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, form_name=None, as_d
     
     db = plominoDocument.getParentDatabase()
 #    grid_form = db.getForm(form_grid_name)
-    grid_field = db.getForm(form_name or plominoDocument.Form).getFormField(grid_name)
+    if not form_name:
+        form_name = plominoDocument.Form
+    grid_field = db.getForm(form_name).getFormField(grid_name)
 #    html_form =  grid_form._get_html_content()
     
 #    r = re.compile('<span class="plominoFieldClass">([^<]+)</span>')
