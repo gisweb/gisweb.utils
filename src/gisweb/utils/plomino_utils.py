@@ -155,7 +155,7 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
     return html
 
 
-def get_gridDataFor(plominoDocument, grid_name, items=None, form_name=None, as_dict=False):
+def get_gridDataFor(plominoDocument, grid_name, items=None, as_dict=True, form_name=None):
     '''
     formula di popolamento oggetto con dati per la mappa del tipo
     [['label', <lat>, <lon>], ...]
@@ -195,7 +195,7 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, form_name=None, as_d
         if as_dict:
             obj = dict([(ordered_fields[n],rec[i]) for n,i in enumerate(idxs)])
         else:
-            obj = [rec[i] for i in idx]
+            obj = [rec[i] for i in idxs]
         data.append(obj)
     
     return data
