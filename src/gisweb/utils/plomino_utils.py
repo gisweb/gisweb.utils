@@ -155,7 +155,7 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
     return html
 
 
-def get_gridDataFor(plominoDocument, grid_name, items=None, as_dict=True, form_name=None):
+def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, as_dict=False, form_name=None):
     '''
     formula di popolamento oggetto con dati per la mappa del tipo
     [['label', <lat>, <lon>], ...]
@@ -165,38 +165,58 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, as_dict=True, form_n
     
     if plominoDocument.isNewDocument():
         return []
+    
+    if as_dict:
+        init_value = dict([(item,plominoDocument.getItem(item)) for item in items])
     else:
-        grid_value = plominoDocument.getItem(grid_name)
+        init_value = [plominoDocument.getItem(item) for item in items]
+    
+    if init_value not in (
+        dict([(item,None) for item in items]),
+        [None for item in items]
+    ):
+        data = [init_value]
+
+    grid_value = plominoDocument.getItem(grid_name)
     
     if not grid_value:
-        return []
+        return data
     
     db = plominoDocument.getParentDatabase()
-#    grid_form = db.getForm(form_grid_name)
     if not form_name:
         form_name = plominoDocument.Form
     grid_field = db.getForm(form_name).getFormField(grid_name)
-#    html_form =  grid_form._get_html_content()
+    grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
     
-#    r = re.compile('<span class="plominoFieldClass">([^<]+)</span>')
-#    ordered_fields = [i.strip() for i in r.findall(html_form)]
+#    grid_adapt = grid_form.getSettings()
     
     ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
     
     # if no items list is provided all the fields are considered
     #+ this case could be useful for converting the DataGrid native list of list
     #+ value into a list of dictionaries passing as_dict=True
+    
+    all_idxs = range(len(ordered_fields))
+    
     if items:
         idxs = [ordered_fields.index(field_name) for field_name in items]
     else:
-        idxs = range(len(ordered_fields))
+        idxs = all_idxs
     
+    if not smart_filter:
+        smart_filter = lambda rec: True
+
     for rec in grid_value:
-        if as_dict:
-            obj = dict([(ordered_fields[i],rec[i]) for i in idxs])
-        else:
-            obj = [rec[i] for i in idxs]
-        data.append(obj)
+    
+        complete_obj = dict([(ordered_fields[i], grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])) for i in all_idxs])
+        if smart_filter(complete_obj):
+    
+            if as_dict:
+                obj = dict([(ordered_fields[i], grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])) for i in idxs])
+            else:
+                obj = [grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])) for i in idxs]
+        
+            data.append(obj)
     
     return data
 
