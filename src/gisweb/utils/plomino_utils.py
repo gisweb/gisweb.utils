@@ -155,7 +155,7 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
     return html
 
 
-def get_gridDataFor(plominoDocument, grid_name, form_grid_name, form_fields=None, as_dict=False):
+def get_gridDataFor(plominoDocument, grid_name, items=None, form_name=None, as_dict=False):
     '''
     formula di popolamento oggetto con dati per la mappa del tipo
     [['label', <lat>, <lon>], ...]
@@ -172,16 +172,20 @@ def get_gridDataFor(plominoDocument, grid_name, form_grid_name, form_fields=None
         return []
     
     db = plominoDocument.getParentDatabase()
-    grid_form = db.getForm(form_grid_name)
-    html_form =  grid_form._get_html_content()
-    r = re.compile('<span class="plominoFieldClass">([^<]+)</span>')
-    ordered_fields = [i.strip() for i in r.findall(html_form)]
+#    grid_form = db.getForm(form_grid_name)
+    grid_field = db.getForm(form_name or plominoDocument.Form).getFormField(grid_name)
+#    html_form =  grid_form._get_html_content()
     
-    # if no form_fields list is provided all the fields are considered
+#    r = re.compile('<span class="plominoFieldClass">([^<]+)</span>')
+#    ordered_fields = [i.strip() for i in r.findall(html_form)]
+    
+    ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
+    
+    # if no items list is provided all the fields are considered
     #+ this case could be useful for converting the DataGrid native list of list
     #+ value into a list of dictionaries passing as_dict=True
-    if form_fields:
-        idxs = [ordered_fields.index(field_name) for field_name in form_fields]
+    if items:
+        idxs = [ordered_fields.index(field_name) for field_name in items]
     else:
         idxs = range(len(ordered_fields))
     
