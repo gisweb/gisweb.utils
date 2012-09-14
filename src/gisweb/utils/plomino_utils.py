@@ -193,7 +193,7 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, as_dict=True, form_n
     
     for rec in grid_value:
         if as_dict:
-            obj = dict([(ordered_fields[n],rec[i]) for n,i in enumerate(idxs)])
+            obj = dict([(ordered_fields[i],rec[i]) for i in idxs])
         else:
             obj = [rec[i] for i in idxs]
         data.append(obj)
