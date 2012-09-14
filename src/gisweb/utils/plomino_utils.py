@@ -167,6 +167,9 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, a
     if plominoDocument.isNewDocument():
         return []
     
+    if not form_name:
+        form_name = plominoDocument.Form
+    grid_field = db.getForm(form_name).getFormField(grid_name)
     grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
     if not items:
         if grid_name:
@@ -193,10 +196,6 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, a
     
     if not grid_value:
         return data
-    
-    if not form_name:
-        form_name = plominoDocument.Form
-    grid_field = db.getForm(form_name).getFormField(grid_name)
     
     ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
     
