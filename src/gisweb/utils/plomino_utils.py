@@ -155,16 +155,25 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
     return html
 
 
-def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, as_dict=False, form_name=None):
+def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, as_dict=False, form_name=None, sub_form_name=None):
     '''
     formula di popolamento oggetto con dati per la mappa del tipo
     [['label', <lat>, <lon>], ...]
     '''
     
     data = []
+    db = plominoDocument.getParentDatabase()
     
     if plominoDocument.isNewDocument():
         return []
+    
+    if not items:
+        if grid_name:
+            grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
+            items = [f.id for f in grid_form.getFormFields()]
+        else:
+            sub_frm = db.getForm(sub_form_name)
+            items = [f.id for f in sub_frm.getFormFields()]
     
     if as_dict:
         init_value = dict([(item,plominoDocument.getItem(item)) for item in items])
@@ -177,18 +186,17 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, a
     ):
         data = [init_value]
 
+    if not grid_name:
+        return data
+
     grid_value = plominoDocument.getItem(grid_name)
     
     if not grid_value:
         return data
     
-    db = plominoDocument.getParentDatabase()
     if not form_name:
         form_name = plominoDocument.Form
     grid_field = db.getForm(form_name).getFormField(grid_name)
-    grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
-    
-#    grid_adapt = grid_form.getSettings()
     
     ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
     
@@ -208,7 +216,11 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, a
 
     for rec in grid_value:
     
-        foo = lambda i: grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])
+        def foo(i):
+            if rec[i]:
+                return grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])
+            else:
+                return rec[i]
     
         complete_obj = dict([(ordered_fields[i], foo(i)) for i in all_idxs])
         if smart_filter(complete_obj):
