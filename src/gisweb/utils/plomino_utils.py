@@ -255,7 +255,7 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
         items = [f.id for f in sub_form.getFormFields(includesubforms=True)]
 
     if grid_name:
-        data_from_grid = get_gridDataFor_old(plominoDocument,
+        data_from_grid = get_gridDataFor(plominoDocument,
             grid_name=grid_name,
             items=items,
             filter_function=filter_function,
