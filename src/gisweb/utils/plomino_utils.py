@@ -169,26 +169,40 @@ def renderItem(field_value, field_name, form, raise_error=False):
             raise myException
 
 
-def renderRaw(rec, columns, form, render='as_list', raise_error=False):
+def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
     '''
     render a dataGrid record
     '''
     
-    list_render = lambda x, y: renderItem(x, y, form, raise_error=raise_error)
-    dict_render = lambda x, y: (y, renderItem(x, y, form, raise_error=raise_error), )
+#    list_render = lambda x, y: renderItem(x, y, form, raise_error=raise_error)
+#    dict_render = lambda x, y: (y, renderItem(x, y, form, raise_error=raise_error), )
     
-    if isinstance(render, basestring):
-        if render == 'as_list':
-            out_raw = map(list_render, rec, columns)
-            
-        elif render == 'as_dict':
-            out_raw = dict(map(dict_render, rec, columns))        
-    else:
-        out_raw = dict(map(dict_render, rec, columns))
-        rendered_html = render.displayDocument(None, request=out_raw)
-        out_raw.append(rendered_html)
-    return out_raw
+    def get_element(item_name):
+        field_value = rec[columns.index(item_name)]
+        element = renderItem(field_value, item_name, form, raise_error=raise_error)
+        return element
+
+    ll = list()
+    ld = list()
+    for item_name in items:
+        element = get_element(item_name)
+        ll.append(element)
+        ld.append((item_name, element, ))
+
+    if render == 'as_list':
+        return ll
+
+    dd = dict(ld)
+        
+    if hasattr(render, displayDocument):
+        rendered_html = render.displayDocument(None, request=dd)
+        return ll + [rendered_html]
     
+    if render == 'as_dict':
+        return dd
+        
+    return ll
+
 
 def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', filter_function=False, form_name=None, raise_error=False):
     '''
@@ -227,7 +241,6 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
             filter_arg = dict(map(dict_render, rec, all_ordered_fields))
             if not filter_function(filter_arg):
                 continue
-        
         out_raw = renderRaw(rec, all_ordered_fields, grid_form, render=render, raise_error=raise_error)
         out.append(out_raw)
     
@@ -268,6 +281,8 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
 
     init_rec = dict([(k, plominoDocument.getItem(k)) for k in items])
     if any(init_rec.values()):
+        init_raw = renderRaw(rec, columns, form, render='as_list', raise_error=False)
+        
         init_raw = render_raw(init_rec, fields=items, render=render, raise_error=raise_error)
         data_from_grid.insert(0, init_raw)
     
