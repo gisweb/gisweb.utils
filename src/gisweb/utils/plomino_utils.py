@@ -164,7 +164,7 @@ def renderItem(field_value, field_name, form, raise_error=False):
         return form.getFormField(field_name).getSettings().processInput(field_name)
     except Exception as myException:
         if not raise_error:
-            return 'Error: %s' % err
+            return '%s' % myException
         else:
             raise myException
 
