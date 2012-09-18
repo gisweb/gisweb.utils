@@ -154,11 +154,14 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
 
     return html
 
-def renderItem(field_name, field_value, raise_error=False):
+def renderItem(field_value, field_name, form, raise_error=False):
+    '''
+    render the field value according to the given form
+    '''
     if not field_value:
         return field_value
     try:
-        return grid_form.getFormField(field_name).getSettings().processInput(field_name)
+        return form.getFormField(field_name).getSettings().processInput(field_name)
     except Exception as myException:
         if not raise_error:
             return 'Error: %s' % err
@@ -166,21 +169,23 @@ def renderItem(field_name, field_value, raise_error=False):
             raise myException
 
 
-def render_raw(rec, fields=None, render='as_list', raise_error=False):
+def renderRaw(rec, columns, form, render='as_list', raise_error=False):
     '''
     render a dataGrid record
     '''
+    
+    list_render = lambda x, y: renderItem(x, y, form, raise_error=raise_error)
+    dict_render = lambda x, y: (y, renderItem(x, y, form, raise_error=raise_error), )
+    
     if isinstance(render, basestring):
         if render == 'as_list':
-            out_raw = [renderItem(fields[i], rec[i], raise_error=raise_error) for i in idxs]
+            out_raw = map(list_render, rec, columns)
+            
         elif render == 'as_dict':
-            out_raw = dict([(fields[i], renderItem(fields[i], rec[i], raise_error=raise_error)) for i in idxs])
+            out_raw = dict(map(dict_render, rec, columns))        
     else:
-        out_raw = [renderItem(fields[i], rec[i], raise_error=raise_error) for i in idxs]
-        request = dict([(fields[i], renderItem(
-            fields[i], rec[i], raise_error=raise_error
-        )) for i in all_idxs])
-        rendered_html = render.displayDocument(None, request=request)
+        out_raw = dict(map(dict_render, rec, columns))
+        rendered_html = render.displayDocument(None, request=out_raw)
         out_raw.append(rendered_html)
     return out_raw
     
@@ -201,32 +206,29 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
     grid_field = db.getForm(form_name).getFormField(grid_name)
     grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
     grid_value = plominoDocument.getItem(grid_name)
+    
     all_ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
     all_idxs = range(len(all_ordered_fields))
     
     # if no item given all associated form fields are considered
     if not items:
-        items = [f.id for f in grid_form.getFormFields()]
+        items = all_ordered_fields
         idxs = all_idxs
     else:
         idxs = [all_ordered_fields.index(field_name) for field_name in items]
     
     out = list() # output init
     
-    def renderItem(field_name, field_value):
-        if not field_value:
-            return field_value
-        else:
-            return grid_form.getFormField(field_name).getSettings().processInput(field_name)
     
+    dict_render = lambda x, y: (y, renderItem(x, y, grid_form, raise_error=raise_error), )
     for rec in grid_value:
     
         if filter_function:
-            filter_arg = dict([(all_ordered_fields[i], foo(i)) for i in all_idxs])
+            filter_arg = dict(map(dict_render, rec, all_ordered_fields))
             if not filter_function(filter_arg):
                 continue
         
-        out_raw = render_raw(rec, fields=items, render=render, raise_error=raise_error)
+        out_raw = renderRaw(rec, all_ordered_fields, grid_form, render=render, raise_error=raise_error)
         out.append(out_raw)
     
     return out
