@@ -241,7 +241,7 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
             filter_arg = dict(map(dict_render, rec, all_ordered_fields))
             if not filter_function(filter_arg):
                 continue
-        out_raw = renderRaw(rec, all_ordered_fields, grid_form, render=render, raise_error=raise_error)
+        out_raw = renderRaw(rec, all_ordered_fields, items, grid_form, render=render, raise_error=raise_error)
         out.append(out_raw)
     
     return out
