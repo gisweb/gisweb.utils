@@ -202,7 +202,7 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
     grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
     grid_value = plominoDocument.getItem(grid_name)
     all_ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
-    all_idxs = range(len(ordered_fields))
+    all_idxs = range(len(all_ordered_fields))
     
     # if no item given all associated form fields are considered
     if not items:
@@ -222,7 +222,7 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
     for rec in grid_value:
     
         if filter_function:
-            filter_arg = dict([(ordered_fields[i], foo(i)) for i in all_idxs])
+            filter_arg = dict([(all_ordered_fields[i], foo(i)) for i in all_idxs])
             if not filter_function(filter_arg):
                 continue
         
