@@ -262,9 +262,12 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
         form = db.getForm(form_name or plominoDocument.Form)
         grid_field = form.getFormField(grid_name)
         sub_form_name = grid_field.getSettings(key='associated_form')
+        sub_form = db.getForm(sub_form_name)
+        columns = grid_field.getSettings(key='field_mapping').split(',')
     else:
         sub_form_name = where
-    sub_form = db.getForm(sub_form_name)
+        sub_form = db.getForm(sub_form_name)
+        columns = sub_form.getItems()
 
     if not items:
         items = [f.id for f in sub_form.getFormFields(includesubforms=True)]
@@ -283,7 +286,7 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     if any(init_rec.values()):
         init_raw = renderRaw(init_rec, columns, form, render='as_list', raise_error=False)
         
-        init_raw = render_raw(init_rec, fields=items, render=render, raise_error=raise_error)
+#        init_raw = render_raw(init_rec, fields=items, render=render, raise_error=raise_error)
         data_from_grid.insert(0, init_raw)
     
     return data_from_grid
