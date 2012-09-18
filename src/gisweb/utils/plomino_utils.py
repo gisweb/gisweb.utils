@@ -154,8 +154,123 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
 
     return html
 
+def renderItem(field_name, field_value, raise_error=False):
+    if not field_value:
+        return field_value
+    try:
+        return grid_form.getFormField(field_name).getSettings().processInput(field_name)
+    except Exception as myException:
+        if not raise_error:
+            return 'Error: %s' % err
+        else:
+            raise myException
 
-def get_gridDataFor(plominoDocument, grid_name, items=None, smart_filter=None, as_dict=False, form_name=None, sub_form_name=None):
+
+def render_raw(rec, fields=None, render='as_list', raise_error=False):
+    '''
+    render a dataGrid record
+    '''
+    if isinstance(render, basestring):
+        if render == 'as_list':
+            out_raw = [renderItem(fields[i], rec[i], raise_error=raise_error) for i in idxs]
+        elif render == 'as_dict':
+            out_raw = dict([(fields[i], renderItem(fields[i], rec[i], raise_error=raise_error)) for i in idxs])
+    else:
+        out_raw = [renderItem(fields[i], rec[i], raise_error=raise_error) for i in idxs]
+        request = dict([(fields[i], renderItem(
+            fields[i], rec[i], raise_error=raise_error
+        )) for i in all_idxs])
+        rendered_html = render.displayDocument(None, request=request)
+        out_raw.append(rendered_html)
+    return out_raw
+    
+
+def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', filter_function=False, form_name=None, raise_error=False):
+    '''
+    render = 'as_list' or 'as_dict' or <plominoForm>
+    
+    returns:
+        - [[<item_value_1>, <item_value_2>, <item_value_3>, ...], ...] # as_list
+        - [{'<item_1>': <item_value_1>, ...}, ...] # as_dict
+        - [[<item_value_1>, <item_value_2>, <html>], ...]
+    
+    '''
+    db = plominoDocument.getParentDatabase()
+    if not form_name:
+        form_name = plominoDocument.Form
+    grid_field = db.getForm(form_name).getFormField(grid_name)
+    grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
+    grid_value = plominoDocument.getItem(grid_name)
+    all_ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
+    all_idxs = range(len(ordered_fields))
+    
+    # if no item given all associated form fields are considered
+    if not items:
+        items = [f.id for f in grid_form.getFormFields()]
+        idxs = all_idxs
+    else:
+        idxs = [all_ordered_fields.index(field_name) for field_name in items]
+    
+    out = list() # output init
+    
+    def renderItem(field_name, field_value):
+        if not field_value:
+            return field_value
+        else:
+            return grid_form.getFormField(field_name).getSettings().processInput(field_name)
+    
+    for rec in grid_value:
+    
+        if filter_function:
+            filter_arg = dict([(ordered_fields[i], foo(i)) for i in all_idxs])
+            if not filter_function(filter_arg):
+                continue
+        
+        out_raw = render_raw(rec, fields=items, render=render, raise_error=raise_error)
+        out.append(out_raw)
+    
+    return out
+    
+def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=False):
+    '''
+    "where" must be an item name (of type dataGrid) or at least a form name used
+    as sub form in form (whom name is given in form_name or corresponds to
+    plominoDocument.Form)
+    '''
+    
+    grid_name = None
+    sub_form_name = None
+    if where in plominoDocument.getItems():
+        grid_name = where
+        db = plominoDocument.getParentDatabase()
+        sub_form_name = grid_field.getSettings(key='associated_form')
+    else:
+        sub_form_name = where
+    sub_form = db.getForm(sub_form_name)
+
+    if not items:
+        items = [f.id for f in sub_form.getFormFields(includesubforms=True)]
+
+    if grid_name:
+        data_from_grid = get_gridDataFor_old(plominoDocument,
+            grid_name=grid_name,
+            items=items,
+            filter_function=filter_function,
+            render=render,
+            form_name=form_name,
+            raise_error=False
+        )
+
+    init_rec = dict([(k, plominoDocument.getItem(k)) for k in items])
+    if any(init_rec.values()):
+        init_raw = render_raw(init_rec, fields=items, render=render, raise_error=raise_error)
+        data_from_grid.insert(0, init_raw)
+    
+    return data_from_grid
+
+    
+
+def get_gridDataFor_old(plominoDocument, grid_name, items=None, smart_filter=None, as_dict=False, form_name=None, sub_form_name=None):
     '''
     formula di popolamento oggetto con dati per la mappa del tipo
     [['label', <lat>, <lon>], ...]
