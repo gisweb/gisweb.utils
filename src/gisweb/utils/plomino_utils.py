@@ -199,7 +199,7 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
 
     dd = dict(ld)
         
-    if hasattr(render, displayDocument):
+    if hasattr(render, 'displayDocument'):
         rendered_html = render.displayDocument(None, request=dd)
         return ll + [rendered_html]
     
