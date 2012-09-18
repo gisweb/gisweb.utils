@@ -158,16 +158,17 @@ def renderItem(field_value, field_name, form, raise_error=False, default=None):
     '''
     render the field value according to the given form
     '''
-    if not field_value:
-        return default
-    try:
-        return form.getFormField(field_name).getSettings().processInput(field_name)
-    except Exception as myException:
-        return field_value
-#        if not raise_error:
-#            return '%s' % myException
-#        else:
-#            raise myException
+    return field_value
+#    if not field_value:
+#        return default
+#    try:
+#        return form.getFormField(field_name).getSettings().processInput(field_name)
+#    except Exception as myException:
+#        return field_value
+##        if not raise_error:
+##            return '%s' % myException
+##        else:
+##            raise myException
 
 
 def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
