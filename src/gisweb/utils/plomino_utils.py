@@ -75,7 +75,7 @@ def addToDate(date, addend, units='months', start=1):
     added to a DateTime and the number is supposed to represent a number of days
     to add to the date in the sum.
     You can use this function to easily add other time units such as months or years.
-    Form internal conventuion is returned the first valid date before the one
+    Form internal convention by default is returned the first valid date before the one
     you could expect.
     """
     
@@ -154,12 +154,12 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
 
     return html
 
-def renderItem(field_value, field_name, form, raise_error=False):
+def renderItem(field_value, field_name, form, raise_error=False, default=None):
     '''
     render the field value according to the given form
     '''
     if not field_value:
-        return field_value
+        return default
     try:
         return form.getFormField(field_name).getSettings().processInput(field_name)
     except Exception as myException:
@@ -171,7 +171,11 @@ def renderItem(field_value, field_name, form, raise_error=False):
 
 def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
     '''
-    render a dataGrid record
+    render a dataGrid like record
+    rec = [[...], ...]
+    columns: a list of item names
+    form: a plominoForm
+    render: could be a string like "as_list" or "as_dict" or a plominoForm
     '''
     
 #    list_render = lambda x, y: renderItem(x, y, form, raise_error=raise_error)
@@ -217,33 +221,34 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
     db = plominoDocument.getParentDatabase()
     if not form_name:
         form_name = plominoDocument.Form
-    grid_field = db.getForm(form_name).getFormField(grid_name)
-    grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
-    grid_value = plominoDocument.getItem(grid_name)
     
-    all_ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
-    all_idxs = range(len(all_ordered_fields))
+    grid_field = db.getForm(form_name).getFormField(grid_name)
+    grid_form_name = grid_field.getSettings(key='associated_form')
+    grid_form = db.getForm(grid_form_name)
+    grid_value = plominoDocument.getItem(grid_name, [])
+    
+    columns = grid_field.getSettings(key='field_mapping').split(',')
+    all_idxs = range(len(columns))
     
     # if no item given all associated form fields are considered
     if not items:
-        items = all_ordered_fields
+        items = columns
         idxs = all_idxs
     else:
-        idxs = [all_ordered_fields.index(field_name) for field_name in items]
+        idxs = [columns.index(field_name) for field_name in items]
     
     out = list() # output init
-    
-    
-    dict_render = lambda x, y: (y, renderItem(x, y, grid_form, raise_error=raise_error), )
+    dict_render = lambda v, n: (n, renderItem(v, n, grid_form, raise_error=raise_error), )
     for rec in grid_value:
-    
+
         if filter_function:
-            filter_arg = dict(map(dict_render, rec, all_ordered_fields))
+            filter_arg = dict(map(dict_render, rec, columns))
             if not filter_function(filter_arg):
                 continue
-        out_raw = renderRaw(rec, all_ordered_fields, items, grid_form, render=render, raise_error=raise_error)
+
+        out_raw = renderRaw(rec, columns, items, grid_form, render=render, raise_error=raise_error)
         out.append(out_raw)
-    
+
     return out
     
 def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=False):
@@ -256,6 +261,7 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     grid_name = None
     sub_form_name = None
     
+    # data in dataGrid field?
     if where in plominoDocument.getItems():
         grid_name = where
         db = plominoDocument.getParentDatabase()
@@ -264,6 +270,7 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
         sub_form_name = grid_field.getSettings(key='associated_form')
         sub_form = db.getForm(sub_form_name)
         columns = grid_field.getSettings(key='field_mapping').split(',')
+    # else data comes from fields in a sub Form
     else:
         sub_form_name = where
         sub_form = db.getForm(sub_form_name)
@@ -276,17 +283,15 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
         data_from_grid = get_gridDataFor(plominoDocument,
             grid_name=grid_name,
             items=items,
-            filter_function=filter_function,
             render=render,
+            filter_function=filter_function,
             form_name=form_name,
-            raise_error=False
+            raise_error=raise_error
         )
 
     init_rec = dict([(k, plominoDocument.getItem(k)) for k in items])
     if any(init_rec.values()):
-        init_raw = renderRaw(init_rec, columns, form, render='as_list', raise_error=False)
-        
-#        init_raw = render_raw(init_rec, fields=items, render=render, raise_error=raise_error)
+        init_raw = renderRaw(init_rec, columns, sub_form, render=render, raise_error=raise_error)
         data_from_grid.insert(0, init_raw)
     
     return data_from_grid
