@@ -21,7 +21,7 @@ def exportElementAsXML(obj, xmldoc=None):
     
     if not xmldoc:
         impl = getDOMImplementation()
-        xmldoc = implself.createDocument(None, "plominoform", None)
+        xmldoc = impl.createDocument(None, "plominoform", None)
     
     isDatabase=False
     if isDatabase:
