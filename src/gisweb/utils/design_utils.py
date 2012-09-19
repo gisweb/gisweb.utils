@@ -4,6 +4,7 @@
 from xml.dom.minidom import getDOMImplementation, parseString
 from Products.CMFPlomino.PlominoDesignManager import plomino_schemas, extra_schema_attributes
 import xmlrpclib
+from zope import component
 
 #def exportElementAsXML(form, prefix=''):
 
