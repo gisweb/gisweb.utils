@@ -5,7 +5,7 @@ from xml.dom.minidom import getDOMImplementation
 
 def exportElementAsXML(form, prefix=''):
 
-    db = plominoForm.getParentDatabase()
+    db = form.getParentDatabase()
 
     impl = getDOMImplementation()
     xmlform = impl.createDocument(None, "plominoform", None)
