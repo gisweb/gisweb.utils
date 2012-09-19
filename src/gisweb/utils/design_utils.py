@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from xml.dom.minidom import getDOMImplementation
-from Products.CMFPlomino import PlominoDesignManager
+from Products.CMFPlomino.PlominoDesignManager import plomino_schemas
 
 #def exportElementAsXML(form, prefix=''):
 
