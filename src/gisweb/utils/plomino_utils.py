@@ -298,7 +298,7 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
         )
 
 #    init_rec = dict([(k, plominoDocument.getItem(k)) for k in items])
-    init_rec = [plominoDocument.getItem(k) for k in items]
+    init_rec = [plominoDocument.getItem(k) for k in columns]
     if any(init_rec):
         init_raw = renderRaw(init_rec, columns, items, sub_form, render=render, raise_error=raise_error)
         data_from_grid.insert(0, init_raw)
