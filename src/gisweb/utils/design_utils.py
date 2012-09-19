@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from xml.dom.minidom import getDOMImplementation
+from xml.dom.minidom import getDOMImplementation, parseString
 from Products.CMFPlomino.PlominoDesignManager import plomino_schemas, extra_schema_attributes
 
 #def exportElementAsXML(form, prefix=''):
@@ -15,12 +15,13 @@ from Products.CMFPlomino.PlominoDesignManager import plomino_schemas, extra_sche
 
 #    return xml
 
-def exportElementAsXML(obj, doctype="plominoform"):
+def exportElementAsXML(obj, xmldoc=None):
     """
     """
     
-    impl = getDOMImplementation()
-    xmldoc = impl.createDocument(None, doctype, None)
+    if not xmldoc:
+        impl = getDOMImplementation()
+        xmldoc = implself.createDocument(None, "plominoform", None)
     
     isDatabase=False
     if isDatabase:
@@ -84,7 +85,7 @@ def exportElementAsXML(obj, doctype="plominoform"):
         if len(elementslist)>0:
             elements = xmldoc.createElement('elements')
             for id in elementslist:
-                elementNode = exportElementAsXML(xmldoc, getattr(obj, id))
+                elementNode = exportElementAsXML(getattr(obj, id), xmldoc=xmldoc)
                 elements.appendChild(elementNode)
             node.appendChild(elements)
 
