@@ -22,17 +22,17 @@ def exportElementAsXML(obj, doctype="plominoform"):
     impl = getDOMImplementation()
     xmldoc = impl.createDocument(None, doctype, None)
     
-#    isDatabase=False
-#    if isDatabase:
-#        node = xmldoc.createElement('dbsettings')
-#        schema = sys.modules[self.__module__].schema
-#    else:
-    node = xmldoc.createElement('element')
-    node.setAttribute('id', obj.id)
-    node.setAttribute('type', obj.Type())
-    title = obj.title
-    node.setAttribute('title', title)
-    schema = plomino_schemas[obj.Type()]
+    isDatabase=False
+    if isDatabase:
+        node = xmldoc.createElement('dbsettings')
+        schema = sys.modules[self.__module__].schema
+    else:
+        node = xmldoc.createElement('element')
+        node.setAttribute('id', obj.id)
+        node.setAttribute('type', obj.Type())
+        title = obj.title
+        node.setAttribute('title', title)
+        schema = plomino_schemas[obj.Type()]
 
     for f in schema.fields():
         fieldNode = xmldoc.createElement(f.getName())
