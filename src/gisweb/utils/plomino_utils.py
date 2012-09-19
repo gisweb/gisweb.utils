@@ -268,10 +268,11 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     grid_name = None
     sub_form_name = None
     
+    db = plominoDocument.getParentDatabase()
+    
     # data in dataGrid field?
     if where in plominoDocument.getItems():
         grid_name = where
-        db = plominoDocument.getParentDatabase()
         form = db.getForm(form_name or plominoDocument.Form)
         grid_field = form.getFormField(grid_name)
         sub_form_name = grid_field.getSettings(key='associated_form')
