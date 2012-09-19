@@ -299,9 +299,10 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     else:
         data_from_grid = list()
 
+    
 #    init_rec = dict([(k, plominoDocument.getItem(k)) for k in items])
-    init_rec = [plominoDocument.getItem(k) for k in columns]
-    if any(init_rec):
+    if any([i in plominoDocument.getItems() for i in items]):
+        init_rec = [plominoDocument.getItem(k) for k in columns]
         init_raw = renderRaw(init_rec, columns, items, sub_form, render=render, raise_error=raise_error)
         data_from_grid.insert(0, init_raw)
     
