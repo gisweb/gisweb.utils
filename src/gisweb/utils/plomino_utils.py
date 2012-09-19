@@ -282,10 +282,10 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     else:
         sub_form_name = where
         sub_form = db.getForm(sub_form_name)
-        columns = sub_form.getFormFields(includesubforms=True)
+        columns = [f.id for f in sub_form.getFormFields(includesubforms=True)]
 
     if not items:
-        items = [f.id for f in sub_form.getFormFields(includesubforms=True)]
+        items = columns
 
     if grid_name:
         data_from_grid = get_gridDataFor(plominoDocument,
