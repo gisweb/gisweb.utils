@@ -306,10 +306,9 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     
     return data_from_grid
 
-    
-
 def get_gridDataFor_old(plominoDocument, grid_name, items=None, smart_filter=None, as_dict=False, form_name=None, sub_form_name=None):
     '''
+    DEPRECATED!!!
     formula di popolamento oggetto con dati per la mappa del tipo
     [['label', <lat>, <lon>], ...]
     '''
