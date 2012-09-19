@@ -83,6 +83,7 @@ def exportElementAsXML(obj, xmldoc=None):
                 except ExpatError:
                     dom_items = parseString(escape_xml_illegal_chars(str_items))
                 node.appendChild(dom_items.documentElement)
+
     if not isDatabase:
         elementslist = obj.objectIds()
         if len(elementslist)>0:
