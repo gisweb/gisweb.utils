@@ -83,7 +83,7 @@ def openUrl(url, timeout=None, **kwargs):
 def Type(arg):
     return '%s' % type(arg)
 
-from design_utils import exportElementAsXML
+#from design_utils import exportElementAsXML
 
 ################################################################### DATE UTILS #
 
