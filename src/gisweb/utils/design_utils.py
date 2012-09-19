@@ -84,7 +84,7 @@ def exportElementAsXML(obj, doctype="plominoform"):
         if len(elementslist)>0:
             elements = xmldoc.createElement('elements')
             for id in elementslist:
-                elementNode = self.exportElementAsXML(xmldoc, getattr(obj, id))
+                elementNode = exportElementAsXML(xmldoc, getattr(obj, id))
                 elements.appendChild(elementNode)
             node.appendChild(elements)
 
