@@ -10,6 +10,6 @@ def exportElementAsXML(form, prefix=''):
     impl = getDOMImplementation()
     xmlform = impl.createDocument(None, "plominoform", None)
 
-    xml = db.exportElementAsXML(self, xmlform, form, isDatabase=False)
+    xml = db.exportElementAsXML(xmlform, form, isDatabase=False)
 
     return xml
