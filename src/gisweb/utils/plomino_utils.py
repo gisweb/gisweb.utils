@@ -218,6 +218,10 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
         - [[<item_value_1>, <item_value_2>, <html>], ...]
     
     '''
+    
+    if plominoDocument.isNewDocument():
+        return list()
+    
     db = plominoDocument.getParentDatabase()
     if not form_name:
         form_name = plominoDocument.Form
@@ -257,6 +261,9 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     as sub form in form (whom name is given in form_name or corresponds to
     plominoDocument.Form)
     '''
+    
+    if plominoDocument.isNewDocument():
+        return list()
     
     grid_name = None
     sub_form_name = None
