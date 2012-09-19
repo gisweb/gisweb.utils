@@ -296,6 +296,8 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
             form_name=form_name,
             raise_error=raise_error
         )
+    else:
+        data_from_grid = list()
 
 #    init_rec = dict([(k, plominoDocument.getItem(k)) for k in items])
     init_rec = [plominoDocument.getItem(k) for k in columns]
