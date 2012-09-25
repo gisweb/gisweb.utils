@@ -169,7 +169,7 @@ def renderItem(field_value, field_name, form, raise_error=False, default=None):
             raise myException
 
 
-def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
+def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, default_item_value=None):
     '''
     render a dataGrid like record
     rec = [[...], ...]
@@ -183,7 +183,7 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
     
     def get_element(item_name):
         field_value = rec[columns.index(item_name)]
-        element = renderItem(field_value, item_name, form, raise_error=raise_error)
+        element = renderItem(field_value, item_name, form, raise_error=raise_error, default=default_item_value)
         return element
 
     ll = list()
@@ -206,7 +206,7 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
     if hasattr(render, 'displayDocument'):
         replacements = [('\n', '', ), ('\r', '', ), ('\t', '', )]
         rendered_html = render.displayDocument(None, request=dd)
-        cleaned_html = multireplace(rendered_html, replacements)
+        cleaned_html = '"%s"' % multireplace(rendered_html, replacements)
         return ll + [cleaned_html]
     
     if render == 'as_dict':
@@ -215,7 +215,7 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
     return ll
 
 
-def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', filter_function=False, form_name=None, raise_error=False):
+def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', filter_function=False, form_name=None, raise_error=False, default_item_value=None):
     '''
     render = 'as_list', 'as_dict', <plominoForm>
     
@@ -250,8 +250,10 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
     
     out = list() # output init
     dict_render = lambda v, n: (n, renderItem(v, n, grid_form, raise_error=raise_error), )
+    
     if render == 'as_form':
         render = grid_form
+    
     for rec in grid_value:
 
         if filter_function:
@@ -259,12 +261,12 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
             if not filter_function(filter_arg):
                 continue
 
-        out_raw = renderRaw(rec, columns, items, grid_form, render=render, raise_error=raise_error)
+        out_raw = renderRaw(rec, columns, items, grid_form, render=render, raise_error=raise_error, default_item_value=default_item_value)
         out.append(out_raw)
 
     return out
     
-def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=False):
+def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=True, default_item_value=''):
     '''
     "where" must be an item name (of type dataGrid) or at least a form name used
     as sub form in form (whom name is given in form_name or corresponds to
@@ -301,19 +303,21 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
 
     if grid_name:
         data_from_grid = get_gridDataFor(plominoDocument,
-            grid_name=grid_name,
-            items=items,
-            render=render,
-            filter_function=filter_function,
-            form_name=form_name,
-            raise_error=raise_error
+            grid_name = grid_name,
+            items = items,
+            render = render,
+            filter_function = filter_function,
+            form_name = form_name,
+            raise_error = raise_error,
+            default_item_value = default_item_value
         )
     else:
         data_from_grid = list()
 
     if sub_form_name in form.getSubforms(applyhidewhen=False):
         init_rec = [plominoDocument.getItem(k) for k in columns]
-        init_raw = renderRaw(init_rec, columns, items, sub_form, render=render, raise_error=raise_error)
+        init_raw = renderRaw(init_rec, columns, items, sub_form, render=render,
+            raise_error=raise_error, default_item_value=default_item_value)
         data_from_grid.insert(0, init_raw)
     
     return data_from_grid
