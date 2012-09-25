@@ -197,10 +197,17 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
         return ll
 
     dd = dict(ld)
-        
+    
+    def multireplace(text, replacements):
+        for i, o in replacements:
+            text = text.replace(i, o)
+        return text
+    
     if hasattr(render, 'displayDocument'):
-        rendered_html = render.displayDocument(None, request=dd).replace('\n', '').replace('\r', '')
-        return ll + [rendered_html]
+        replacements = [('\n', '', ), ('\r', '', ), ('\t', '', )]
+        rendered_html = render.displayDocument(None, request=dd)
+        cleaned_html = multireplace(rendered_html, replacements)
+        return ll + [cleaned_html]
     
     if render == 'as_dict':
         return dd
