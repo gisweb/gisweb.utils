@@ -4,7 +4,7 @@
 from Products.CMFPlomino.interfaces import IPlominoDatabase
 from Products.CMFPlomino.PlominoDocument import PlominoDocument
 
-from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate
+from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate, htmlencode
 
 from DateTime import DateTime
 from DateTime.interfaces import DateError
@@ -199,7 +199,7 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
     dd = dict(ld)
         
     if hasattr(render, 'displayDocument'):
-        rendered_html = render.displayDocument(None, request=dd).replace('\n', '').replace('\r', '')
+        rendered_html = htmlencode(render.displayDocument(None, request=dd).replace('\n', '').replace('\r', ''))
         return ll + [rendered_html]
     
     if render == 'as_dict':
