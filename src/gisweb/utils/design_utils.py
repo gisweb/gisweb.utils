@@ -18,6 +18,24 @@ from Products.CMFPlomino.interfaces import IXMLImportExportSubscriber
 
 #    return xml
 
+def rename(instring, **kw):
+    outstring = ''
+    for k,v in kw.items():
+        toremove = '%s' % k
+        if toremove in instring:
+            toplace = '%s' % v
+            outstring = instring.replace(toremove, toplace)
+    return outstring
+
+def duplicateForm(form, xmldoc, **kw):
+
+    xmlout = ''
+    for instring in [form.id] + [i.id for i in form.getFormFields]:
+        outstring = rename(instring, **kw)
+        xmlout = xmldoc.replace(instring, outstring)
+
+    return xmlout
+
 def exportElementAsXML(obj, xmldoc=None):
     """
     """

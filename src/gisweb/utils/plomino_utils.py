@@ -210,7 +210,7 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False):
 
 def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', filter_function=False, form_name=None, raise_error=False):
     '''
-    render = 'as_list' or 'as_dict' or <plominoForm>
+    render = 'as_list', 'as_dict', <plominoForm>
     
     returns:
         - [[<item_value_1>, <item_value_2>, <item_value_3>, ...], ...] # as_list
@@ -286,6 +286,9 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
 
     if not items:
         items = columns
+
+    if render == 'as_form':
+        render = sub_form
 
     if grid_name:
         data_from_grid = get_gridDataFor(plominoDocument,
