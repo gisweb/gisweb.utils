@@ -208,7 +208,7 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, de
         rendered_html = render.displayDocument(None, request=dd).strip()
         cleaned_html = '%s' % multireplace(rendered_html, replacements)
         for focus in ("^<p>\s*</p>", "<p>\s*</p>$", ):
-            cleaned_html = re.sub(focus,"", cleaned_html, flags=re.MULTILINE)
+            cleaned_html = re.sub(focus, "", cleaned_html)
         return ll + [cleaned_html]
     
     if render == 'as_dict':
