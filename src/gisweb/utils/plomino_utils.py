@@ -205,8 +205,8 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, de
     
     if hasattr(render, 'displayDocument'):
         replacements = [('\n', '', ), ('\r', '', ), ('\t', '', )]
-        rendered_html = render.displayDocument(None, request=dd)
-        cleaned_html = '"%s"' % multireplace(rendered_html, replacements)
+        rendered_html = render.displayDocument(None, request=dd).strip()
+        cleaned_html = '%s' % multireplace(rendered_html, replacements)
         return ll + [cleaned_html]
     
     if render == 'as_dict':
