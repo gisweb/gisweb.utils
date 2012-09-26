@@ -186,17 +186,22 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, de
         element = renderItem(field_value, item_name, form, raise_error=raise_error, default=default_item_value)
         return element
 
-    ll = list()
-    ld = list()
-    for item_name in items:
-        element = get_element(item_name)
-        ll.append(element)
-        ld.append((item_name, element, ))
+#    ll = list()
+#    ld = list()
+#    for item_name in items:
+#        element = get_element(item_name)
+#        ll.append(element)
+#        ld.append((item_name, element, ))
 
+    dd = dict()
+    for item_name in columns:
+        element = get_element(item_name)
+        dd[item_name] = element
+    
+    ll = [dd[i] for i in items]
+    
     if render == 'as_list':
         return ll
-
-    dd = dict(ld)
     
     def multireplace(text, replacements):
         for i, o in replacements:
