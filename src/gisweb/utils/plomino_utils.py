@@ -276,7 +276,7 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
 
     return out
     
-def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=True, default_item_value='pippo'):
+def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=False, default_item_value=''):
     '''
     "where" must be an item name (of type dataGrid) or at least a form name used
     as sub form in form (whom name is given in form_name or corresponds to
