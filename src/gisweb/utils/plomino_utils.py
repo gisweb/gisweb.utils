@@ -204,11 +204,11 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, de
         return text
     
     if hasattr(render, 'displayDocument'):
-#        request = render.getParentDatabase().REQUEST
-#        for k,v in dd.items():
-#            request.set(k, v)
+        request = render.getParentDatabase().REQUEST
+        for k,v in dd.items():
+            request.set(k, v)
         replacements = [('\n', '', ), ('\r', '', ), ('\t', '', )]
-        rendered_html = render.displayDocument(None, creation=True, request=dd).strip()
+        rendered_html = render.displayDocument(None, creation=True, request=request).strip()
         cleaned_html = '%s' % multireplace(rendered_html, replacements)
         for focus in ("^<p>\s*</p>", "<p>\s*</p>$", ):
             cleaned_html = re.sub(focus, "", cleaned_html)
