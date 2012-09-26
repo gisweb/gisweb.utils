@@ -204,11 +204,11 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, de
         return text
     
     if hasattr(render, 'displayDocument'):
-        request = render.getParentDatabase().REQUEST
-        for k,v in dd.items():
-            request.set(k, v)
+#        request = render.getParentDatabase().REQUEST
+#        for k,v in dd.items():
+#            request.set(k, v)
         replacements = [('\n', '', ), ('\r', '', ), ('\t', '', )]
-        rendered_html = render.displayDocument(None, creation=True, request=request).strip()
+        rendered_html = render.displayDocument(None, creation=True, request=dd).strip()
         cleaned_html = '%s' % multireplace(rendered_html, replacements)
         for focus in ("^<p>\s*</p>", "<p>\s*</p>$", ):
             cleaned_html = re.sub(focus, "", cleaned_html)
@@ -276,7 +276,7 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
 
     return out
     
-def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=True, default_item_value=''):
+def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=True, default_item_value='pippo'):
     '''
     "where" must be an item name (of type dataGrid) or at least a form name used
     as sub form in form (whom name is given in form_name or corresponds to
