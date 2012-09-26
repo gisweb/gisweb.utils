@@ -251,8 +251,13 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
     out = list() # output init
     dict_render = lambda v, n: (n, renderItem(v, n, grid_form, raise_error=raise_error), )
     
-    if render == 'as_form':
-        render = grid_form
+    
+    if isinstance(render, basestring):
+        maybeForm = db.getForm(render)
+        if maybeForm:
+            render = maybeForm
+        elif render == 'as_form':
+            render = grid_form
     
     for rec in grid_value:
 
@@ -298,8 +303,12 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     if not items:
         items = columns
 
-    if render == 'as_form':
-        render = sub_form
+    if isinstance(render, basestring):
+        maybeForm = db.getForm(render)
+        if maybeForm:
+            render = maybeForm
+        elif render == 'as_form':
+            render = sub_form
 
     if grid_name:
         data_from_grid = get_gridDataFor(plominoDocument,
