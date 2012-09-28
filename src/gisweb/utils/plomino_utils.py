@@ -111,7 +111,7 @@ def getAllSubforms(frm, doc=None, applyhidewhen=False):
     Get sub forms recursively.
     """
     
-    
+    db = frm.getParentDatabase()
     sub_forms = []
 
     flag_frm = frm
