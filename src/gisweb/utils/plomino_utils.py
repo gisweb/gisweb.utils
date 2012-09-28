@@ -106,7 +106,7 @@ def addToDate(date, addend, units='months', start=1):
     else:
         raise Exception('units %s is not yet implemented' % units)
 
-def getAllSubforms(frm):
+def getAllSubforms(frm, doc=None, applyhidewhen=False):
     """
     Get sub forms recursively.
     """
@@ -114,7 +114,7 @@ def getAllSubforms(frm):
     sub_forms = []
 
     flag_frm = frm
-    flag_subs = flag_frm.getSubforms(applyhidewhen=False)
+    flag_subs = flag_frm.getSubforms(doc=doc, applyhidewhen=applyhidewhen)
     n = 0
     test = True
     while n < len(flag_subs):
