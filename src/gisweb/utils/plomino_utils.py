@@ -106,6 +106,26 @@ def addToDate(date, addend, units='months', start=1):
     else:
         raise Exception('units %s is not yet implemented' % units)
 
+def getAllSubforms(frm):
+    """
+    Get sub forms recursively.
+    """
+    
+    sub_forms = []
+
+    flag_frm = frm
+    flag_subs = flag_frm.getSubforms(applyhidewhen=False)
+    n = 0
+    test = True
+    while n < len(flag_subs):
+        sub_forms += flag_subs
+        flag_frm_id = flag_subs[n]
+        flag_frm = db.getForm(flag_frm_id)
+        flag_subs = flag_frm.getSubforms()
+        n += 1
+
+    return sub_forms
+
 def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
     '''
     useful params examples:
