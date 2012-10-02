@@ -193,7 +193,7 @@ def renderItem(field_value, field_name, form, raise_error=False, default=None):
 def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, default_item_value=None):
     '''
     render a dataGrid like record
-    rec: a dataGrid record
+    rec = [[...], ...]
     columns: a list of item names
     form: a plominoForm
     render: could be a string like "as_list" or "as_dict" or a plominoForm
@@ -320,16 +320,11 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
     
     # data in dataGrid field?
     if where in plominoDocument.getItems():
-        myfield = form.getFormField(where)
-        if myfield.getFieldType() == 'DATAGRID':
-            grid_name = where
-            sub_form_name = myfield.getSettings(key='associated_form')
-            sub_form = db.getForm(sub_form_name)
-            columns = myfield.getSettings(key='field_mapping').split(',')
-        # se il campo fornito NON è un DATAGRID lo considero come unico attributo
-        #+ cui si è interessati
-        else:
-            columns = [where]
+        grid_name = where
+        grid_field = form.getFormField(grid_name)
+        sub_form_name = grid_field.getSettings(key='associated_form')
+        sub_form = db.getForm(sub_form_name)
+        columns = grid_field.getSettings(key='field_mapping').split(',')
     # else data comes from fields in a sub Form
     else:
         sub_form_name = where
