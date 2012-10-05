@@ -62,9 +62,11 @@ def suggestFromTable(sessionname, name, columnname, schema='public', tip='', **f
     query = session.query(table.c[columnname])
     
     column = table.c[columnname]
-    ilikefilter = or_(column.startswith(tip), column.startswith(tip.capitalize()), column.startswith(tip.lower()))
+    where = or_(column.startswith(tip), column.startswith(tip.capitalize()), column.startswith(tip.lower()))
     
-    return query.filter_by(**filters).filter(ilikefilter).all()
+    where = and_(where, *[(table.c[k]==v) for k,v in filters.items()])
+    
+    return query.filter(where).all()
     
 
 def plominoSqlSync(session, plominoDocument, **table_infos):
