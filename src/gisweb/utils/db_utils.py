@@ -59,7 +59,7 @@ def suggestFromTable(sessionname, name, columnname, others=[], schema='public', 
     
     table = db.entity(name, schema=schema)
     
-    if isinstance([], (list, tuple)):
+    if isinstance(others, (list, tuple)):
         query = session.query(*[table.c[col] for col in [columnname]+list(others)])
     else:
         # otherwise all columns will be returned
