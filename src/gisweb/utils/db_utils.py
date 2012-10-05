@@ -59,11 +59,13 @@ def suggestFromTable(sessionname, name, columnname, schema='public', tip='', **f
     
     table = db.entity(name, schema=schema)
     
+    query = session.query(table[columnname])
+    
     column = table.c[columnname]
     ilikefilter = column.ilike(tip)
     
     
-    return table.filter(ilikefilter).filter_by(**filters).select(column)
+    return query.filter(ilikefilter).filter_by(**filters).all()
     
     
     
