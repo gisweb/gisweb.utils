@@ -59,7 +59,9 @@ def suggestFromTable(sessionname, name, schema='public', columnname=None, tip=''
     
     table = db.entity(name, schema=schema)
     
-    return table.filter(table[columnname].ilike(tip)).filter_by(**filters).all()
+    ilikefilter = table.c.[columnname].ilike(tip)
+    
+    return table.filter(ilikefilter).filter_by(**filters).all()
     
     
     
