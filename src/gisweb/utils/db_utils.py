@@ -30,9 +30,10 @@ def get_session(sessionname):
 #    
 #    return 1
 
-def query_table(sessionname, name, schema='public', flt=None):
+def query_table(sessionname, name, schema='public', flt=None, test=True):
     '''
     table_infos = dict(name='<table_name>', schema='<schema_name>')
+    flt = {'<column_name>': {'query': <value>, 'operator': ..., }}
     '''
 
     session = get_session(sessionname)
@@ -42,7 +43,14 @@ def query_table(sessionname, name, schema='public', flt=None):
     
     table = db.entity(name, schema=schema)
     
-    return table.filter(flt).all()
+#    if flt:
+#        for k,v in flt.items():
+#            table[k]
+    
+    if test:
+        return table.filter(flt).all()
+    else:
+        return table
 
 
 def plominoSqlSync(session, plominoDocument, **table_infos):
