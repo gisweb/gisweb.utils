@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from z3c.saconfig import named_scoped_session
-from sqlalchemy import select, and_, or_, String, DateTime, create_engine
+from sqlalchemy import select, ilike, and_, or_, String, DateTime, create_engine
 from sqlalchemy.schema import MetaData, Table, SchemaItem, Column
 from sqlalchemy.ext.sqlsoup import SqlSoup
 from sqlalchemy.exc import NoSuchTableError
@@ -59,7 +59,7 @@ def suggestFromTable(sessionname, name, schema='public', ilike='', **filters):
     
     table = db.entity(name, schema=schema)
     
-    return table.filter_by(**filters).ilike(ilike).all()
+    return table.filter(ilike(ilike)).filter_by(**filters).all()
     
     
     
