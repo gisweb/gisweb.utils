@@ -43,15 +43,27 @@ def query_table(sessionname, name, schema='public', flt=None, test=True):
     
     table = db.entity(name, schema=schema)
     
-#    if flt:
-#        for k,v in flt.items():
-#            table[k]
+    if flt:
+        for k,v in flt.items():
+            table[k]
     
     if test:
         return table.filter(flt).all()
     else:
         return table
 
+def suggestFromTable(sessionname, name, schema='public', ilike='', **filters):
+    session = get_session(sessionname)
+    engine = session.get_bind()
+    db = SqlSoup(engine)
+    
+    table = db.entity(name, schema=schema)
+    
+    return table.filter_by(**filters).ilike(ilike).all()
+    
+    
+    
+    
 
 def plominoSqlSync(session, plominoDocument, **table_infos):
     """
