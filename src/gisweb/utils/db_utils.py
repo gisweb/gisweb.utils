@@ -30,7 +30,7 @@ def get_session(sessionname):
 #    
 #    return 1
 
-def get_tab(sessionname, table_name, **table_infos):
+def query_table(sessionname, name, schema='public', flt=None):
     '''
     table_infos = dict(name='<table_name>', schema='<schema_name>')
     '''
@@ -40,9 +40,9 @@ def get_tab(sessionname, table_name, **table_infos):
     engine = session.get_bind()
     db = SqlSoup(engine)
     
-    table = db.entity(table_name, **table_infos)
+    table = db.entity(name, schema=schema)
     
-    return table.slice(0, 10).all()
+    return table.filter(flt).all()
 
 
 def plominoSqlSync(session, plominoDocument, **table_infos):
