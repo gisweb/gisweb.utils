@@ -70,9 +70,9 @@ def suggestFromTable(sessionname, name, columnname, others=[], schema='public', 
     
     where = and_(where, *[(table.c[k]==v) for k,v in filters.items() if k in table.c.keys()])
     
-    row2dict = lambda r: dict([(c.name, getattr(r, c.name)) for c in r.__table__.columns])
+#    row2dict = lambda r: dict([(c.name, getattr(r, c.name)) for c in r.__table__.columns])
     
-    return [row2dict(row) for row in query.filter(where).all()]
+    return [row.__dict__ for row in query.filter(where).all()]
     
 
 def plominoSqlSync(session, plominoDocument, **table_infos):
