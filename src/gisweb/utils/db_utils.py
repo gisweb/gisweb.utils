@@ -30,7 +30,7 @@ def get_session(sessionname):
 #    
 #    return 1
 
-def get_tab(session_id, table_infos):
+def get_tab(session_id, table_name, table_infos):
     '''
     table_infos = dict(name='<table_name>', schema='<schema_name>')
     '''
@@ -39,7 +39,7 @@ def get_tab(session_id, table_infos):
     engine = session.get_bind()
     db = SqlSoup(engine, session=session)
     
-    table = db.entity(**table_infos)
+    table = db.entity(table_name, **table_infos)
     
     return table
 
