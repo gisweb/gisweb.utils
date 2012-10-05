@@ -40,9 +40,9 @@ def get_tab(sessionname, table_name, table_infos):
     engine = session.get_bind()
     db = SqlSoup(engine, session=session)
     
-    table = db.entity(table_name, **table_infos)
+#    table = db.entity(table_name, **table_infos)
     
-    return table
+    return db
 
 
 def plominoSqlSync(session, plominoDocument, **table_infos):
