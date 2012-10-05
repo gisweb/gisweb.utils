@@ -53,14 +53,14 @@ def query_table(sessionname, name, schema='public', flt=None, test=True):
     else:
         return table
 
-def suggestFromTable(sessionname, name, schema='public', term='', **filters):
+def suggestFromTable(sessionname, name, schema='public', columnname=None, tip='', **filters):
     session = get_session(sessionname)
     engine = session.get_bind()
     db = SqlSoup(engine)
     
     table = db.entity(name, schema=schema)
     
-    return table.filter(ilike(term)).filter_by(**filters).all()
+    return table.filter(table[columnname].ilike(tip)).filter_by(**filters).all()
     
     
     
