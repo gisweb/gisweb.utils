@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 from z3c.saconfig import named_scoped_session
 from sqlalchemy import select, and_, or_, String, DateTime, create_engine
-from sqlalchemy.sql.operators.ColumnOperators import ilike
 from sqlalchemy.schema import MetaData, Table, SchemaItem, Column
 from sqlalchemy.ext.sqlsoup import SqlSoup
 from sqlalchemy.exc import NoSuchTableError
