@@ -64,7 +64,7 @@ def suggestFromTable(sessionname, name, columnname, others=[], schema='public', 
     column = table.c[columnname]
     where = or_(column.startswith(tip), column.startswith(tip.capitalize()), column.startswith(tip.lower()))
     
-    where = and_(where, *[(table.c[k]==v) for k,v in filters.items()])
+    where = and_(where, *[(table.c[k]==v) for k,v in filters.items() if k in table.c.keys()])
     
     return query.filter(where).all()
     
