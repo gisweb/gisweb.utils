@@ -59,7 +59,11 @@ def suggestFromTable(sessionname, name, columnname, others=[], schema='public', 
     
     table = db.entity(name, schema=schema)
     
-    query = session.query(*[table.c[col] for col in [columnname]+others])
+    if isinstance([], (list, tuple)):
+        query = session.query(*[table.c[col] for col in [columnname]+list(others)])
+    else:
+        # otherwise all columns will be returned
+        query = table
     
     column = table.c[columnname]
     where = or_(column.startswith(tip), column.startswith(tip.capitalize()), column.startswith(tip.lower()))
