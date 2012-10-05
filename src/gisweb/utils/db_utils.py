@@ -52,14 +52,14 @@ def query_table(sessionname, name, schema='public', flt=None, test=True):
     else:
         return table
 
-def suggestFromTable(sessionname, name, columnname, schema='public', tip='', **filters):
+def suggestFromTable(sessionname, name, columnname, others=[], schema='public', tip='', **filters):
     session = get_session(sessionname)
     engine = session.get_bind()
     db = SqlSoup(engine)
     
     table = db.entity(name, schema=schema)
     
-    query = session.query(table.c[columnname])
+    query = session.query([table.c[col] for col in [columnname]+others])
     
     column = table.c[columnname]
     where = or_(column.startswith(tip), column.startswith(tip.capitalize()), column.startswith(tip.lower()))
