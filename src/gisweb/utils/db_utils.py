@@ -64,8 +64,9 @@ def suggestFromTable(sessionname, name, columnname, schema='public', tip='', **f
     column = table.c[columnname]
     ilikefilter = column.ilike(tip)
     
+    return query.all()
     
-    return query.filter(ilikefilter).filter_by(**filters).all()
+#    return query.filter(ilikefilter).filter_by(**filters).all()
     
     
     
