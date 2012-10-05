@@ -30,6 +30,19 @@ def get_session(sessionname):
 #    
 #    return 1
 
+def get_tab(session_id, table_infos):
+    '''
+    table_infos = dict(name='<table_name>', schema='<schema_name>')
+    '''
+
+    session = get_session(session_id)
+    engine = session.get_bind()
+    db = SqlSoup(engine, session=session)
+    
+    table = db.entity(**table_infos)
+    
+    return table
+
 
 def plominoSqlSync(session, plominoDocument, **table_infos):
     """

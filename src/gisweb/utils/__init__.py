@@ -56,6 +56,7 @@ from pdf_utils import generate_pdf
 ##################################################################### DB UTILS #
 
 from db_utils import get_session, plominoSqlSync
+from db_utils import get_tab
 
 
 ############################################################### CF P.IVA UTILS #
