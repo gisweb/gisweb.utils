@@ -58,8 +58,9 @@ def suggestFromTable(sessionname, name, schema='public', columnname=None, tip=''
     db = SqlSoup(engine)
     
     table = db.entity(name, schema=schema)
+    column = table.c.[columnname]
     
-    ilikefilter = table.c.[columnname].ilike(tip)
+    ilikefilter = column.ilike(tip)
     
     return table.filter(ilikefilter).filter_by(**filters).all()
     
