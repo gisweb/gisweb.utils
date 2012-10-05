@@ -35,8 +35,8 @@ def get_tab(sessionname, table_name, table_infos):
     table_infos = dict(name='<table_name>', schema='<schema_name>')
     '''
 
-#    session = get_session(session_id)
-    session = named_scoped_session(sessionname) 
+    session = get_session(session_id)
+#    session = named_scoped_session(sessionname) 
     engine = session.get_bind()
     db = SqlSoup(engine)
     
