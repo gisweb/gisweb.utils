@@ -38,7 +38,7 @@ def get_tab(sessionname, table_name, table_infos):
 #    session = get_session(session_id)
     session = named_scoped_session(sessionname) 
     engine = session.get_bind()
-    db = SqlSoup(engine, session=session)
+    db = SqlSoup(engine)
     
 #    table = db.entity(table_name, **table_infos)
     
