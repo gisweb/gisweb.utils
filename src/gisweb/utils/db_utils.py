@@ -30,7 +30,7 @@ def get_session(sessionname):
 #    
 #    return 1
 
-def get_tab(session_id, table_name, table_infos):
+def get_tab(sessionname, table_name, table_infos):
     '''
     table_infos = dict(name='<table_name>', schema='<schema_name>')
     '''
