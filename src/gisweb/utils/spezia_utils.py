@@ -76,7 +76,7 @@ def initBody4spezia():
     return locals()
 
 def getXmlBody(
-        parent = 86,
+        parent = '86',
         titolario = '6',
         classifica = '7',
         tipocontesto = 'IndicazioneClassificazione',
