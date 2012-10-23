@@ -90,7 +90,8 @@ def getXmlBody(
     bodyParts = initBody4spezia()
 
     for k,v in data.items():
-        bodyParts[k].text = v
+        if k in bodyParts:
+            bodyParts[k].text = v
     
     xmlfile = StringIO()
     bodyParts['doc'].write(xmlfile)
