@@ -104,7 +104,7 @@ def strftime(date, format, custom_locale):
 
 ################################################################# SPEZIA UTILS #
 
-from spezia_utils import getXmlBody
+from spezia_utils import protocolla
 
 
 ################################################################### MAIL UTILS #
