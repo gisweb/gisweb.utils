@@ -1,7 +1,8 @@
 # - coding: utf-8 -
 
 from lxml import etree
-#from datetime import datetime
+import xmlrpclib
+from datetime import datetime
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -80,7 +81,7 @@ def getXmlBody(
         titolario = '6',
         classifica = '7',
         tipocontesto = 'IndicazioneClassificazione',
-        responseURL = "http://protocollo/ricevitore/ricevitore.php",
+        responseURL = "http://protocollo.spezia.vmserver/ws_protocollo.php", # URL di test
         **kwdata):
 
     data = locals()
@@ -100,3 +101,12 @@ def getXmlBody(
 
     return body
 
+def protocolla(served_url, kwargs, test=1):
+    service_url = 'http://protocollo.spezia.vmserver/ws_protocollo.php'
+    server = xmlrpclib.Server(url)
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    xml_content = getXmlBody(kwargs)
+    if test:
+        num = datetime.datetime.now().strftime('%s')
+    response = server.accoda(now, num, served_url, xml_content.encode('base64'))
+    return response.decode('base64')
