@@ -106,7 +106,7 @@ def protocolla(served_url, kwargs, test=1):
     server = xmlrpclib.Server(served_url)
     now = datetime.now()
     data = now.strftime('%Y-%m-%d %H:%M:%S')
-    xml_content = getXmlBody(kwargs)
+    xml_content = getXmlBody(**kwargs)
     if test:
         num = now.strftime('%s')
     response = server.accoda(data, num, served_url, xml_content.encode('base64'))
