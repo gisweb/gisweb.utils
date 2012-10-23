@@ -87,6 +87,7 @@ def Type(arg):
 
 #from design_utils import exportElementAsXML
 
+
 ################################################################### DATE UTILS #
 
 import locale
@@ -99,6 +100,11 @@ def strftime(date, format, custom_locale):
     except Exception, err:
         pass
     return date.strftime(format), err
+
+
+################################################################# SPEZIA UTILS #
+
+from spezia_utils import getXmlBody
 
 
 ################################################################### MAIL UTILS #
