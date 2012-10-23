@@ -104,9 +104,10 @@ def getXmlBody(
 def protocolla(served_url, kwargs, test=1):
     service_url = 'http://protocollo.spezia.vmserver/ws_protocollo.php'
     server = xmlrpclib.Server(served_url)
-    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    now = datetime.now()
+    data = now.strftime('%Y-%m-%d %H:%M:%S')
     xml_content = getXmlBody(kwargs)
     if test:
-        num = datetime.now().strftime('%s')
-    response = server.accoda(now, num, served_url, xml_content.encode('base64'))
+        num = now.strftime('%s')
+    response = server.accoda(data, num, served_url, xml_content.encode('base64'))
     return response.decode('base64')
