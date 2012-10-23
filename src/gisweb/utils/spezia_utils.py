@@ -103,7 +103,7 @@ def getXmlBody(
 
 def protocolla(served_url, kwargs, test=1):
     service_url = 'http://protocollo.spezia.vmserver/ws_protocollo.php'
-    server = xmlrpclib.Server(url)
+    server = xmlrpclib.Server(served_url)
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     xml_content = getXmlBody(kwargs)
     if test:
