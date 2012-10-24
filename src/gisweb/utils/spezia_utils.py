@@ -81,12 +81,12 @@ def initBody4spezia():
     return locals()
 
 def getXmlBody(
+        data_segnatura = datetime.now().strftime('%Y-%m-%d'),
         parent = '86',
         titolario = '6',
         classifica = '7',
         tipocontesto = 'IndicazioneClassificazione',
         utenteProtocollatore = 'dammau54',
-        responseURL = "http://protocollo.spezia.vmserver/ws_protocollo.php", # URL di test
         **kwdata):
 
     data = locals()
@@ -106,26 +106,35 @@ def getXmlBody(
 
     return body
 
-service_url = 'http://protocollo.spezia.vmserver/ws_protocollo.php'
-def protocolla(served_url, kwargs, test=1):
-    
+def get_id():
+    '''
+    returns '<int>', '%Y-%m-%d %H:%M:%S'
+    per ora ricaviamo num dai secondi della data odierna dal 1/1/1970
+    poi si userà un progressivo ricavato da una tabella in database.
+    '''
     now = datetime.now()
+    num = now.strftime('%s')
     data = now.strftime('%Y-%m-%d %H:%M:%S')
+    return num, data
+
+def protocolla(served_url,
+    responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
+    **kwargs):
+    now = datetime.now()
+    kwargs['responseURL'] = responseURL
     xml_content = getXmlBody(**kwargs)
-    if test:
-        num = now.strftime('%s')
-    server = xmlrpclib.Server(service_url)
+    num, data = get_id()
+    # responseURL in kwargs is mandatory!
+    server = xmlrpclib.Server(responseURL)
     response = server.accoda(data, num, served_url, xml_content.encode('base64'))
     return response.decode('base64')
 
 if __name__ == '__main__':
-    kwargs ={'oggetto':u'test', 'nominativo':u'manuele pesenti',
-        'indirizzo':u'via A. Gramsci', 'cap':u'16100','comune':u'Genova',
-        'provincia':u'GE', 'username':u'pippo', 'tipo':u'scavi'}
     served_url = "http://iol.vmserver/scavicantieri/application/test"
-    server = xmlrpclib.Server(service_url)
-#    print server.system.listMethods()
-#    print getXmlBody(**kwargs)
-    
-    print protocolla(served_url, kwargs)
+    data = datetime.now().strftime('%Y-%m-%d')
+    kwargs ={'oggetto':u'test', 'nominativo':u'manuele pesentì',
+        'indirizzo':u'via A. Gramsci, 9/7€', 'cap':u'16100','comune':u'Genova',
+        'provincia':u'GE', 'username':u'pippo€', 'tipo':u'scavi'}
+    print getXmlBody(**kwargs)
+    print protocolla(served_url, 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
     
