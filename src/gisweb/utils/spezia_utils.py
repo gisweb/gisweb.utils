@@ -10,11 +10,15 @@ except ImportError:
 
 def initBody4spezia():
 
-    page = etree.Element('xml', version='1.0', encoding='ISO-8859-1')
-    doc = etree.ElementTree(page)
+#    page = etree.Element('xml', version='1.0', encoding='ISO-8859-1')
     
     segnatura_info = {'{http://www.w3.org/XML/1998/namespace}lang': 'it'}
-    segnatura = etree.SubElement(page, 'Segnatura', **segnatura_info)
+    segnatura = etree.Element('Segnatura', **segnatura_info)
+    
+    doc = etree.ElementTree(segnatura)
+    
+#    segnatura_info = {'{http://www.w3.org/XML/1998/namespace}lang': 'it'}
+#    segnatura = etree.SubElement(page, 'Segnatura', **segnatura_info)
     
     intestazione = etree.SubElement(segnatura, 'Intestazione')
 
@@ -64,11 +68,11 @@ def initBody4spezia():
     cp_aoo = etree.SubElement(contestoprocedurale, 'CodiceAOO')
     identificativo = etree.SubElement(contestoprocedurale, 'Identificativo')
     tipocontesto = etree.SubElement(contestoprocedurale, 'TipoContestoProcedurale')
-    classifica = etree.SubElement(contestoprocedurale, 'Classifica')
+    classifica0 = etree.SubElement(contestoprocedurale, 'Classifica')
 
-    titolario = etree.SubElement(classifica, 'Livello')
-    classifica = etree.SubElement(classifica, 'Livello')
-    cl_l3 = etree.SubElement(classifica, 'Livello')
+    titolario = etree.SubElement(classifica0, 'Livello')
+    classifica = etree.SubElement(classifica0, 'Livello')
+    cl_l3 = etree.SubElement(classifica0, 'Livello')
     cl_l3.text = '0'
     
     descrizione = etree.SubElement(segnatura, 'Descrizione')
@@ -77,11 +81,11 @@ def initBody4spezia():
     return locals()
 
 def getXmlBody(
-        parent = '86' or ' & 86 & ',
+        parent = '86',
         titolario = '6',
         classifica = '7',
         tipocontesto = 'IndicazioneClassificazione',
-#        utenteProtocollatore = 'dammau54',
+        utenteProtocollatore = 'dammau54',
         responseURL = "http://protocollo.spezia.vmserver/ws_protocollo.php", # URL di test
         **kwdata):
 
@@ -117,13 +121,11 @@ def protocolla(served_url, kwargs, test=1):
 if __name__ == '__main__':
     kwargs ={'oggetto':u'test', 'nominativo':u'manuele pesenti',
         'indirizzo':u'via A. Gramsci', 'cap':u'16100','comune':u'Genova',
-        'provincia':u'GE', 'tipo':u'scavi'}
+        'provincia':u'GE', 'username':u'pippo', 'tipo':u'scavi'}
     served_url = "http://iol.vmserver/scavicantieri/application/test"
     server = xmlrpclib.Server(service_url)
-    print server.system.listMethods()
-    print getXmlBody(**kwargs)
-    
-    
+#    print server.system.listMethods()
+#    print getXmlBody(**kwargs)
     
     print protocolla(served_url, kwargs)
     
