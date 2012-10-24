@@ -77,11 +77,11 @@ def initBody4spezia():
     return locals()
 
 def getXmlBody(
-        parent = '86',
+        parent = '86' or ' & 86 & ',
         titolario = '6',
         classifica = '7',
         tipocontesto = 'IndicazioneClassificazione',
-        utenteProtocollatore = 'dammau54',
+#        utenteProtocollatore = 'dammau54',
         responseURL = "http://protocollo.spezia.vmserver/ws_protocollo.php", # URL di test
         **kwdata):
 
@@ -102,8 +102,9 @@ def getXmlBody(
 
     return body
 
+service_url = 'http://protocollo.spezia.vmserver/ws_protocollo.php'
 def protocolla(served_url, kwargs, test=1):
-    service_url = 'http://protocollo.spezia.vmserver/ws_protocollo.php'
+    
     now = datetime.now()
     data = now.strftime('%Y-%m-%d %H:%M:%S')
     xml_content = getXmlBody(**kwargs)
@@ -112,3 +113,17 @@ def protocolla(served_url, kwargs, test=1):
     server = xmlrpclib.Server(service_url)
     response = server.accoda(data, num, served_url, xml_content.encode('base64'))
     return response.decode('base64')
+
+if __name__ == '__main__':
+    kwargs ={'oggetto':u'test', 'nominativo':u'manuele pesenti',
+        'indirizzo':u'via A. Gramsci', 'cap':u'16100','comune':u'Genova',
+        'provincia':u'GE', 'tipo':u'scavi'}
+    served_url = "http://iol.vmserver/scavicantieri/application/test"
+    server = xmlrpclib.Server(service_url)
+    print server.system.listMethods()
+    print getXmlBody(**kwargs)
+    
+    
+    
+    print protocolla(served_url, kwargs)
+    
