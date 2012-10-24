@@ -81,7 +81,7 @@ def getXmlBody(
         titolario = '6',
         classifica = '7',
         tipocontesto = 'IndicazioneClassificazione',
-        utenteProtocollatore = 'dammau54'
+        utenteProtocollatore = 'dammau54',
         responseURL = "http://protocollo.spezia.vmserver/ws_protocollo.php", # URL di test
         **kwdata):
 
