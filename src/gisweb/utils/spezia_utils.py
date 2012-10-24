@@ -81,7 +81,7 @@ def initBody4spezia():
     return locals()
 
 def getXmlBody(
-        data_segnatura = datetime.now().strftime('%Y-%m-%d'),
+        data_segnatura = None,
         parent = '86',
         titolario = '6',
         classifica = '7',
@@ -89,6 +89,7 @@ def getXmlBody(
         utenteProtocollatore = 'dammau54',
         **kwdata):
 
+    data_segnatura = data_segnatura or datetime.now().strftime('%Y-%m-%d')
     data = locals()
     kwdata = data.pop('kwdata')
     data.update(kwdata)
@@ -136,5 +137,5 @@ if __name__ == '__main__':
         'indirizzo':u'via A. Gramsci, 9/7€', 'cap':u'16100','comune':u'Genova',
         'provincia':u'GE', 'username':u'pippo€', 'tipo':u'scavi'}
     print getXmlBody(**kwargs)
-    print protocolla(served_url, 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
+    print protocolla(served_url, responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
     
