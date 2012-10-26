@@ -149,7 +149,7 @@ def protocolla(served_url, adapter=None,
     kwargs['responseURL'] = responseURL
     xml_content = getXmlBody(**kwargs)
     corr = dict(tipo='tipologia', username='utente', data_segnatura='tms_req')
-    data = dict([(c2, kwargs[c1])) for c1,c2 in corr.items()])
+    data = dict([(c2, kwargs[c1]) for c1,c2 in corr.items()])
     data['pid'] = kwargs.get('pid')
     
     num, date = get_id(adapter=adapter, data=data)
