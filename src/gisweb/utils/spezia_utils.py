@@ -120,6 +120,7 @@ def get_id(adapter=None, data={}):
     now = datetime.now()
     num = now.strftime('%s')
     pid = num
+    rec = None
     if isinstance(adapter, basestring):
         from db_utils import get_session, SqlSoup
         session = get_session(adapter)
@@ -136,7 +137,7 @@ VALUES('%(tipo)s','%(username)s',%(tms)s,%(pid)s);"""
         else:
             raise IOError('Error! No session found with name %s'  % adapter)
     date = data.get('data_segnatura') or now.strftime('%Y-%m-%d %H:%M:%S')
-    return pid, date
+    return pid, date, rec
 
 def protocolla(served_url, adapter=None,
     responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
