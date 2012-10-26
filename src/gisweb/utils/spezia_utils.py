@@ -144,7 +144,7 @@ def protocolla(served_url, adapter=None,
     for k in ('tipo', 'username', 'data_segnatura', ):
         if kwargs.get(k):
             data[k] = kwargs[k]
-    data['pid'] = kwargs.get('pid')
+    data['pid'] = kwargs.get('pid') or ''
     
     num, date = get_id(adapter=adapter, data=data)
     server = xmlrpclib.Server(responseURL)
