@@ -141,7 +141,7 @@ def get_id(adapter=None, data={}):
             pass #raise IOError('Error! No session found with name %s'  % adapter)
     else:
         pid = adapter(**data)
-    return pid, data['data_segnatura']
+    return pid, data['tms_req']
 
 def protocolla(served_url, adapter=None,
     responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
