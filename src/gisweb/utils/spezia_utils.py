@@ -131,7 +131,7 @@ VALUES(':tipo',':username',:tms,:pid);"""
             pid = db.execute(query, tms=num, **data)
         else:
             raise IOError('Error! No session found with name %s'  % adapter)
-    date = now.strftime('%Y-%m-%d %H:%M:%S')
+    date = data.get('data_segnatura') or now.strftime('%Y-%m-%d %H:%M:%S')
     return pid, date
 
 def protocolla(served_url, adapter=None,
@@ -141,7 +141,7 @@ def protocolla(served_url, adapter=None,
     kwargs['responseURL'] = responseURL
     xml_content = getXmlBody(**kwargs)
     data = dict()
-    for k in ('tipo', 'username', ):
+    for k in ('tipo', 'username', 'data_segnatura', ):
         if kwargs.get(k):
             data[k] = kwargs[k]
     data['pid'] = kwargs.get('pid')
