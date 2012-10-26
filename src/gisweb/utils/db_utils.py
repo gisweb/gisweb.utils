@@ -30,6 +30,11 @@ def get_session(sessionname):
 #    
 #    return 1
 
+def getDatabase(sessionname):
+    session = get_session(sessionname)
+    engine = session.get_bind()
+    return SqlSoup(engine)
+
 def suggestFromTable(sessionname, name, columnname, others=[], schema='public', tip='', **filters):
     '''
     utile per l'implementazione di semplici servizi di auto-suggest da tabella.

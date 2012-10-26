@@ -121,7 +121,7 @@ def get_id(adapter=None, data={}):
     num = now.strftime('%s')
     pid = num
     if isinstance(adapter, basestring):
-        from db_utils import get_session
+        from db_utils import get_session, SqlSoup
         session = get_session(adapter)
         if session:
             query = """INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
@@ -153,7 +153,7 @@ def protocolla(served_url, adapter=None,
 
 if __name__ == '__main__':
     served_url = "http://iol.vmserver/scavicantieri/application/test"
-    now = datetime.now().strftime('%Y-%m-%d')
+    #now = datetime.now().strftime('%Y-%m-%d')
     kwargs ={'oggetto': u'test', 'nominativo': u'manuele pesentì',
         'indirizzo': u'via A. Gramsci, 9/7', 'cap': u'16100',
         'comune': u'Genova', 'provincia': u'GE', 'username': u'pippo',
@@ -165,7 +165,7 @@ if __name__ == '__main__':
         if kwargs.get(k):
             data[k] = kwargs[k]
     data['pid'] = kwargs.get('pid')
-    num, date = get_id(adapter=adapter, data=now)
+    num, date = get_id(adapter=adapter, data=data)
     print num, date
     #print protocolla(served_url, adapter=adapter, responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
     
