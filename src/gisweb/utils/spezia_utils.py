@@ -130,7 +130,7 @@ VALUES('%(tipo)s','%(username)s',%(tms)s,%(pid)s);"""
             db = SqlSoup(engine)
 #            pid = db.execute(query % dict(tms=num, **data))
             table = db.entity('richiesta_protocollo', schema='istanze')
-            table.insert(**data)
+            pid = table.insert(**data)
         else:
             raise IOError('Error! No session found with name %s'  % adapter)
     date = data.get('data_segnatura') or now.strftime('%Y-%m-%d %H:%M:%S')
