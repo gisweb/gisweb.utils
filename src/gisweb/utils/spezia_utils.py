@@ -120,41 +120,51 @@ def get_id(adapter=None, data={}):
     now = datetime.now()
     num = now.strftime('%s')
     pid = num
-    rec = None
-    if not 'tms_req' in data:
-        data['tms_req'] = now.strftime('%s')
-    if isinstance(adapter, basestring):
-        from db_utils import get_session, SqlSoup
-        session = get_session(adapter)
-        if session:
-#            query = """INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
-#VALUES('%(tipo)s','%(username)s',%(tms)s,%(pid)s);"""
-            engine = session.get_bind()
-            db = SqlSoup(engine)
-#            pid = db.execute(query % dict(tms=num, **data))
-            table = db.entity('richiesta_protocollo', schema='istanze')
-            table.insert(**data)
-#            rec = table.insert(**data)
-#            pid = rec.id
-            pid = table.filter_by(**data).one().id
+    if adapter:
+        if isinstance(adapter, basestring):
+            # adapter è una connessione SQLAlchemy
+            from db_utils import get_session, SqlSoup
+            session = get_session(adapter)
+            if session:
+                engine = session.get_bind()
+                db = SqlSoup(engine)
+                table = db.entity('richiesta_protocollo', schema='istanze')
+                # TO DO: trovare il modo di recuperare in maniera rigorosa l'id del 
+                # record appena inserito.
+                table.insert(**data)
+                pid = table.filter_by(**data).one().id
+            else:
+                raise IOError('Error! No session found with name %s'  % adapter)
         else:
-            pass #raise IOError('Error! No session found with name %s'  % adapter)
-    else:
-        pid = adapter(**data)[0]['id']
-    return pid, data['tms_req']
+            # adapter è uno Z SQL Method
+            pid = adapter(**data)[0]['id']
+    return pid
 
 def protocolla(served_url, adapter=None,
     responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
     **kwargs):
+    """
+    served_url: URL dello script chiamante
+    adapter: può essere il nome di una sessione SQLAlchemy, uno Z SQL Method o None
+    responseURL: URL del servizio ws_protocollo
+    kwargs: dizionario contenente le informazioni per costrure l'XML per la protocollazione
+    """
     now = datetime.now()
     kwargs['responseURL'] = responseURL
+
     xml_content = getXmlBody(**kwargs)
+
     corr = dict(tipo='tipologia', username='utente', data_segnatura='tms_req')
     data = dict([(c2, kwargs[c1]) for c1,c2 in corr.items()])
+    if not 'tms_req' in data:
+        data['tms_req'] = now.strftime('%s')
     data['pid'] = kwargs.get('pid')
+    date = datetime.datetime.strptime(data['tms_req'], '%s').strftime('%Y-%m-%d %H:%M:%S')
     
-    num, date = get_id(adapter=adapter, data=data)
+    num = get_id(adapter=adapter, data=data)
+
     server = xmlrpclib.Server(responseURL)
+    # da testare il formato di date: %Y-%m-%d %H:%M:%S ???
     response = server.accoda(date, num, served_url, xml_content.encode('base64'))
     return response.decode('base64')
 
