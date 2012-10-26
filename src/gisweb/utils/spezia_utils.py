@@ -131,9 +131,9 @@ def get_id(adapter=None, data={}):
             db = SqlSoup(engine)
 #            pid = db.execute(query % dict(tms=num, **data))
             table = db.entity('richiesta_protocollo', schema='istanze')
-            table.insert(**data)
-#            rec = table.insert(**data)
-#            pid = rec.id
+#            table.insert(**data)
+            rec = table.insert(**data)
+            pid = rec.id
             #pid = table.filter_by(**data).one().id
         else:
             pass #raise IOError('Error! No session found with name %s'  % adapter)
