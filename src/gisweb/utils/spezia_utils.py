@@ -140,7 +140,7 @@ def get_id(adapter=None, data={}):
         else:
             pass #raise IOError('Error! No session found with name %s'  % adapter)
     else:
-        pid = adapter(**data)
+        pid = adapter(**data)[0]['id']
     return pid, data['tms_req']
 
 def protocolla(served_url, adapter=None,
