@@ -121,8 +121,8 @@ def get_id(adapter=None, data={}):
     num = now.strftime('%s')
     pid = num
     rec = None
-    if not 'data_segnatura' in data:
-        data['data_segnatura'] = now.strftime('%Y-%m-%d %H:%M:%S')
+    if not 'tms_req' in data:
+        data['tms_req'] = now.strftime('%Y-%m-%d %H:%M:%S')
     if isinstance(adapter, basestring):
         from db_utils import get_session, SqlSoup
         session = get_session(adapter)
