@@ -122,7 +122,7 @@ def get_id(adapter=None, data={}):
     pid = num
     rec = None
     if not 'tms_req' in data:
-        data['tms_req'] = now.strftime('%Y-%m-%d %H:%M:%S')
+        data['tms_req'] = now.strftime('%s')
     if isinstance(adapter, basestring):
         from db_utils import get_session, SqlSoup
         session = get_session(adapter)
