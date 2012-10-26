@@ -134,13 +134,13 @@ def get_id(adapter=None, data={}):
             table.insert(**data)
 #            rec = table.insert(**data)
 #            pid = rec.id
-            pid = table.filter_by(**data).one().id
+            pid2 = table.filter_by(**data).one().id
         else:
             pass #raise IOError('Error! No session found with name %s'  % adapter)
     else:
         pid = adapter(**data)
     date = data.get('data_segnatura') or now.strftime('%Y-%m-%d %H:%M:%S')
-    return pid, date
+    return pid2, date
 
 def protocolla(served_url, adapter=None,
     responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
