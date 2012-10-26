@@ -35,7 +35,7 @@ def suggestFromTable(sessionname, name, columnname, others=[], schema='public', 
     utile per l'implementazione di semplici servizi di auto-suggest da tabella.
     sessionname: neme della sessione
     name: nome della tabella
-    columnname: nome della colonna
+    columnname: nome della colonna da cui attingere
     others: altre colonne cui si è interessati al valore. Usare '' per tutte.
     schema: nome dello schema di appartenenza della tabella
     tip: "suggerimento"

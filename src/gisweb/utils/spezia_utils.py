@@ -107,35 +107,58 @@ def getXmlBody(
 
     return body
 
-def get_id():
+def get_id(adapter=None, data={}):
     '''
     returns '<int>', '%Y-%m-%d %H:%M:%S'
     per ora ricaviamo num dai secondi della data odierna dal 1/1/1970
     poi si userà un progressivo ricavato da una tabella in database.
+    $sql="INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
+        VALUES('$data[tipo]','$data[username]',$t,$pid);	
+    SELECT id FROM istanze.richiesta_protocollo
+        WHERE tipologia='$data[tipo]' and utente='$data[username]' and tms_req=$t;";
     '''
     now = datetime.now()
     num = now.strftime('%s')
-    data = now.strftime('%Y-%m-%d %H:%M:%S')
-    return num, data
+    pid = num
+    if isinstance(adapter, basestring):
+        from db_utils import get_session
+        session = get_session(adapter)
+        if session:
+            query = """INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
+VALUES(':tipo',':username',:tms,:pid);"""
+            engine = session.get_bind()
+            db = SqlSoup(engine)
+            pid = db.execute(query, tms=num, **data)
+        else:
+            raise IOError('Error! No session found with name %s'  % adapter)
+    date = now.strftime('%Y-%m-%d %H:%M:%S')
+    return pid, date
 
-def protocolla(served_url,
+def protocolla(served_url, adapter=None,
     responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
     **kwargs):
     now = datetime.now()
     kwargs['responseURL'] = responseURL
     xml_content = getXmlBody(**kwargs)
-    num, data = get_id()
-    # responseURL in kwargs is mandatory!
+    data = dict()
+    for k in ('tipo', 'username', ):
+        if kwargs.get(k):
+            data[k] = kwargs[k]
+    data['pid'] = kwargs.get('pid')
+    
+    num, date = get_id(adapter=adapter, data=data)
     server = xmlrpclib.Server(responseURL)
-    response = server.accoda(data, num, served_url, xml_content.encode('base64'))
+    response = server.accoda(date, num, served_url, xml_content.encode('base64'))
     return response.decode('base64')
 
 if __name__ == '__main__':
     served_url = "http://iol.vmserver/scavicantieri/application/test"
     data = datetime.now().strftime('%Y-%m-%d')
-    kwargs ={'oggetto':u'test', 'nominativo':u'manuele pesentì',
-        'indirizzo':u'via A. Gramsci, 9/7€', 'cap':u'16100','comune':u'Genova',
-        'provincia':u'GE', 'username':u'pippo€', 'tipo':u'scavi'}
+    kwargs ={'oggetto': u'test', 'nominativo': u'manuele pesentì',
+        'indirizzo': u'via A. Gramsci, 9/7', 'cap': u'16100',
+        'comune': u'Genova', 'provincia': u'GE', 'username': u'pippo',
+        'tipo': u'scavi'}
     print getXmlBody(**kwargs)
-    print protocolla(served_url, responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
+    adapter = 'sitar' # None (da testare con adapter != None)
+    print protocolla(served_url, adapter=adapter, responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
     
