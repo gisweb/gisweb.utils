@@ -132,7 +132,6 @@ VALUES('%(tipo)s','%(username)s',%(tms)s,%(pid)s);"""
 #            pid = db.execute(query % dict(tms=num, **data))
             table = db.entity('richiesta_protocollo', schema='istanze')
             rec = table.insert(**data)
-            db.commit()
             pid = rec.id
             #pid = table.filter_by(**data).one().id
         else:
