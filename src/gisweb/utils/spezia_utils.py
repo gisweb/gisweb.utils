@@ -136,8 +136,10 @@ VALUES('%(tipo)s','%(username)s',%(tms)s,%(pid)s);"""
             #pid = table.filter_by(**data).one().id
         else:
             raise IOError('Error! No session found with name %s'  % adapter)
+    else:
+        pid = adapter(**data)
     date = data.get('data_segnatura') or now.strftime('%Y-%m-%d %H:%M:%S')
-    return pid, date, rec
+    return pid, date
 
 def protocolla(served_url, adapter=None,
     responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
@@ -145,8 +147,9 @@ def protocolla(served_url, adapter=None,
     now = datetime.now()
     kwargs['responseURL'] = responseURL
     xml_content = getXmlBody(**kwargs)
-    corr = dict(tipo='tipologia', username='utente', data_segnatura='tms_req', pid='pid')
-    data = dict([(c2, kwargs.get(c1)) for c1,c2 in corr.items() if kwargs.get(c1)!=None])
+    corr = dict(tipo='tipologia', username='utente', data_segnatura='tms_req')
+    data = dict([(c2, kwargs[c1])) for c1,c2 in corr.items()])
+    data['pid'] = kwargs.get('pid')
     
     num, date = get_id(adapter=adapter, data=data)
     server = xmlrpclib.Server(responseURL)
