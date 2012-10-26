@@ -125,17 +125,18 @@ def get_id(adapter=None, data={}):
         from db_utils import get_session, SqlSoup
         session = get_session(adapter)
         if session:
-            query = """INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
-VALUES('%(tipo)s','%(username)s',%(tms)s,%(pid)s);"""
+#            query = """INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
+#VALUES('%(tipo)s','%(username)s',%(tms)s,%(pid)s);"""
             engine = session.get_bind()
             db = SqlSoup(engine)
 #            pid = db.execute(query % dict(tms=num, **data))
             table = db.entity('richiesta_protocollo', schema='istanze')
-            rec = table.insert(**data)
-            pid = rec.id
+            table.insert(**data)
+#            rec = table.insert(**data)
+#            pid = rec.id
             #pid = table.filter_by(**data).one().id
         else:
-            raise IOError('Error! No session found with name %s'  % adapter)
+            pass #raise IOError('Error! No session found with name %s'  % adapter)
     else:
         pid = adapter(**data)
     date = data.get('data_segnatura') or now.strftime('%Y-%m-%d %H:%M:%S')
