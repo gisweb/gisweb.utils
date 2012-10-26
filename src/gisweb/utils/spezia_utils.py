@@ -128,7 +128,8 @@ def get_id(adapter=None, data={}):
 VALUES('%(tipo)s','%(username)s',%(tms)s,%(pid)s);"""
             engine = session.get_bind()
             db = SqlSoup(engine)
-            pid = db.execute(query % dict(tms=num, **data))
+#            pid = db.execute(query % dict(tms=num, **data))
+            db.istanze.richiesta_protocollo.insert(**data)
         else:
             raise IOError('Error! No session found with name %s'  % adapter)
     date = data.get('data_segnatura') or now.strftime('%Y-%m-%d %H:%M:%S')
@@ -140,11 +141,8 @@ def protocolla(served_url, adapter=None,
     now = datetime.now()
     kwargs['responseURL'] = responseURL
     xml_content = getXmlBody(**kwargs)
-    data = dict()
-    for k in ('tipo', 'username', 'data_segnatura', ):
-        if kwargs.get(k):
-            data[k] = kwargs[k]
-    data['pid'] = kwargs.get('pid') or ''
+    corr = dict(tipo='tipologia', username='utente', data_segnatura='tms_req', pid='pid')
+    data = dict([(c2, kwargs.get(c1)) for c1,c2 in corr.items() if kwargs.get(c1)!=None])
     
     num, date = get_id(adapter=adapter, data=data)
     server = xmlrpclib.Server(responseURL)
