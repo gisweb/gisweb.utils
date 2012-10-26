@@ -131,7 +131,7 @@ VALUES(':tipo',':username',:tms,:pid);"""
             pid = db.execute(query, tms=num, **data)
         else:
             raise IOError('Error! No session found with name %s'  % adapter)
-    date = now.strftime('%Y-%m-%d %H:%M:%S')
+    date = data.get('data_segnatura') or now.strftime('%Y-%m-%d %H:%M:%S')
     return pid, date
 
 def protocolla(served_url, adapter=None,
@@ -141,7 +141,7 @@ def protocolla(served_url, adapter=None,
     kwargs['responseURL'] = responseURL
     xml_content = getXmlBody(**kwargs)
     data = dict()
-    for k in ('tipo', 'username', ):
+    for k in ('tipo', 'username', 'data_segnatura', ):
         if kwargs.get(k):
             data[k] = kwargs[k]
     data['pid'] = kwargs.get('pid')
@@ -158,7 +158,13 @@ if __name__ == '__main__':
         'indirizzo': u'via A. Gramsci, 9/7', 'cap': u'16100',
         'comune': u'Genova', 'provincia': u'GE', 'username': u'pippo',
         'tipo': u'scavi'}
-    print getXmlBody(**kwargs)
+    #print getXmlBody(**kwargs)
     adapter = 'sitar' # None (da testare con adapter != None)
-    print protocolla(served_url, adapter=adapter, responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
+    for k in ('tipo', 'username', 'data_segnatura', ):
+        if kwargs.get(k):
+            data[k] = kwargs[k]
+    data['pid'] = kwargs.get('pid')
+    num, date = get_id(adapter=adapter, data=data)
+    print num, date
+    #print protocolla(served_url, adapter=adapter, responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
     
