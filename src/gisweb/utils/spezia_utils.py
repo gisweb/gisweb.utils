@@ -184,10 +184,10 @@ def protocolla(served_url, adapter=None,
 if __name__ == '__main__':
     served_url = "http://iol.vmserver/scavicantieri/application/test"
     #now = datetime.now().strftime('%Y-%m-%d')
-    kwargs ={'username': u'pippo', 'comune': 'La Spezia',
+    kwargs = {'username': u'pippo', 'comune': 'La Spezia',
         'oggetto': 'A247\r\nscavo per nuovo allacciamento rete idrica \r\nVia Toti ',
-        'indirizzo': 'via a picco 22', 'provincia': 'SP', 'tipo': 'scavi', 'cap': '19100',
-        'nominativo': 'dimattia mirko'}
+        'indirizzo': 'via a picco 22', 'provincia': 'SP', 'tipo': 'scavi',
+        'data_segnatura': '2011-07-13 14:48:03', 'cap': '19100', 'nominativo': 'dimattia mirko'}
     #print getXmlBody(**kwargs)
     adapter = 'sitar'
 
