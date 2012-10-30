@@ -172,7 +172,8 @@ def protocolla(served_url, adapter=None,
     if not 'tms_req' in data:
         data['tms_req'] = now.strftime('%s')
     data['pid'] = kwargs.get('pid')
-    date = datetime.strptime(data['tms_req'], '%s').strftime('%Y-%m-%d %H:%M:%S')
+    
+    date = data['tms_req']
     
     num = get_id_request(adapter=adapter, data=data)
 
