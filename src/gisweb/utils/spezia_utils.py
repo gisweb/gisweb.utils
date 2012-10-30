@@ -181,18 +181,14 @@ def protocolla(served_url, adapter=None,
 if __name__ == '__main__':
     served_url = "http://iol.vmserver/scavicantieri/application/test"
     #now = datetime.now().strftime('%Y-%m-%d')
-    kwargs ={'oggetto': u'test', 'nominativo': u'manuele pesentì',
-        'indirizzo': u'via A. Gramsci, 9/7', 'cap': u'16100',
-        'comune': u'Genova', 'provincia': u'GE', 'username': u'pippo',
-        'tipo': u'scavi'}
+    kwargs ={'username': u'pippo', 'comune': 'La Spezia',
+        'oggetto': 'A247\r\nscavo per nuovo allacciamento rete idrica \r\nVia Toti ',
+        'indirizzo': 'via a picco 22', 'provincia': 'SP', 'tipo': 'scavi', 'cap': '19100',
+        'nominativo': 'dimattia mirko'}
     #print getXmlBody(**kwargs)
-    adapter = 'sitar' # None (da testare con adapter != None)
-    data = dict()
-    for k in ('tipo', 'username', 'data_segnatura', ):
-        if kwargs.get(k):
-            data[k] = kwargs[k]
-    data['pid'] = kwargs.get('pid')
-    num, date = get_id_request(adapter=adapter, data=data)
-    print num, date
-    #print protocolla(served_url, adapter=adapter, responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
+    adapter = 'sitar'
+
+    print protocolla(served_url,
+        adapter=adapter,
+        responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
     
