@@ -112,10 +112,6 @@ def get_id(adapter=None, data={}):
     returns '<int>', '%Y-%m-%d %H:%M:%S'
     per ora ricaviamo num dai secondi della data odierna dal 1/1/1970
     poi si userà un progressivo ricavato da una tabella in database.
-    $sql="INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
-        VALUES('$data[tipo]','$data[username]',$t,$pid);	
-    SELECT id FROM istanze.richiesta_protocollo
-        WHERE tipologia='$data[tipo]' and utente='$data[username]' and tms_req=$t;";
     '''
     now = datetime.now()
     num = now.strftime('%s')
@@ -133,10 +129,15 @@ def get_id(adapter=None, data={}):
                 # record appena inserito.
                 table.insert(**data)
                 pid = table.filter_by(**data).one().id
+                db.commit()
             else:
                 raise IOError('Error! No session found with name %s'  % adapter)
         else:
-            # adapter è uno Z SQL Method
+            # adapter è uno Z SQL Method contenente la seguente query:
+            # INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
+            #    VALUES('$data[tipo]','$data[username]',$t,$pid);	
+            # SELECT id FROM istanze.richiesta_protocollo
+            #    WHERE tipologia='$data[tipo]' and utente='$data[username]' and tms_req=$t;
             pid = adapter(**data)[0]['id']
     return pid
 
