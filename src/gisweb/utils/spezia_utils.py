@@ -129,7 +129,8 @@ def get_id_request(adapter=None, data={}):
             try:
                 from db_utils import get_session, SqlSoup
             except ImportError:
-                from gisweb.utils import get_session, SqlSoup
+                from gisweb.utils import get_session
+                from sqlalchemy.ext.sqlsoup import SqlSoup
             session = get_session(adapter)
             if session:
                 engine = session.get_bind()
