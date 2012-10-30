@@ -126,7 +126,10 @@ def get_id_request(adapter=None, data={}):
     if adapter:
         if isinstance(adapter, basestring):
             # adapter è una connessione SQLAlchemy
-            from db_utils import get_session, SqlSoup
+            try:
+                from db_utils import get_session, SqlSoup
+            except ImportError:
+                from gisweb.utils import get_session, SqlSoup
             session = get_session(adapter)
             if session:
                 engine = session.get_bind()
