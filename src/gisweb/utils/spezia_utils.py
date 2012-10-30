@@ -107,15 +107,11 @@ def getXmlBody(
 
     return body
 
-def get_id(adapter=None, data={}):
+def get_id_request(adapter=None, data={}):
     '''
     returns '<int>', '%Y-%m-%d %H:%M:%S'
     per ora ricaviamo num dai secondi della data odierna dal 1/1/1970
     poi si userà un progressivo ricavato da una tabella in database.
-    $sql="INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
-        VALUES('$data[tipo]','$data[username]',$t,$pid);	
-    SELECT id FROM istanze.richiesta_protocollo
-        WHERE tipologia='$data[tipo]' and utente='$data[username]' and tms_req=$t;";
     '''
     now = datetime.now()
     num = now.strftime('%s')
@@ -133,10 +129,15 @@ def get_id(adapter=None, data={}):
                 # record appena inserito.
                 table.insert(**data)
                 pid = table.filter_by(**data).one().id
+                db.commit()
             else:
                 raise IOError('Error! No session found with name %s'  % adapter)
         else:
-            # adapter è uno Z SQL Method
+            # adapter è uno Z SQL Method contenente la seguente query:
+            # INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
+            #    VALUES('$data[tipo]','$data[username]',$t,$pid);	
+            # SELECT id FROM istanze.richiesta_protocollo
+            #    WHERE tipologia='$data[tipo]' and utente='$data[username]' and tms_req=$t;
             pid = adapter(**data)[0]['id']
     return pid
 
@@ -161,7 +162,7 @@ def protocolla(served_url, adapter=None,
     data['pid'] = kwargs.get('pid')
     date = datetime.datetime.strptime(data['tms_req'], '%s').strftime('%Y-%m-%d %H:%M:%S')
     
-    num = get_id(adapter=adapter, data=data)
+    num = get_id_request(adapter=adapter, data=data)
 
     server = xmlrpclib.Server(responseURL)
     # da testare il formato di date: %Y-%m-%d %H:%M:%S ???
@@ -182,7 +183,7 @@ if __name__ == '__main__':
         if kwargs.get(k):
             data[k] = kwargs[k]
     data['pid'] = kwargs.get('pid')
-    num, date = get_id(adapter=adapter, data=data)
+    num, date = get_id_request(adapter=adapter, data=data)
     print num, date
     #print protocolla(served_url, adapter=adapter, responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
     
