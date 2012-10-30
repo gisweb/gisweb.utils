@@ -18,6 +18,11 @@ def get_session(sessionname):
     factory = named_scoped_session(sessionname)
     return factory()
 
+def get_soup(sessionname):
+    session = get_session(adapter)
+    engine = session.get_bind()
+    return SqlSoup(engine)
+
 #def sql_test(session, tname):
 #    if isinstance(session, basestring):
 #        session = get_session(session)
@@ -30,10 +35,10 @@ def get_session(sessionname):
 #    
 #    return 1
 
-def getDatabase(sessionname):
-    session = get_session(sessionname)
-    engine = session.get_bind()
-    return SqlSoup(engine)
+#def getDatabase(sessionname):
+#    session = get_session(sessionname)
+#    engine = session.get_bind()
+#    return SqlSoup(engine)
 
 def suggestFromTable(sessionname, name, columnname, others=[], schema='public', tip='', **filters):
     '''

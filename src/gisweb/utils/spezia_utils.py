@@ -127,22 +127,18 @@ def get_id_request(adapter=None, data={}):
         if isinstance(adapter, basestring):
             # adapter è una connessione SQLAlchemy
             try:
-                from db_utils import get_session, SqlSoup
+                from db_utils import get_soup
             except ImportError:
-                from gisweb.utils import get_session
-                from sqlalchemy.ext.sqlsoup import SqlSoup
-            session = get_session(adapter)
-            if session:
-                engine = session.get_bind()
-                db = SqlSoup(engine)
-                table = db.entity('richiesta_protocollo', schema='istanze')
-                # TO DO: trovare il modo di recuperare in maniera rigorosa l'id del 
-                # record appena inserito.
-                table.insert(**data)
-                pid = table.filter_by(**data).one().id
-                db.commit()
-            else:
-                raise IOError('Error! No session found with name %s'  % adapter)
+                from gisweb.utils import get_soup
+
+            db = get_soup(adapter)
+            table = db.entity('richiesta_protocollo', schema='istanze')
+            # TO DO: trovare il modo di recuperare in maniera rigorosa l'id del 
+            # record appena inserito.
+            table.insert(**data)
+            pid = table.filter_by(**data).one().id
+            db.commit()
+
         else:
             # adapter è uno Z SQL Method contenente la seguente query:
             # INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)

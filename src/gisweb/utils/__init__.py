@@ -55,7 +55,7 @@ from pdf_utils import generate_pdf
 
 ##################################################################### DB UTILS #
 
-from db_utils import get_session, plominoSqlSync
+from db_utils import get_session, get_soup, plominoSqlSync
 from db_utils import suggestFromTable
 
 
