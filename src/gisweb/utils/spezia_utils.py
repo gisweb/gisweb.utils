@@ -8,8 +8,6 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from XmlDict import XmlDictConfig
-
 def guess_resp(appid=None):
     responsabili_noti = dict(
         cantieri = 'ceccla57',
@@ -178,15 +176,8 @@ def protocolla(served_url, adapter=None,
 
     server = xmlrpclib.Server(responseURL)
     # da testare il formato di date: %Y-%m-%d %H:%M:%S ???
-    response = server.accoda(date, num, served_url, xml_content.encode('base64')).decode('base64')
-    response_object = StrinIO()
-    response_object.write(response)
-    response_object.seek(0)
-    tree = etree.parse(response_object)
-    root = tree.getroot()
-    return XmlDictConfig(root)
-    
-    
+    response = server.accoda(date, num, served_url, xml_content.encode('base64'))
+    return response.decode('base64')
 
 if __name__ == '__main__':
     served_url = "http://iol.vmserver/scavicantieri/application/test"
