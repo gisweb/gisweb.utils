@@ -8,6 +8,13 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+try:
+    import cElementTree as ElementTree
+except ImportError:
+    import ElementTree
+
+from XmlDict import XmlDictConfig
+
 def guess_resp(appid=None):
     responsabili_noti = dict(
         cantieri = 'ceccla57',
@@ -157,15 +164,12 @@ def get_id_request(adapter=None, data={}):
 
 def xml2obj(xml):
 
-    try:
-        import cElementTree as ElementTree
-    except ImportError:
-        import ElementTree
-
-    from XmlDict import XmlDictConfig
-
     root = ElementTree.XML(xml)
-    return XmlDictConfig(root)
+    
+    out = dict()
+    out.update(XmlDictConfig(root))
+    
+    return out
 
 
 def protocolla(served_url, adapter=None,
