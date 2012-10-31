@@ -130,7 +130,6 @@ def getXmlBody(
 
     for k,v in data.items():
         if k in bodyParts:
-            converted = UnicodeDammit(webfile, isHTML=True)
             if isinstance(v, basestring):
                 flag = UnicodeDammit(v).unicode
             elif hasattr(v, 'strftime'):
