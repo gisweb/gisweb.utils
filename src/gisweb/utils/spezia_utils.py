@@ -210,7 +210,7 @@ def get_params(doc, tipo):
     
     params['tipo'] = '%s' % tipo
     
-    params['data_segnatura'] = doc.getItem('data_presentazione', datime.now())
+    params['data_segnatura'] = doc.getItem('data_presentazione', datetime.now())
 
     return params
 
