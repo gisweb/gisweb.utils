@@ -36,7 +36,7 @@ def initBody4spezia():
 #    page = etree.Element('xml', version='1.0', encoding='ISO-8859-1')
     
     segnatura_info = {'{http://www.w3.org/XML/1998/namespace}lang': 'it'}
-    segnatura = etree.Element('Segnatura', **segnatura_info)
+    segnatura = etree.Element('Segnatura', encoding='ISO-8859-1', **segnatura_info)
     
     doc = etree.ElementTree(segnatura)
     
@@ -120,30 +120,21 @@ def getXmlBody(
 
     bodyParts = initBody4spezia()
     
-    # courtesy of: http://stackoverflow.com/questions/8733233/filtering-out-certain-bytes-in-python
-#    def valid_XML_char_ordinal(i):
-#        return ( # conditions ordered by presumed frequency
-#            0x20 <= i <= 0xD7FF 
-#            or i in (0x9, 0xA, 0xD)
-#            or 0xE000 <= i <= 0xFFFD
-#            or 0x10000 <= i <= 0x10FFFF
-#            )
-
     for k,v in data.items():
         if k in bodyParts:
-            if isinstance(v, basestring):
-                flag = UnicodeDammit(v).unicode
-            elif hasattr(v, 'strftime'):
-                flag = u'%s' % v.strftime('%Y-%m-%d %H:%M:%S')
+        
+            if hasattr(v, 'strftime'):
+                flag = v.strftime('%Y-%m-%d %H:%M:%S')
+            elif isinstance(v, str):
+                flag = unicode(v).encode('utf8').decode('utf8')
+            elif isinstance(v, unicode):
+                fix = UnicodeDammit(v).unicode
+                flag = fix.encode('utf8').decode('utf8')
             else:
-                flag = u'%s' % v
+                flag = str(v)
                 
-            bodyParts[k].text = flag.encode('utf-8')
+            bodyParts[k].text = flag
             
-#            bodyParts[k].text = ''.join(
-#                c for c in flag if valid_XML_char_ordinal(ord(c))
-#            ).encode('utf-8')
-    
     xmlfile = StringIO()
     bodyParts['doc'].write(xmlfile)
     body = xmlfile.getvalue()
