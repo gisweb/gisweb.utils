@@ -189,7 +189,7 @@ def protocolla(served_url, adapter=None,
     data = dict(
         tipologia = kwargs['tipo'],
         utente = kwargs['username'],
-        tms_req = date_req.strftime('%s')
+        tms_req = date_req.strftime('%s'),
         pid = kwargs.get('pid')
     )
 
