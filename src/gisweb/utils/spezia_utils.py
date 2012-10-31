@@ -202,7 +202,7 @@ def protocolla(served_url, adapter=None,
     
     return xml2obj(response)
 
-def get_params(doc, tipo):
+def get_params(doc, tipo, **kwargs):
     
     params = dict()
     for par in ('oggetto', 'indirizzo', 'comune', 'cap', 'prov', ):
@@ -211,6 +211,8 @@ def get_params(doc, tipo):
     params['tipo'] = '%s' % tipo
     
     params['data_segnatura'] = doc.getItem('data_presentazione', datetime.now())
+    
+    params.update(kwargs)
 
     return params
 
