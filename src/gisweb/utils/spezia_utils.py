@@ -14,6 +14,7 @@ except ImportError:
     import ElementTree
 
 from XmlDict import XmlDictConfig
+from UnicodeDammit import UnicodeDammit
 
 def guess_resp(appid=None):
     responsabili_noti = dict(
@@ -121,8 +122,9 @@ def getXmlBody(
 
     for k,v in data.items():
         if k in bodyParts:
+            converted = UnicodeDammit(webfile, isHTML=True)
             if isinstance(v, basestring):
-                flag = u'%s' % v
+                flag = UnicodeDammit(v).unicode
             elif hasattr(v, 'strftime'):
                 flag = u'%s' % v.strftime('%Y-%m-%d %H:%M:%S')
             else:
