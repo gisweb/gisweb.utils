@@ -19,7 +19,7 @@ def get_session(sessionname):
     return factory()
 
 def get_soup(sessionname):
-    session = get_session(adapter)
+    session = get_session(sessione)
     engine = session.get_bind()
     return SqlSoup(engine)
 
