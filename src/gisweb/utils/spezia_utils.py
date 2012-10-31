@@ -3,6 +3,7 @@
 from lxml import etree
 import xmlrpclib
 from datetime import datetime
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -13,8 +14,15 @@ try:
 except ImportError:
     import ElementTree
 
-from XmlDict import XmlDictConfig
-from UnicodeDammit import UnicodeDammit
+try:
+    from XmlDict import XmlDictConfig
+except ImportError:
+    pass
+
+try:
+    from UnicodeDammit import UnicodeDammit
+except ImportError:
+    pass
 
 def guess_resp(appid=None):
     responsabili_noti = dict(
