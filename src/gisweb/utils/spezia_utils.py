@@ -148,6 +148,19 @@ def get_id_request(adapter=None, data={}):
             pid = adapter(**data)[0]['id']
     return pid
 
+def xml2obj(xml):
+
+    try:
+        import cElementTree as ElementTree
+    except ImportError:
+        import ElementTree
+
+    from XmlDict import XmlDictConfig
+
+    root = ElementTree.XML(xml)
+    return XmlDictConfig(root)
+
+
 def protocolla(served_url, adapter=None,
     responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
     **kwargs):
@@ -175,10 +188,10 @@ def protocolla(served_url, adapter=None,
     num = get_id_request(adapter=adapter, data=data)
 
     server = xmlrpclib.Server(responseURL)
-    # da testare il formato di date: %Y-%m-%d %H:%M:%S ???
     response = server.accoda(date, num, served_url, xml_content.encode('base64')).decode('base64')
     
-    
+    return xml2obj(response)
+
 
 if __name__ == '__main__':
     served_url = "http://iol.vmserver/scavicantieri/application/test"
@@ -188,7 +201,7 @@ if __name__ == '__main__':
         'indirizzo': 'via a picco 22', 'provincia': 'SP', 'tipo': 'scavi',
         'data_segnatura': '2011-07-13 14:48:03', 'cap': '19100', 'nominativo': 'dimattia mirko'}
     #print getXmlBody(**kwargs)
-    adapter = 'sitar'
+    adapter = None
 
     print protocolla(served_url,
         adapter=adapter,
