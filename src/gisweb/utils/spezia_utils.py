@@ -119,14 +119,15 @@ def getXmlBody(
     data.update(kwdata)
 
     bodyParts = initBody4spezia()
-
-    def valid_XML_char_ordinal(i):
-        return ( # conditions ordered by presumed frequency
-            0x20 <= i <= 0xD7FF 
-            or i in (0x9, 0xA, 0xD)
-            or 0xE000 <= i <= 0xFFFD
-            or 0x10000 <= i <= 0x10FFFF
-            )
+    
+    # courtesy of: http://stackoverflow.com/questions/8733233/filtering-out-certain-bytes-in-python
+#    def valid_XML_char_ordinal(i):
+#        return ( # conditions ordered by presumed frequency
+#            0x20 <= i <= 0xD7FF 
+#            or i in (0x9, 0xA, 0xD)
+#            or 0xE000 <= i <= 0xFFFD
+#            or 0x10000 <= i <= 0x10FFFF
+#            )
 
     for k,v in data.items():
         if k in bodyParts:
@@ -137,11 +138,11 @@ def getXmlBody(
             else:
                 flag = u'%s' % v
                 
-#            bodyParts[k].text = flag.encode('utf-8')
+            bodyParts[k].text = flag.encode('utf-8')
             
-            bodyParts[k].text = ''.join(
-                c for c in flag if valid_XML_char_ordinal(ord(c))
-            ).encode('utf-8')
+#            bodyParts[k].text = ''.join(
+#                c for c in flag if valid_XML_char_ordinal(ord(c))
+#            ).encode('utf-8')
     
     xmlfile = StringIO()
     bodyParts['doc'].write(xmlfile)
