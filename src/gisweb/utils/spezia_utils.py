@@ -214,6 +214,32 @@ def get_params(doc, tipo):
 
     return params
 
+def protocolla_doc(doc, tipo, served_url, responseURL,
+    adapter=None,
+    refresh_index = True
+    ):
+    '''
+    in place function
+    '''
+
+    kwargs = get_params(doc, tipo)
+
+    resp = protocolla(served_url, adapter=adapter,
+        responseURL = responseURL,
+        **kwargs)
+    
+    doc.setItem('protocollo', '%s' % resp['numero'])
+    
+    # coutesy of: https://github.com/plomino/Plomino/blob/github-main/Products/CMFPlomino/PlominoDocument.py
+    # in save
+    if refresh_index:
+        db = doc.getParentDatabase()
+        # update index
+        db.getIndex().indexDocument(doc)
+        # update portal_catalog
+        if db.getIndexInPortal():
+            db.portal_catalog.catalog_object(doc, "/".join(db.getPhysicalPath() + (self.id,)))
+
 if __name__ == '__main__':
     served_url = "http://iol.vmserver/scavicantieri/application/test"
     #now = datetime.now().strftime('%Y-%m-%d')
