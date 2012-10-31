@@ -108,11 +108,12 @@ def getXmlBody(
     for k,v in data.items():
         if k in bodyParts:
             if isinstance(v, basestring):
-                bodyParts[k].text = v
+                flag = v
             elif hasattr(v, 'strftime'):
-                bodyParts[k].text = v.strftime('%Y-%m-%d %H:%M:%S')
+                flag = v.strftime('%Y-%m-%d %H:%M:%S')
             else:
-                bodyParts[k].text = '%s' % v
+                flag = '%s' % v
+            bodyParts[k].text = flag.encode('utf-8')
     
     xmlfile = StringIO()
     bodyParts['doc'].write(xmlfile)
