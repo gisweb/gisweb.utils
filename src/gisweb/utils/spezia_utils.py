@@ -13,7 +13,7 @@ def guess_resp(appid=None):
         cantieri = 'ceccla57',
         trasporti = 'traale71'
     )
-    return esponsabili_noti.get(appid) or 'dammau54'
+    return responsabili_noti.get(appid) or 'dammau54'
 
 def initBody4spezia():
 
