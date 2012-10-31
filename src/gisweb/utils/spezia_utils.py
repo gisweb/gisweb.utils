@@ -96,6 +96,8 @@ def getXmlBody(
         utenteProtocollatore = 'dammau54',
         **kwdata):
 
+    from json_utils import json_dumps
+
     data_segnatura = data_segnatura or datetime.now().strftime('%Y-%m-%d')
     data = locals()
     kwdata = data.pop('kwdata')
@@ -105,7 +107,12 @@ def getXmlBody(
 
     for k,v in data.items():
         if k in bodyParts:
-            bodyParts[k].text = v
+            if isinstance(v, basestring):
+                bodyParts[k].text = v
+            elif hasattr(v, 'strftime'):
+                bodyParts[k].text = v.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                bodyParts[k].text = '%s' % v
     
     xmlfile = StringIO()
     bodyParts['doc'].write(xmlfile)
@@ -177,12 +184,14 @@ def protocolla(served_url, adapter=None,
 
     xml_content = getXmlBody(**kwargs)
 
-    corr = dict(tipo='tipologia', username='utente', data_segnatura='tms_req')
-    data = dict([(c2, kwargs[c1]) for c1,c2 in corr.items()])
-    if not 'tms_req' in data:
-        data['tms_req'] = now.strftime('%s')
-    data['pid'] = kwargs.get('pid')
-    
+    date_req = kwargs.get('data_segnatura') or now
+    data = dict(
+        tipologia = kwargs['tipo'],
+        utente = kwargs['username'],
+        tms_req = date_req.strftime('%s')
+        pid = kwargs.get('pid')
+    )
+
     date = data['tms_req']
     
     num = get_id_request(adapter=adapter, data=data)

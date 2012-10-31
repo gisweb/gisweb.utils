@@ -11,7 +11,7 @@ def handler(obj):
             srepr = '%d/%m/%Y'
 #            srepr = '%a %d %b %Y'
         else:
-            srepr = '%d/%m/%Y %H:%M'
+            srepr = '%d/%m/%Y %H:%M:%S'
         return obj.strftime(srepr)
     else:
         return None
