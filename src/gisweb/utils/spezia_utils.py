@@ -34,6 +34,7 @@ def initBody4spezia():
     parent = etree.SubElement(identificatore, 'CodiceAmministrazione')
     id_aoo = etree.SubElement(identificatore, 'CodiceAOO')
     idRichiesta = etree.SubElement(identificatore, 'NumeroRegistrazione')
+    tiporegistrazione = etree.SubElement(identificatore, 'TipoRegistrazione')
     data_segnatura = etree.SubElement(identificatore, 'DataRegistrazione')
     
     origine = etree.SubElement(intestazione, 'Origine')
