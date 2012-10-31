@@ -202,6 +202,17 @@ def protocolla(served_url, adapter=None,
     
     return xml2obj(response)
 
+def get_params(doc, tipo):
+    
+    params = dict()
+    for par in ('oggetto', 'indirizzo', 'comune', 'cap', 'prov', ):
+        params[par] = doc.getItem(par, '')
+    
+    params['tipo'] = '%s' % tipo
+    
+    params['data_segnatura'] = doc.getItem('data_presentazione', datime.now())
+
+    return params
 
 if __name__ == '__main__':
     served_url = "http://iol.vmserver/scavicantieri/application/test"
