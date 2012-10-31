@@ -181,7 +181,7 @@ def protocolla(served_url, adapter=None,
     now = datetime.now()
     kwargs['responseURL'] = responseURL
     if not 'username' in kwargs:
-        kwargs['username'] = guess_resp(appid=kwargs['tipologia'])
+        kwargs['username'] = guess_resp(appid=kwargs['tipo'])
 
     xml_content = getXmlBody(**kwargs)
 
