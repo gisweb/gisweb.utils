@@ -97,8 +97,6 @@ def getXmlBody(
         utenteProtocollatore = 'dammau54',
         **kwdata):
 
-    from json_utils import json_dumps
-
     data_segnatura = data_segnatura or datetime.now().strftime('%Y-%m-%d')
     data = locals()
     kwdata = data.pop('kwdata')
