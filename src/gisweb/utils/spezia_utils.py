@@ -14,6 +14,12 @@ try:
 except ImportError:
     import ElementTree
 
+# nel caso in cui questo file venga usato nelle Extensions ho riscontrato difficoltà
+# nell'importazione di moduli locali per cui i file XmlDict e UnicodeDammit
+# vanno accodati al presente. È sufficiente fare:
+# cat path/to/XmlDict.py >> path/to/spezia_utils.py
+# cat path/to/UnicodeDammit.py >> path/to/spezia_utils.py
+
 try:
     from XmlDict import XmlDictConfig
 except ImportError:
@@ -25,23 +31,27 @@ except ImportError:
     pass
 
 def guess_resp(appid=None):
+    '''
+    indovina il responsabile per la protocollazione in base al tipo di richiesta.
+    '''
+
     responsabili_noti = dict(
         cantieri = 'ceccla57',
-        trasporti = 'traale71'
+        trasporti = 'traale71',
+        scavi = 'dammau54'
     )
     return responsabili_noti.get(appid) or 'dammau54'
 
 def initBody4spezia():
+    '''
+    inizializzazione delle sezioni utili del file xml da passare al servizio di
+    protocollazione
+    '''
 
-#    page = etree.Element('xml', version='1.0', encoding='ISO-8859-1')
-    
     segnatura_info = {'{http://www.w3.org/XML/1998/namespace}lang': 'it'}
     segnatura = etree.Element('Segnatura', encoding='ISO-8859-1', **segnatura_info)
     
     doc = etree.ElementTree(segnatura)
-    
-#    segnatura_info = {'{http://www.w3.org/XML/1998/namespace}lang': 'it'}
-#    segnatura = etree.SubElement(page, 'Segnatura', **segnatura_info)
     
     intestazione = etree.SubElement(segnatura, 'Intestazione')
 
@@ -105,13 +115,24 @@ def initBody4spezia():
     return locals()
 
 def getXmlBody(
-        data_segnatura = None,
-        parent = '86',
-        titolario = '6',
-        classifica = '7',
-        tipocontesto = 'IndicazioneClassificazione',
-        utenteProtocollatore = 'dammau54',
-        **kwdata):
+    data_segnatura = None,
+    parent = '86',
+    titolario = '6',
+    classifica = '7',
+    tipocontesto = 'IndicazioneClassificazione',
+    utenteProtocollatore = 'dammau54',
+    **kwdata):
+
+    '''
+    funzione per la compilazione del documento xml per la protocollazione.
+    
+    Problema riscontrato:
+    * Nel caso di velore unicode è necessario un encode seguito da decode,
+    altrimenti i caratteri accentati non vengono accettati dallalibreria lxml.  
+    * Nel caso di valore unicode con codifica ignota diversa da quella di sistema
+    ho usato la classe UnicodeDammit per farmi restituire una stringa unicode
+    nella codifica di sistema e quindi nota (UTF8). 
+    '''
 
     data_segnatura = data_segnatura or datetime.now().strftime('%Y-%m-%d')
     data = locals()
@@ -144,16 +165,20 @@ def getXmlBody(
 
 def get_id_request(adapter=None, data={}):
     '''
-    returns '<int>', '%Y-%m-%d %H:%M:%S'
-    per ora ricaviamo num dai secondi della data odierna dal 1/1/1970
-    poi si userà un progressivo ricavato da una tabella in database.
+    restituisce l'id della richiesta come progressivo contenuto nella tabella
+    "richiesta_protocollo" nello schema "istanze" del database "sitar" raggiungibile
+    o mediante sqlalchemy adapter o con Z SQL method.
+    In mancanza di tali informazioni l'id viene ricavato dai secondi della data
+    UNIX attuale.
     '''
+
     now = datetime.now()
     num = now.strftime('%s')
     pid = num
     if adapter:
         if isinstance(adapter, basestring):
             # adapter è una connessione SQLAlchemy
+            
             try:
                 from db_utils import get_soup
             except ImportError:
@@ -168,33 +193,44 @@ def get_id_request(adapter=None, data={}):
             db.commit()
 
         else:
-            # adapter è uno Z SQL Method contenente la seguente query:
+            # adapter è uno Z SQL Method e deve contenere la seguente query:
             # INSERT INTO istanze.richiesta_protocollo(tipologia,utente,tms_req,pid)
             #    VALUES('$data[tipo]','$data[username]',$t,$pid);	
             # SELECT id FROM istanze.richiesta_protocollo
             #    WHERE tipologia='$data[tipo]' and utente='$data[username]' and tms_req=$t;
             pid = adapter(**data)[0]['id']
+
     return pid
 
 def xml2obj(xml):
+    '''
+    Converte un xml in un dizionario.
+    Utile per accedere ai contenuti della risposta xml del servizio di protocollazione.
+    
+    Non restituisce direttamente l'oggetto XmlDictConfig per aggirare problemi
+    di permessi di Plone.
+    '''
 
     root = ElementTree.XML(xml)
-    
     out = dict()
     out.update(XmlDictConfig(root))
     
     return out
 
 
-def protocolla(served_url, adapter=None,
-    responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test
+def protocolla(served_url,
+    responseURL,
+    adapter=None,
     **kwargs):
     """
-    served_url: URL dello script chiamante
+    served_url: URL chiamante
     adapter: può essere il nome di una sessione SQLAlchemy, uno Z SQL Method o None
     responseURL: URL del servizio ws_protocollo
     kwargs: dizionario contenente le informazioni per costrure l'XML per la protocollazione
+    
+    Questa funzione interroga la funzione "accoda" del servizio di protocollazione.
     """
+
     now = datetime.now()
     kwargs['responseURL'] = responseURL
     if not 'username' in kwargs:
@@ -220,31 +256,36 @@ def protocolla(served_url, adapter=None,
     return xml2obj(response)
 
 def get_params(doc, tipo, **kwargs):
+    '''
+    Ricava dal plominoDocument di una istanza scavi i paramtri utili alla
+    protocollazione. I parametri in kwargs vengono settati così come sono. 
+    '''
     
     params = dict()
     for par in ('oggetto', 'indirizzo', 'comune', 'cap', 'prov', ):
         params[par] = doc.getItem(par, '')
     
     params['tipo'] = '%s' % tipo
-    
     params['data_segnatura'] = doc.getItem('data_presentazione', datetime.now())
-    
     params.update(kwargs)
 
     return params
 
-def protocolla_doc(doc, tipo, served_url, responseURL,
-    adapter=None,
-    refresh_index = True
-    ):
+def protocolla_doc(doc, tipo, served_url,
+    responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test,
+    adapter = None,
+    refresh_index = True):
     '''
     in place function
+    funzione inutile... non è detto che queste operazioni possano o debbano
+    essere fatte tutte.
     '''
 
     kwargs = get_params(doc, tipo)
 
-    resp = protocolla(served_url, adapter=adapter,
+    resp = protocolla(served_url,
         responseURL = responseURL,
+        adapter=adapter,
         **kwargs)
     
     doc.setItem('protocollo', '%s' % resp['numero'])
@@ -260,6 +301,10 @@ def protocolla_doc(doc, tipo, served_url, responseURL,
             db.portal_catalog.catalog_object(doc, "/".join(db.getPhysicalPath() + (self.id,)))
 
 if __name__ == '__main__':
+    '''
+    da script non è possibile testere valori del parametro tester diversi da None. 
+    '''
+
     served_url = "http://iol.vmserver/scavicantieri/application/test"
     #now = datetime.now().strftime('%Y-%m-%d')
     kwargs = {'username': u'pippo', 'comune': 'La Spezia',
@@ -272,4 +317,3 @@ if __name__ == '__main__':
     print protocolla(served_url,
         adapter=adapter,
         responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', **kwargs)
-    

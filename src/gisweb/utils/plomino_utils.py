@@ -71,7 +71,13 @@ def getItemOr(plominoDocument, item_name, default=None):
 #    """
 
 def addToDate(date, addend, units='months', start=1):
-    """A DateTime may be added to a number and a number may be
+    """
+    data: a zope DateTime object
+    addend: int
+    units: string, "months", "years" or "days" are accepted
+    start: int, 0 or 1
+    
+    A DateTime may be added to a number and a number may be
     added to a DateTime and the number is supposed to represent a number of days
     to add to the date in the sum.
     You can use this function to easily add other time units such as months or years.
