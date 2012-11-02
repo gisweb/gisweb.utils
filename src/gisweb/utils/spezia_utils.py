@@ -250,6 +250,9 @@ def protocolla(served_url,
     
     num = get_id_request(adapter=adapter, data=data)
 
+    if kwargs.get('test'):
+        return dict(numero=num)
+
     server = xmlrpclib.Server(responseURL)
     response = server.accoda(date, num, served_url, xml_content.encode('base64')).decode('base64')
     
