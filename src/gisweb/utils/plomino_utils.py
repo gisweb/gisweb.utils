@@ -503,14 +503,14 @@ def get_related_info(plominoDocument, clues, default=None, debug=False):
     return out
     
     
-def get_parent_plominodb(obj):
-    ''' Return the current plominoDatabase. Is enough to pass the context from
-        within a scipt or a plominoDocument python formula.
-    '''
-    current = obj
-    while hasattr(current, 'aq_parent') and not IPlominoDatabase.providedBy(current):
-        current = current.aq_parent
-    return hasattr(current, 'aq_parent') and current
+#def get_parent_plominodb(obj):
+#    ''' Return the current plominoDatabase. Is enough to pass the context from
+#        within a scipt or a plominoDocument python formula.
+#    '''
+#    current = obj
+#    while hasattr(current, 'aq_parent') and not IPlominoDatabase.providedBy(current):
+#        current = current.aq_parent
+#    return hasattr(current, 'aq_parent') and current
 
 def search_around(plominoDocument, parentKey='parentDocument', *targets, **flts):
     '''
@@ -735,10 +735,7 @@ class plominoKin(object):
         self.parentLinkKey = kwargs.get('parentLinkKey') or 'linkToParent'
         self.childrenList_name = kwargs.get('childrenList_name') or 'elenco_%s'
 
-        if hasattr(context, 'getParentDatabase'):
-            self.db = context.getParentDatabase()
-        else:
-            self.db = get_parent_plominodb(context)
+        self.db = context.getParentDatabase()
 
         if kwargs.get('pid'):
             self.doc = self.db.getDocument(pid)
