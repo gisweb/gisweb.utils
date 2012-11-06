@@ -994,7 +994,7 @@ class plominoKin(object):
         self.setParenthood(parent.id, doc.id, **kwargs)
         self.setChildhood(parent.id, doc.id)
         doc.save()
-        return doc.id
+        return doc.getId()
 
 def ondelete_parent(doc):
     plominoKin(doc).ondelete_parent()
