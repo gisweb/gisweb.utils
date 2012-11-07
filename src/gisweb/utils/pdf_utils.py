@@ -7,7 +7,9 @@ from reportlab.lib.enums import TA_CENTER
 import os
 import tempfile
 
-def generate_pdf(data, layout, options={}):
+_marker = []
+
+def generate_pdf(data, layout, options=_marker):
     """Generate a pdf file using the strings in data,
        laying them out according to layout (data and layout share the same keys)
        layout values are like this (in millimeters units):
@@ -16,8 +18,20 @@ def generate_pdf(data, layout, options={}):
        Overflowing text will cause the font to scale down to fit the whole text
        Options can be used to set font/colour etc
        Example Options dict:
-           #XXX unimplemented so far
+            {
+                'default': ParagraphStyle(fontSize=12),
+                'nome': ParagraphStyle(fontSize=14)
+            }
     """
+    if options is _marker:
+        bold = ParagraphStyle(name='bold', fontSize=14,
+                              fontName='Helvetica-Bold')
+        options = {
+            'n_permesso_bottom': bold,
+            'data_rilascio_bottom': bold,
+            'scadenza_bottom': bold,
+            'targa_bottom': bold,
+        }
     pagesize = options.get('pagesize', (210*mm, 297*mm) )
     (_, canvasFileName) = tempfile.mkstemp('page.pdf')
     mycanvas = Canvas(canvasFileName,pagesize=pagesize)
@@ -31,14 +45,14 @@ def generate_pdf(data, layout, options={}):
 
 def process_fields(data, canvas, fields, pagesize, options):
     # tl = top left; br = bottom right
-    for fieldname, (bbox_tl, bbox_br) in fields.items():
-        style = ParagraphStyle(name=fieldname,
-            fontSize = 14,
-            fontname='Arial',
+    default_style = options.get('default', ParagraphStyle(
+            name='default-default',
+            fontSize=14,
+            fontName='Helvetica',
             alignment=TA_CENTER,
-            # borderWidth=4,
-            # borderColor='black'
-        )
+        ))
+    for fieldname, (bbox_tl, bbox_br) in fields.items():
+        style = options.get(fieldname, default_style)
         p = Paragraph(data.get(fieldname) or '',style)
         width = bbox_br[0] - bbox_tl[0]
         height = bbox_br[1] - bbox_tl[1]
