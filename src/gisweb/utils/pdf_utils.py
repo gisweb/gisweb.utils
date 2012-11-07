@@ -33,7 +33,7 @@ def process_fields(data, canvas, fields, pagesize, options):
     # tl = top left; br = bottom right
     for fieldname, (bbox_tl, bbox_br) in fields.items():
         style = ParagraphStyle(name=fieldname,
-            fontSize = 12,
+            fontSize = 14,
             fontname='Arial',
             alignment=TA_CENTER,
             # borderWidth=4,
