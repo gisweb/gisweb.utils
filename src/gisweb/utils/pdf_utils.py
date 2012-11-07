@@ -19,8 +19,8 @@ def generate_pdf(data, layout, options=_marker):
        Options can be used to set font/colour etc
        Example Options dict:
             {
-                'default': ParagraphStyle(fontSize=12),
-                'nome': ParagraphStyle(fontSize=14)
+                'default': ParagraphStyle(fontSize=12, fontName="Helvetica"),
+                'nome': ParagraphStyle(fontSize=14, fontName="Helvetica")
             }
     """
     if options is _marker:
