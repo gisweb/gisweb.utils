@@ -65,6 +65,8 @@ from anagrafica_utils import is_valid_cf, is_valid_piva
 
 #################################################################### URL UTILS #
 
+from url_utils import proxy
+
 from urllib import urlencode
 from urllib2 import urlopen
 def openUrl(url, timeout=None, **kwargs):
