@@ -7,7 +7,9 @@ from reportlab.lib.enums import TA_CENTER
 import os
 import tempfile
 
-def generate_pdf(data, layout, options={}):
+_marker = []
+
+def generate_pdf(data, layout, options=_marker):
     """Generate a pdf file using the strings in data,
        laying them out according to layout (data and layout share the same keys)
        layout values are like this (in millimeters units):
@@ -16,8 +18,20 @@ def generate_pdf(data, layout, options={}):
        Overflowing text will cause the font to scale down to fit the whole text
        Options can be used to set font/colour etc
        Example Options dict:
-           #XXX unimplemented so far
+            {
+                'default': ParagraphStyle(fontSize=12, fontName="Helvetica"),
+                'nome': ParagraphStyle(fontSize=14, fontName="Helvetica")
+            }
     """
+    if options is _marker:
+        bold = ParagraphStyle(name='bold', fontSize=14,
+                              fontName='Helvetica-Bold')
+        options = {
+            'n_permesso_bottom': bold,
+            'data_rilascio_bottom': bold,
+            'scadenza_bottom': bold,
+            'targa_bottom': bold,
+        }
     pagesize = options.get('pagesize', (210*mm, 297*mm) )
     (_, canvasFileName) = tempfile.mkstemp('page.pdf')
     mycanvas = Canvas(canvasFileName,pagesize=pagesize)
@@ -31,14 +45,14 @@ def generate_pdf(data, layout, options={}):
 
 def process_fields(data, canvas, fields, pagesize, options):
     # tl = top left; br = bottom right
-    for fieldname, (bbox_tl, bbox_br) in fields.items():
-        style = ParagraphStyle(name=fieldname,
-            fontSize = 14,
-            fontname='Arial',
+    default_style = options.get('default', ParagraphStyle(
+            name='default-default',
+            fontSize=14,
+            fontName='Helvetica',
             alignment=TA_CENTER,
-            # borderWidth=4,
-            # borderColor='black'
-        )
+        ))
+    for fieldname, (bbox_tl, bbox_br) in fields.items():
+        style = options.get(fieldname, default_style)
         p = Paragraph(data.get(fieldname) or '',style)
         width = bbox_br[0] - bbox_tl[0]
         height = bbox_br[1] - bbox_tl[1]
@@ -64,19 +78,19 @@ def show_in_evince(filecontents, bgpdf='/tmp/abbonamento.pdf'):
 if __name__ == '__main__':
     # Row 1, top; Row 1, bottom
     R1T, R1B = 41, 49
-    R2T, R2B = 63, 71 # Row 2
-    R3T, R3B = 79, 87 # Ok, you can figure it out all by yourself
+    R2T, R2B = 63, 71  # Row 2
+    R3T, R3B = 79, 87  # Ok, you can figure it out all by yourself
     R4T, R4B = 98, 106
     R5T, R5B = 116, 124
     # Firma is not dynamic, thus I don't consider it a row at all
     R6T, R6B = 177, 185
 
-    RR = 201 # right margin (many fields aling on this margin)
+    RR = 201  # right margin (many fields aling on this margin)
 
     SANREMO_LAYOUT = {
         'n_permesso_top': ((153, 20), (RR, 27)),
 
-        'rilasciato': ((23,R1T), (57,R1B)),
+        'rilasciato': ((23, R1T), (57, R1B)),
         'scadenza': ((70, R1T), (105, R1B)),
         'categoria': ((127, R1T), (153, R1B)),
         'procura': ((164, R1T), (RR, R1B)),
@@ -87,31 +101,31 @@ if __name__ == '__main__':
         'nato_il': ((173, R2T), (RR, R2B)),
 
         'numero_ff': ((22, R3T), (44, R3B)),
-        'indirizzo': ((56,R3T), (165,R3B)),
-        'civico': ((175,R3T), (RR,R3B)),
+        'indirizzo': ((56, R3T), (165, R3B)),
+        'civico': ((175, R3T), (RR, R3B)),
 
-        'targa': ((18,R4T), (57,R4B)),
-        'marca': ((66,R4T), (105,R4B)),
-        'modello': ((117,R4T), (153,R4B)),
-        'colore': ((162,R4T), (RR,R4B)),
+        'targa': ((18, R4T), (57, R4B)),
+        'marca': ((66, R4T), (105, R4B)),
+        'modello': ((117, R4T), (153, R4B)),
+        'colore': ((162, R4T), (RR, R4B)),
 
-        'verificato': ((22,R5T), (56,R5B)),
-        'pagato': ((68,R5T), (104,R5B)),
-        'autocertificazione': ((127,R5T), (152,R5B)),
-        'data_ritiro': ((166,R5T), (RR,R5B)),
+        'verificato': ((22, R5T), (56, R5B)),
+        'pagato': ((68, R5T), (104, R5B)),
+        'autocertificazione': ((127, R5T), (152, R5B)),
+        'data_ritiro': ((166, R5T), (RR, R5B)),
 
-        'zona': ((15,R6T), (99,R6B)),
-        'data_rilascio': ((115,R6T), (RR,R6B)),
+        'zona': ((15, R6T), (99, R6B)),
+        'data_rilascio': ((115, R6T), (RR, R6B)),
 
         'n_permesso_middle': ((156, 166), (204, 173)),
 
-        'n_permesso_bottom': ((45,244), (73,251)),
-        'data_rilascio_bottom': ((12,254), (39,258)),
-        'scadenza_bottom': ((49,254), (73,258)),
-        'targa_bottom': ((24,261), (74,270)),
+        'n_permesso_bottom': ((45, 244), (73, 251)),
+        'data_rilascio_bottom': ((12, 254), (39, 258)),
+        'scadenza_bottom': ((49, 254), (73, 258)),
+        'targa_bottom': ((24, 261), (74, 270)),
     }
     test_data = {
-        'n_permesso_top' : '344666',
+        'n_permesso_top': '344666',
         'rilasciato': 'RILASCIATO',
         'scadenza': ('SCADENZA della pratica in un remoto '
                      'futuro che prima o poi arriverà sorprendendo tutti '
