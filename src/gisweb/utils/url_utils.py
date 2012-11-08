@@ -32,7 +32,7 @@ def proxy(request, url):
     
     method = request.method
     params = request.form
-    query_string = context.REQUEST.QUERY_STRING
+    query_string = request.QUERY_STRING
     
     if "HTTP_X_FORWARDED_FOR" in request.environ:
         # Virtual host
