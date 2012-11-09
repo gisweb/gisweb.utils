@@ -1154,6 +1154,6 @@ def batch_saveDocument(context, doc, REQUEST, creation=False):
     return b.errors
 
 def batch_save(context, doc, form=None, creation=False, refresh_index=True,
-    asAuthor=True, onSaveEvent=True, mantainOriginalForm=True)):
+    asAuthor=True, onSaveEvent=True, mantainOriginalForm=True):
     
     pass
