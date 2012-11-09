@@ -31,6 +31,7 @@ def generate_pdf(data, layout, options=_marker):
             'data_rilascio_bottom': bold,
             'scadenza_bottom': bold,
             'targa_bottom': bold,
+            'mese_validita': bold,
         }
     pagesize = options.get('pagesize', (210*mm, 297*mm) )
     (_, canvasFileName) = tempfile.mkstemp('page.pdf')

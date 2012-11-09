@@ -1019,3 +1019,141 @@ def get_parent(doc):
 
 def fetchDocs(context, **kwargs):
     return plominoKin(context).searchAndFetch(**kwargs)
+
+class batch(object):
+
+    def __init__(self, context):
+        self.db = context.getParentDatabase()
+        self.errors = list()
+
+    def set_error(self, method, message, **kwargs):
+        kwargs.update({
+            'method': method,
+            'message': message,
+            'date': DateTime()
+        })
+        self.errors.append(kwargs)
+
+    def save(self, doc, form=None, creation=False, refresh_index=True, asAuthor=True, onSaveEvent=True, mantainOriginalForm=True):
+        """refresh values according form, and reindex the document
+        """
+        method = 'save'
+        
+        # we process computed fields (refresh the value)
+        if form is None:
+            form = doc.getForm()
+        elif not mantainOriginalForm:
+            # questa sostituzione può essere evitata... 
+            doc.setItem('Form', form.getFormName())
+
+        db=self.db # SONO QUI
+        if form:
+            for f in form.getFormFields(includesubforms=True, doc=doc, applyhidewhen=False):
+                mode = f.getFieldMode()
+                fieldname = f.id
+                if mode in ["COMPUTED", "COMPUTEDONSAVE"] or (mode=="CREATION" and creation):
+                    result = form.computeFieldValue(fieldname, doc)
+                    doc.setItem(fieldname, result)
+                else:
+                    # computed for display field are not stored
+                    pass
+
+            # compute the document title
+            title_formula = form.getDocumentTitle()
+            if title_formula:
+                # Use the formula if we have one
+                try:
+                    title = doc.runFormulaScript("form_"+form.id+"_title", doc, form.DocumentTitle)
+                except PlominoScriptException, e:
+                    message = 'Title formula failed: %s' % e
+                    self.set_error(method, message)
+                else:
+                    if title != doc.Title():
+                        doc.setTitle(title)
+            elif creation:
+                # If we have no formula and we're creating, use Form's title
+                title = form.Title()
+                if title != doc.Title():
+                    # We may be calling save with 'creation=True' on
+                    # existing documents, in which case we may already have
+                    # a title.
+                    doc.setTitle(title)
+
+            # update the document id
+            if creation and form.getDocumentId():
+                new_id = doc.generateNewId()
+                if new_id:
+                    transaction.savepoint(optimistic=True)
+                    db.documents.manage_renameObject(doc.id, new_id)
+
+        # update the Plomino_Authors field with the current user name
+        if asAuthor:
+            authors = doc.getItem('Plomino_Authors', []) or []
+            name = db.getCurrentUser().getUserName()
+            
+            if name not in authors:
+                authors.append(name)
+            
+            doc.setItem('Plomino_Authors', authors)
+
+        # execute the onSaveDocument code of the form
+        if form and onSaveEvent:
+            try:
+                result = doc.runFormulaScript("form_"+form.id+"_onsave", doc, form.onSaveDocument)
+#                if result and hasattr(doc, 'REQUEST'):
+#                    doc.REQUEST.set('plominoredirecturl', result)
+            except PlominoScriptException, e:
+                message = 'Document has been saved but onSave event failed: %s' % e
+                self.set_error(method, message)
+#                if hasattr(doc, 'REQUEST'):
+#                    e.reportError('Document has been saved but onSave event failed.')
+#                    doc_path = doc.REQUEST.physicalPathToURL(doc.doc_path())
+#                    doc.REQUEST.RESPONSE.redirect(doc_path)
+
+        if refresh_index:
+            # update index
+            db.getIndex().indexDocument(doc)
+            # update portal_catalog
+            if db.getIndexInPortal():
+                db.portal_catalog.catalog_object(doc, "/".join(db.getPhysicalPath() + (doc.id,)))
+
+    def saveDocument(self, doc, REQUEST, creation=False):
+        """save a document using the form submitted content
+        """
+        method = 'saveDocument'
+        
+        db = self.db
+        form_name = REQUEST.get('Form') or doc.getItem('Form')
+        
+        form = db.getForm(form_name)
+
+        errors=form.validateInputs(REQUEST, doc=doc)
+        if len(errors)>0:
+            for err in errors:
+                self.set_error(method, err)
+        else:
+            doc.setItem('Form', form.getFormName())
+
+            # process editable fields (we read the submitted value in the request)
+            form.readInputs(doc, REQUEST, process_attachments=True)
+
+            # refresh computed values, run onSave, reindex
+            self.save(form, creation)
+
+    def refresh(self, form=None, **kwargs):
+        """ re-compute fields and re-index document
+        (by default onSave event is not called, and authors are not updated
+        """
+        default = dict(creation=False, refresh_index=True, asAuthor=False, onSaveEvent=False)
+        default.update(kwargs)
+        self.save(doc, form, **default)
+
+def batch_saveDocument(context, doc, REQUEST, creation=False):
+    b = batch(context)
+    b.saveDocument(doc, REQUEST, creation)
+    return b.errors
+
+def batch_save(context, doc, form=None, creation=False, refresh_index=True,
+    asAuthor=True, onSaveEvent=True, mantainOriginalForm=True)):
+    
+    pass
