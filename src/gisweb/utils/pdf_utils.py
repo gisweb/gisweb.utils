@@ -35,6 +35,10 @@ def generate_pdf(data, layout, options=_marker):
             'targa_bottom': big_bold,
             'mese_validita': bold
         }
+    elif isinstance(options, dict):
+        for opt,kwargs in options.items():
+            options[opt] = ParagraphStyle(**kwargs)
+    
     pagesize = options.get('pagesize', (210*mm, 297*mm) )
     (_, canvasFileName) = tempfile.mkstemp('page.pdf')
     mycanvas = Canvas(canvasFileName,pagesize=pagesize)
