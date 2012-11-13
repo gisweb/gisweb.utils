@@ -26,11 +26,13 @@ def generate_pdf(data, layout, options=_marker):
     if options is _marker:
         bold = ParagraphStyle(name='bold', fontSize=14,
                               fontName='Helvetica-Bold')
+        big_bold = ParagraphStyle(name='bold', fontSize=18,
+                              fontName='Helvetica-Bold')
         options = {
             'n_permesso_bottom': bold,
             'data_rilascio_bottom': bold,
             'scadenza_bottom': bold,
-            'targa_bottom': bold,
+            'targa_bottom': big_bold,
             'mese_validita': bold
         }
     pagesize = options.get('pagesize', (210*mm, 297*mm) )
