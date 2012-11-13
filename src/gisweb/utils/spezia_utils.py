@@ -233,8 +233,8 @@ def protocolla(served_url,
 
     now = datetime.now()
     kwargs['responseURL'] = responseURL
-    if not 'username' in kwargs:
-        kwargs['username'] = guess_resp(appid=kwargs['tipo'])
+#    if not 'username' in kwargs:
+#        kwargs['username'] = guess_resp(appid=kwargs['tipo'])
 
     xml_content = getXmlBody(**kwargs)
 
@@ -243,7 +243,7 @@ def protocolla(served_url,
         tipologia = kwargs['tipo'],
         utente = kwargs['username'],
         tms_req = date_req.strftime('%s'),
-        pid = kwargs.get('pid')
+        pid = kwargs['pid']
     )
 
     date = data['tms_req']
@@ -270,6 +270,11 @@ def get_params(doc, tipo, **kwargs):
     
     params['tipo'] = '%s' % tipo
     params['data_segnatura'] = doc.getItem('data_presentazione', datetime.now())
+    params['pid'] = doc.getId()
+    current_usr = doc.getParentDatabase().getCurrentUser()
+    params['username'] = current_usr.getProperty('fullname') or current_usr.getProperty('id')
+    
+    # i valori in kwargs eventualmente sovrascrivono quelli settati sopra
     params.update(kwargs)
 
     return params
