@@ -23,6 +23,9 @@ def LastDayofMonth(d):
     return StringToDate(DateToString(StartDayofMonth(d)+32,'%m-%Y'),'%m-%Y')-1
 
 def lookForValidDate(year, month, day, timeargs=[0, 0, 0], start=1):
+    '''
+    for internal purposes.
+    '''
 
     if month not in range(1, 13):
         raise Exception('GISWEB:UTILS ERROR: Not a valid month passed: %s' % month)
@@ -33,6 +36,7 @@ def lookForValidDate(year, month, day, timeargs=[0, 0, 0], start=1):
     try:
         return DateTime(year, month, day, *timeargs) - start
     except DateError, error:
+        # WARNING! only errors in day parameter are considered.
         day -= 1
         test = True
         while test:
@@ -573,6 +577,10 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
     Usage sample:
     submittedValue = plominoPrint(plominoDocument, 'stampa_autorizzazione')
     attachThis(plominoDocument, submittedValue, 'autorizzazione', filename='stampa_autorizzazione.pdf')
+    #### TO DO ####
+    a batter reciper proposed by Eric B. could be found here:
+    https://github.com/plomino/Plomino/issues/172#issuecomment-9494835
+    ###############
     '''
     (new_file, contenttype) = plominoDocument.setfile(submittedValue, filename=filename, overwrite=True)
     if not contenttype:
@@ -748,9 +756,9 @@ class plominoKin(object):
 #            raise Exception('GISWEB.UTILS ERROR: No plominoDocument found!!')
 
         self.idx = self.db.getIndex()
-        for fieldname in (self.parentKey, 'CASCADE', ):
-            if fieldname not in self.idx.indexes():
-                self.idx.createFieldIndex(fieldname, 'TEXT', refresh=True)
+#        for fieldname in (self.parentKey, 'CASCADE', ):
+#            if fieldname not in self.idx.indexes():
+#                self.idx.createFieldIndex(fieldname, 'TEXT', refresh=True)
     
     def searchAndFetch(self, fields={}, mainRequest={}, sideRequests={}, json=False):
         """
@@ -870,7 +878,8 @@ class plominoKin(object):
         child.setItem(self.parentKey, parent_id)
         child.setItem('CASCADE', CASCADE)
         if setDocLink:
-            child.setItem(self.parentLinkKey, getPath(doc))
+            parent = self.db.getDocument(parent_id)
+            child.setItem(self.parentLinkKey, getPath(parent))
     
     def getParentDoc(self):
         return self.db.getDocument(self.doc.getItem(self.parentKey))
@@ -925,6 +934,10 @@ class plominoKin(object):
         # no way
         if not parent_id:
             raise IOError('GISWEB.UTILS ERROR: Parent id not found!')
+        
+        for fieldname in (self.parentKey, 'CASCADE', ):
+            if fieldname not in self.idx.indexes():
+                self.idx.createFieldIndex(fieldname, 'TEXT', refresh=True)
         
         self.setParenthood(parent_id, child.id, **kwargs)
         self.setChildhood(parent_id, child.id, backToParent)
@@ -1155,5 +1168,4 @@ def batch_saveDocument(context, doc, REQUEST, creation=False):
 
 def batch_save(context, doc, form=None, creation=False, refresh_index=True,
     asAuthor=True, onSaveEvent=True, mantainOriginalForm=True):
-    
     pass
