@@ -879,7 +879,7 @@ class plominoKin(object):
         child.setItem('CASCADE', CASCADE)
         if setDocLink:
             parent = self.db.getDocument(parent_id)
-            child.setItem(self.parentLinkKey, getPath(parent))
+            child.setItem(self.parentLinkKey, [getPath(parent)])
     
     def getParentDoc(self):
         return self.db.getDocument(self.doc.getItem(self.parentKey))
