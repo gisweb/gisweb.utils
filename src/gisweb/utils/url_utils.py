@@ -9,6 +9,8 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 #def get_response(request):
 #    return urllib2.urlopen(request)
 
+def urllib_urlencode(query, doseq=0):
+    return urllib.urlencode(query, doseq)
 
 def proxy(request, url):
     
