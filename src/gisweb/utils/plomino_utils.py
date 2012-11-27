@@ -1185,7 +1185,7 @@ def serialItem(form, fieldname, itemvalue, doc=None):
                 sub_item_value = row[idx]
                 #sub_field = grid_form.getFormField(sub_field_name)
                 
-                req += context.serialItem(grid_form, sub_field_name, sub_item_value)
+                req += serialItem(grid_form, sub_field_name, sub_item_value)
                 
     else:
         fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) or db.getRenderingTemplate('DefaultFieldRead')
