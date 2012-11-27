@@ -24,6 +24,7 @@ from plomino_utils import get_related_info
 from plomino_utils import render_as_dataTable
 from plomino_utils import get_dataFor, get_gridDataFor, renderRaw
 from plomino_utils import getAllSubforms
+from plomino_utils import serialItem
 
 ################################################################### JSON UTILS #
 

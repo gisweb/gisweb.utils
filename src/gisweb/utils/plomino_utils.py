@@ -1169,3 +1169,33 @@ def batch_saveDocument(context, doc, REQUEST, creation=False):
 def batch_save(context, doc, form=None, creation=False, refresh_index=True,
     asAuthor=True, onSaveEvent=True, mantainOriginalForm=True):
     pass
+
+def serialItem(form, fieldname, itemvalue, doc=None):
+    req = []
+    db = form.getParentDatabase()
+    field = form.getFormField(fieldname)
+    fieldtype = field.getFieldType()
+    
+    if fieldtype == 'DATAGRID':
+        grid_form = db.getForm(field.getSettings().associated_form)
+        grid_field_names = field.getSettings().field_mapping.split(',')
+        
+        for row in itemvalue:
+            for idx,sub_field_name in enumerate(grid_field_names):
+                sub_item_value = row[idx]
+                #sub_field = grid_form.getFormField(sub_field_name)
+                
+                req += serialItem(grid_form, sub_field_name, sub_item_value)
+                
+    else:
+        fieldtemplate = field.getRenderingTemplate('Base%sFieldRead' % fieldtype) or field.getRenderingTemplate('DefaultFieldRead')
+        renderedValue = fieldtemplate(fieldname=fieldname,
+            fieldvalue=itemvalue,
+            selection=None,
+            field=field,
+            doc=doc
+        ).strip()
+        
+        req.append((fieldname, renderedValue, ))
+    
+    return req
