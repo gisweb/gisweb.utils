@@ -1174,8 +1174,8 @@ def serialItem(form, fieldname, itemvalue, doc=None):
     req = []
     db = form.getParentDatabase()
     field = form.getFormField(fieldname)
-    fieldtype = field.getFieldType()
-    
+    fieldtype = '' if not field else field.getFieldType()
+
     if fieldtype == 'DATAGRID':
         grid_form = db.getForm(field.getSettings().associated_form)
         grid_field_names = field.getSettings().field_mapping.split(',')
@@ -1185,10 +1185,10 @@ def serialItem(form, fieldname, itemvalue, doc=None):
                 sub_item_value = row[idx]
                 #sub_field = grid_form.getFormField(sub_field_name)
                 
-                req += serialItem(grid_form, sub_field_name, sub_item_value)
+                req += context.serialItem(grid_form, sub_field_name, sub_item_value)
                 
     else:
-        fieldtemplate = field.getRenderingTemplate('Base%sFieldRead' % fieldtype) or field.getRenderingTemplate('DefaultFieldRead')
+        fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) or db.getRenderingTemplate('DefaultFieldRead')
         renderedValue = fieldtemplate(fieldname=fieldname,
             fieldvalue=itemvalue,
             selection=None,
@@ -1197,5 +1197,20 @@ def serialItem(form, fieldname, itemvalue, doc=None):
         ).strip()
         
         req.append((fieldname, renderedValue, ))
+
+    return req
+
+def serialDoc(doc):
     
+    bad_items = ['Plomino_Authors', 'Form']
+
+    req = []
+    for itemname in doc.getItems():
+        if itemname not in bad_items:
+            form = doc.getForm()
+            itemvalue = doc.getItem(itemname)
+            fieldname = itemname
+            if itemvalue:
+                req += serialItem(form, fieldname, itemvalue, doc=doc)
+
     return req
