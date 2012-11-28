@@ -1170,7 +1170,7 @@ def batch_save(context, doc, form=None, creation=False, refresh_index=True,
     asAuthor=True, onSaveEvent=True, mantainOriginalForm=True):
     pass
 
-def serialItem(form, fieldname, itemvalue, doc=None):
+def serialItem(form, fieldname, itemvalue, doc=None, prefix=''):
     req = []
     db = form.getParentDatabase()
     field = form.getFormField(fieldname)
@@ -1184,9 +1184,8 @@ def serialItem(form, fieldname, itemvalue, doc=None):
             for idx,sub_field_name in enumerate(grid_field_names):
                 sub_item_value = row[idx]
                 #sub_field = grid_form.getFormField(sub_field_name)
-                
-                req += serialItem(grid_form, sub_field_name, sub_item_value)
-                
+                prefix = '%s.' % fieldname
+                req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix)
     else:
         fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) or db.getRenderingTemplate('DefaultFieldRead')
         renderedValue = fieldtemplate(fieldname=fieldname,
@@ -1195,8 +1194,8 @@ def serialItem(form, fieldname, itemvalue, doc=None):
             field=field,
             doc=doc
         ).strip()
-        
-        req.append((fieldname, renderedValue, ))
+        key = prefix + fieldname
+        req.append((key, renderedValue, ))
 
     return req
 
