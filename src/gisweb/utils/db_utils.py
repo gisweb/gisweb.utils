@@ -70,7 +70,10 @@ def suggestFromTable(sessionname, name, columnname, others=[], schema='public', 
     column = table.c[columnname]
 
     # ilike '%(tip)s%%'
-    where = or_(column.startswith(tip), column.startswith(tip.capitalize()), column.startswith(tip.lower()))
+    where = or_(column.startswith(tip),
+        column.startswith(tip.capitalize()),
+        column.startswith(tip.lower()),
+        column.startswith(tip.upper()))
     # other simple filters
     where = and_(where, *[(table.c[k]==v) for k,v in filters.items() if k in table.c.keys()])
 

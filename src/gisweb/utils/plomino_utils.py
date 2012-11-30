@@ -1183,7 +1183,6 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix=''):
         for row in itemvalue:
             for idx,sub_field_name in enumerate(grid_field_names):
                 sub_item_value = row[idx]
-                #sub_field = grid_form.getFormField(sub_field_name)
                 prefix = '%s.' % fieldname
                 req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix)
     else:
