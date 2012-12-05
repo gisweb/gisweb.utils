@@ -29,7 +29,7 @@ def lookForValidDate(year, month, day, timeargs=[0, 0, 0], start=1):
 
     if month not in range(1, 13):
         raise Exception('GISWEB:UTILS ERROR: Not a valid month passed: %s' % month)
-    
+
     if day not in range(1, 32):
         raise Exception('GISWEB:UTILS ERROR: Not a valid day passed: %s' % month)
 
@@ -61,9 +61,9 @@ def getItemOr(plominoDocument, item_name, default=None):
         value = plominoDocument.getItem(item_name)
     except AttributeError, err:
         value = default
-    
+
     return value or default
-        
+
 
 #def StringToDate2():
 #    """
@@ -80,7 +80,7 @@ def addToDate(date, addend, units='months', start=1):
     addend: int
     units: string, "months", "years" or "days" are accepted
     start: int, 0 or 1
-    
+
     A DateTime may be added to a number and a number may be
     added to a DateTime and the number is supposed to represent a number of days
     to add to the date in the sum.
@@ -88,21 +88,21 @@ def addToDate(date, addend, units='months', start=1):
     Form internal convention by default is returned the first valid date before the one
     you could expect.
     """
-    
+
     if not isinstance(addend, int):
         addend = int(addend)
-    
+
     if units == 'days':
         return date + addend
 
     year = date.year()
     month = date.month()
     day = date.day()
-    
+
     timeargs = [date.hour(), date.minute(), date.second(), date.timezone()]
     months = range(1, 13)
     month_id = months.index(month)
-    
+
     if units == 'months':
         new_year = year + (month_id+addend)/12
         mew_month_id = (month_id+addend)%12
@@ -112,7 +112,7 @@ def addToDate(date, addend, units='months', start=1):
     elif units == 'years':
         new_year = year + addend
         return lookForValidDate(new_year, month, day, timeargs, start=start)
-        
+
     else:
         raise Exception('units %s is not yet implemented' % units)
 
@@ -120,7 +120,7 @@ def getAllSubforms(frm, doc=None, applyhidewhen=False):
     """
     Get sub forms recursively. That is what getSubforms method does not do.
     """
-    
+
     db = frm.getParentDatabase()
     sub_forms = []
 
@@ -162,7 +162,7 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
         'bInfo': True,
         'bAutoWidth': False
     }
-    
+
     defautl_params.update(params)
     defautl_params = json_dumps(defautl_params)
 
@@ -171,7 +171,7 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
         defautl_params = defautl_params % rawparams
 
     aaData = json_dumps(aaData)
-    
+
     html = """<script type="text/javascript" charset="utf-8">
         var aaData = %(aaData)s;
         var o_%(fieldid)s_DynamicTable;
@@ -180,7 +180,7 @@ def render_as_dataTable(aaData, fieldid, params={}, rawparams=""):
             'aaData': %(aaData)s,
             %(default_params)s
             } );
-        });  
+        });
     </script><table id='%(fieldid)s_table' class="display"></table><div style="clear: both"></div>""" % locals()
 
     return html
@@ -208,10 +208,10 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, de
     form: a plominoForm
     render: could be a string like "as_list" or "as_dict" or a plominoForm
     '''
-    
+
 #    list_render = lambda x, y: renderItem(x, y, form, raise_error=raise_error)
 #    dict_render = lambda x, y: (y, renderItem(x, y, form, raise_error=raise_error), )
-    
+
     def get_element(item_name):
         field_value = rec[columns.index(item_name)]
         element = renderItem(field_value, item_name, form, raise_error=raise_error, default=default_item_value)
@@ -228,17 +228,17 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, de
     for item_name in columns:
         element = get_element(item_name)
         dd[item_name] = element
-    
+
     ll = [dd[i] for i in items]
-    
+
     if render == 'as_list':
         return ll
-    
+
     def multireplace(text, replacements):
         for i, o in replacements:
             text = text.replace(i, o)
         return text
-    
+
     if hasattr(render, 'displayDocument'):
 #        request = render.getParentDatabase().REQUEST
 #        for k,v in dd.items():
@@ -249,57 +249,57 @@ def renderRaw(rec, columns, items, form, render='as_list', raise_error=False, de
         for focus in ("^<p>\s*</p>", "<p>\s*</p>$", ):
             cleaned_html = re.sub(focus, "", cleaned_html)
         return ll + [cleaned_html]
-    
+
     if render == 'as_dict':
         return dd
-        
+
     return ll
 
 
 def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', filter_function=False, form_name=None, raise_error=False, default_item_value=None):
     '''
     render = 'as_list', 'as_dict', <plominoForm>
-    
+
     returns:
         - [[<item_value_1>, <item_value_2>, <item_value_3>, ...], ...] # as_list
         - [{'<item_1>': <item_value_1>, ...}, ...] # as_dict
         - [[<item_value_1>, <item_value_2>, <html>], ...]
-    
+
     '''
-    
+
     if plominoDocument.isNewDocument():
         return list()
-    
+
     db = plominoDocument.getParentDatabase()
     if not form_name:
         form_name = plominoDocument.Form
-    
+
     grid_field = db.getForm(form_name).getFormField(grid_name)
     grid_form_name = grid_field.getSettings(key='associated_form')
     grid_form = db.getForm(grid_form_name)
     grid_value = plominoDocument.getItem(grid_name, [])
-    
+
     columns = grid_field.getSettings(key='field_mapping').split(',')
     all_idxs = range(len(columns))
-    
+
     # if no item given all associated form fields are considered
     if not items:
         items = columns
         idxs = all_idxs
     else:
         idxs = [columns.index(field_name) for field_name in items]
-    
+
     out = list() # output init
     dict_render = lambda v, n: (n, renderItem(v, n, grid_form, raise_error=raise_error), )
-    
-    
+
+
     if isinstance(render, basestring):
         maybeForm = db.getForm(render)
         if maybeForm:
             render = maybeForm
         elif render == 'as_form':
             render = grid_form
-    
+
     for rec in grid_value:
 
         if filter_function:
@@ -311,23 +311,23 @@ def get_gridDataFor(plominoDocument, grid_name, items=None, render='as_list', fi
         out.append(out_raw)
 
     return out
-    
+
 def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_function=None, form_name=None, raise_error=False, default_item_value=''):
     '''
     "where" must be an item name (of type dataGrid) or at least a form name used
     as sub form in form (whom name is given in form_name or corresponds to
     plominoDocument.Form)
     '''
-    
+
     if plominoDocument.isNewDocument():
         return list()
-    
+
     grid_name = None
     sub_form_name = None
-    
+
     db = plominoDocument.getParentDatabase()
     form = db.getForm(form_name or plominoDocument.Form)
-    
+
     # data in dataGrid field?
     if where in plominoDocument.getItems():
         grid_name = where
@@ -369,7 +369,7 @@ def get_dataFor(plominoDocument, where, items=None, render='as_list', filter_fun
         init_raw = renderRaw(init_rec, columns, items, sub_form, render=render,
             raise_error=raise_error, default_item_value=default_item_value)
         data_from_grid.insert(0, init_raw)
-    
+
     return data_from_grid
 
 def get_gridDataFor_old(plominoDocument, grid_name, items=None, smart_filter=None, as_dict=False, form_name=None, sub_form_name=None):
@@ -378,32 +378,32 @@ def get_gridDataFor_old(plominoDocument, grid_name, items=None, smart_filter=Non
     formula di popolamento oggetto con dati per la mappa del tipo
     [['label', <lat>, <lon>], ...]
     '''
-    
+
     data = []
     db = plominoDocument.getParentDatabase()
-    
+
     if plominoDocument.isNewDocument():
         return []
-    
+
     if not form_name:
         form_name = plominoDocument.Form
-    
+
     if grid_name:
         grid_field = db.getForm(form_name).getFormField(grid_name)
         grid_form = db.getForm(grid_field.getSettings(key='associated_form'))
-    
+
     if not items:
         if grid_name:
             items = [f.id for f in grid_form.getFormFields()]
         else:
             sub_frm = db.getForm(sub_form_name)
             items = [f.id for f in sub_frm.getFormFields()]
-    
+
     if as_dict:
         init_value = dict([(item,plominoDocument.getItem(item)) for item in items])
     else:
         init_value = [plominoDocument.getItem(item) for item in items]
-    
+
     if init_value not in (
         dict([(item,None) for item in items]),
         [None for item in items]
@@ -414,99 +414,99 @@ def get_gridDataFor_old(plominoDocument, grid_name, items=None, smart_filter=Non
         return data
 
     grid_value = plominoDocument.getItem(grid_name)
-    
+
     if not grid_value:
         return data
-    
+
     ordered_fields = grid_field.getSettings(key='field_mapping').split(',')
-    
+
     # if no items list is provided all the fields are considered
     #+ this case could be useful for converting the DataGrid native list of list
     #+ value into a list of dictionaries passing as_dict=True
-    
+
     all_idxs = range(len(ordered_fields))
-    
+
     if items:
         idxs = [ordered_fields.index(field_name) for field_name in items]
     else:
         idxs = all_idxs
-    
+
     if not smart_filter:
         smart_filter = lambda rec: True
 
     for rec in grid_value:
-    
+
         def foo(i):
             if rec[i]:
                 return grid_form.getFormField(ordered_fields[i]).getSettings().processInput(rec[i])
             else:
                 return rec[i]
-    
+
         complete_obj = dict([(ordered_fields[i], foo(i)) for i in all_idxs])
         if smart_filter(complete_obj):
-    
+
             if as_dict:
                 obj = dict([(ordered_fields[i], foo(i)) for i in idxs])
             else:
                 obj = [foo(i) for i in idxs]
-        
+
             data.append(obj)
-    
+
     return data
 
 
 def get_related_info(plominoDocument, clues, default=None, debug=False):
     '''
     get item values from one plominoDocument itself and the related ones.
-    clues description: {<alias>: 
+    clues description: {<alias>:
         {
             'field_name': <field_name>, # OPTIONAL
             'source': <lambda to get source document id> # OPTIONAL
         }
     }
-    
+
     the given lambda represent the relation between documents
-    
+
     clues example: {
         'nome': None,
-        'data1': {'field_name': 'data_nato', 
+        'data1': {'field_name': 'data_nato',
             'source': lambda pd: pd.getItem('parentDocument')
         },
-        'data2': {'field_name': 'data_consegna', 
+        'data2': {'field_name': 'data_consegna',
             'source': lambda pd: pd.getItem('elenco_consegne')[0]
         }
     }
     return: {<alias>: <field value>}
     '''
     db = plominoDocument.getParentDatabase()
-    
+
     out = dict()
     for alias,clue in clues.items():
-    
+
         source = None
         field_name = None
         if isinstance(clue, dict):
-        
+
             if 'source' in clue:
                 source = db.getDocument(clue['source'](plominoDocument))
             if 'field_name' in clue:
                 field_name = clue['field_name']
-        
+
         if not source:
             source = plominoDocument # at least get item from the plominoDocument itself
-        
+
         if not field_name:
             field_name = alias # at least the field name is equivalent to alias
-        
+
         if debug:
             if not field_name in source.items():
                 raise IOError('Document %s does not contain field %s' % (source.getId(), field_name))
-        
+
         out[alias] = source.getItem(field_name, default)
-        
+
     return out
-    
-    
+
+
 #def get_parent_plominodb(obj):
 #    ''' Return the current plominoDatabase. Is enough to pass the context from
 #        within a scipt or a plominoDocument python formula.
@@ -519,7 +519,7 @@ def get_related_info(plominoDocument, clues, default=None, debug=False):
 def search_around(plominoDocument, parentKey='parentDocument', *targets, **flts):
     '''
     DA TESTARE
-    
+
     "out" è un dizionario la cui chiavi sono le stringhe contenute in targets se
     per esse è stato trovato almeno un valore tra i documenti collegati al
     plominoDocument (compreso lo stesso). Se i valori trovati per la chiave
@@ -531,7 +531,7 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **flts)
     siano più complesse del semplice confronto di uguaglianza. Possono però
     essere passati parametri specifici per la ricerca su ZDB quali "sort_on",
     "sort_order" e simili.
-    
+
     può sostituire in maniera meno statica il get_info_pratica
     '''
 
@@ -540,20 +540,20 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **flts)
 
 #    main_fields = [t for t in targets if t in plominoDocument.getForm().getFormFields()]
 #    other_fields = [t for t in targets if t not in main_fields]
-    
+
     items = plominoDocument.getItems()
     # cerco prima nel documento "genitore"
     for target in targets:
         if target in items:
             out[target] = [plominoDocument.getItem(target)]
-    
+
     # poi cerco nei documenti figli
     plominoIndex = plominoDocument.getParentDatabase().getIndex()
     flts[parentKey] = plominoDocument.id
     res = plominoIndex.dbsearch(**flts)
     for rec in res:
         pd = rec.getObject()
-        
+
         # nel caso le chiavi in flts non fossero state indicizzate
         #+ evito i documenti che sarebbero stati scartati dalla ricerca
         #+ DA RIVEDERE E CORREGGERE
@@ -607,24 +607,24 @@ def fiatDoc(request, form, applyhidewhen=False):
 ################################################################################
 
 def get_aaData2(brains, field_names, sortindex=None, reverse=None, enum=None):
-    
+
     aaData = list()
-    
+
     for num,rec in enumerate(brains):
         aaRec = dict([(k, rec.get(k) or rec.getObject().getItem(k, '')) for k in field_names])
         if enum:
             aaRec['_order'] = num
-        
+
         if sortindex:
             aaData.append((rec[k] or rec.getObject().getItem(k, ''), aaRec, ))
         else:
             aaData.append(aaRec)
-    
+
     if sortindex:
         aaData.sort()
     if reverse:
         aaData.reverse()
-    
+
     if sortindex:
         return [rec[-1] for rec in aaData]
     else:
@@ -633,7 +633,7 @@ def get_aaData2(brains, field_names, sortindex=None, reverse=None, enum=None):
 def get_aaData(brain, field_names, sortindex, reverse, enum, linked, field_renderes):
 
     aaData = []
-    
+
     for num,rec in enumerate(brain):
         if enum:
             row = [num+1]
@@ -641,7 +641,7 @@ def get_aaData(brain, field_names, sortindex, reverse, enum, linked, field_rende
             row = []
         for k in field_names:
             value = rec[k]
-            
+
             if not value:
                 value = ''
             else:
@@ -650,19 +650,19 @@ def get_aaData(brain, field_names, sortindex, reverse, enum, linked, field_rende
                 if linked:
                     value = '<a href="%(url)s">%(label)s</a>' % dict(url=rec.getURL(), label=json_dumps(value).replace('"', ''))
             row.append(value)
-        
+
         rendered_value = '%s| ' % json_dumps(row)
         if sortindex:
             aaData.append((rec[sortindex], rendered_value, ))
         else:
             aaData.append(rendered_value)
-        
+
     if sortindex:
         aaData.sort()
-    
+
     if reverse:
         aaData.reverse()
-    
+
     if sortindex:
         return [rec[-1] for rec in aaData]
     else:
@@ -681,7 +681,7 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
     """
     db = context.getParentDatabase()
     idx = db.getIndex()
-    
+
     if not field_names:
         form = db.getForm(form_name)
         field_names = [i.id for i in form.getFormFields(includesubforms=True) if i in idx.indexes()]
@@ -693,14 +693,14 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
             else:
                 raise Exception('%s is not an index' % f)
         field_names = fl
-    
+
     res = []
     if isinstance(request, dict):
         request = [request]
-    
+
     for num in range(len(request)):
         request[num]['Form'] = form_name
-    
+
     res_list = [idx.dbsearch(req, sortindex=sortindex, reverse=reverse) for req in request]
     res = sum(res_list[1:], res_list[0])
     if slow_flt != None:
@@ -713,7 +713,7 @@ def get_docLinkInfo(context, form_name, sortindex=None, reverse=0, enum=False, l
 #            res = new_res
         else:
             res = [rec for rec in res if slow_flt(rec)]
-    
+
 #    if len(request) > 1:
 #        sortindex = None
     if deprecated:
@@ -751,7 +751,7 @@ class plominoKin(object):
             self.doc = context
         else:
             self.doc = None
-            
+
 #        if not self.doc:
 #            raise Exception('GISWEB.UTILS ERROR: No plominoDocument found!!')
 
@@ -759,7 +759,7 @@ class plominoKin(object):
 #        for fieldname in (self.parentKey, 'CASCADE', ):
 #            if fieldname not in self.idx.indexes():
 #                self.idx.createFieldIndex(fieldname, 'TEXT', refresh=True)
-    
+
     def searchAndFetch(self, fields={}, mainRequest={}, sideRequests={}, json=False):
         """
         dbsearch(self, request, sortindex, reverse=0)
@@ -775,7 +775,7 @@ class plominoKin(object):
         import itertools
         if not 'Form' in mainRequest:
             raise IOError('GISWEB.UTILS ERROR: A kay for the parent form is required!')
-        
+
         mainResults = self.idx.dbsearch(mainRequest)
         # sideResults = dict(<parentId> = dict(<form_name> = [{**kwargs}, ...], ...))
         sideResults = dict()
@@ -783,9 +783,9 @@ class plominoKin(object):
             if 'Form' not in sideRequest:
                 sideRequest['Form'] = form_name
             sideRequest[self.parentKey] = {'query': [i.id for i in mainResults], 'operator': 'or'}
-            
+
             sideResult = self.idx.dbsearch(sideRequest, sortindex=self.parentKey)
-            
+
             for sideRecord in sideResult:
                 tmp_dict = dict()
                 for i in fields.get(form_name, []):
@@ -794,7 +794,7 @@ class plominoKin(object):
                     except:
                         value = sideRecord.getObject().getItem(i[0], '')
                     tmp_dict[i[-1]] = value
-                
+
                 if sideRecord[self.parentKey] not in sideResults:
                     sideResults[sideRecord[self.parentKey]] = {form_name: [tmp_dict]}
                 else:
@@ -802,7 +802,7 @@ class plominoKin(object):
                         sideResults[sideRecord[self.parentKey]][form_name] = [tmp_dict]
                     else:
                         sideResults[sideRecord[self.parentKey]][form_name].append(tmp_dict)
-        
+
         for rec in mainResults:
             mainForm = rec.getObject().Form
             tmp_dict = dict([(i[-1], rec.get(i[0]) or rec.getObject().getItem(i[0], '')) for i in fields.get(mainForm, [])])
@@ -813,13 +813,13 @@ class plominoKin(object):
                     sideResults[rec.id][mainForm] = [tmp_dict]
                 else:
                     sideResults[rec.id][mainForm].append(tmp_dict)
-        
-        
-        # sideResults2 = dict(<plominoId> = [[{**kwargs}, ...], ...], ...)    
+
+
+        # sideResults2 = dict(<plominoId> = [[{**kwargs}, ...], ...], ...)
         sideResults2 = dict()
         for key,value in sideResults.items():
             sideResults2[key] = [x for x in itertools.product(*sideResults[key].values())]
-        
+
         sideResults3 = dict()
         for key,prod in sideResults2.items():
             for lista in prod:
@@ -836,18 +836,18 @@ class plominoKin(object):
                 mit = [i.items() for i in tt]
                 somma = sum(mit[1:], mit[0])
                 it.append(dict([(k,v) for k,v in somma]))
-            
+
             sideResults3[key] = it
-        
+
         aaData = []
         for mainId,v in sideResults3.items():
-        
+
             mainDict = dict()
             if mainRequest['Form'] in fields:
                 mainDoc = self.db.getDocument(mainId)
                 for x in fields[mainRequest['Form']]:
                     mainDict[x[-1]] = mainDoc.getItem(x[0], '')
-        
+
             for i in v:
                 it = i.items() + mainDict.items()
                 aaRecord = dict()
@@ -860,13 +860,13 @@ class plominoKin(object):
 #                aaRecord = dict([(key,value) for key,value in it])
                 if aaRecord:
                     aaData.append(aaRecord)
-        
+
         if json:
             return json_dumps(aaData)
         else:
-            return aaData  
-                
-    
+            return aaData
+
+
     def setParenthood(self, parent_id, child_id='', CASCADE=True, setDocLink=False):
         '''
         Set parent reference in child document
@@ -880,10 +880,10 @@ class plominoKin(object):
         if setDocLink:
             parent = self.db.getDocument(parent_id)
             child.setItem(self.parentLinkKey, [getPath(parent)])
-    
+
     def getParentDoc(self):
         return self.db.getDocument(self.doc.getItem(self.parentKey))
-    
+
     def ondelete_parent(self):
         parent = self.doc
         idx = self.db.getIndex()
@@ -896,7 +896,7 @@ class plominoKin(object):
             else:
                 rec.getObject().removeItem(self.parentKey)
         self.db.deleteDocuments(ids=toRemove, massive=False)
-    
+
     def setChildhood(self, parent_id, child_id, backToParent='anchor'):
         '''
         Set child reference on parent document
@@ -912,42 +912,42 @@ class plominoKin(object):
 
         url = getPath(child)
         parent.setItem(childrenList_name, childrenList+[url])
-        
+
         if backToParent:
             backUrl = parent.absolute_url()
             if backToParent == 'anchor':
                 backUrl = '%s#%s' % (backUrl, childrenList_name)
             child.setItem('plominoredirecturl', backUrl)
-    
+
     def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
         child = self.doc
-        
+
         # if no parent_id passed
         # first take from the child itself
         if not parent_id:
             parent_id = child.getItem(self.parentKey)
-        
+
         # second take from the request
         if not parent_id:
             parent_id = child.REQUEST.get(self.parentKey)
-        
+
         # no way
         if not parent_id:
             raise IOError('GISWEB.UTILS ERROR: Parent id not found!')
-        
+
         for fieldname in (self.parentKey, 'CASCADE', ):
             if fieldname not in self.idx.indexes():
                 self.idx.createFieldIndex(fieldname, 'TEXT', refresh=True)
-        
+
         self.setParenthood(parent_id, child.id, **kwargs)
         self.setChildhood(parent_id, child.id, backToParent)
-        
+
     def onsave_child(self):
         child = self.doc
         if not child.isNewDocument():
             if child.getItem('plominoredirecturl'):
                 child.removeItem('plominoredirecturl')
-        
+
     def ondelete_child(self, anchor=True):
         child = self.doc
         parent = self.db.getDocument(child.getItem(self.parentKey))
@@ -956,7 +956,7 @@ class plominoKin(object):
         url = getPath(child)
         childrenList.remove(url)
         parent.setItem(childrenList_name, childrenList)
-        
+
         backUrl = parent.absolute_url()
         if anchor:
             backUrl = '%s#%s' % (backUrl, childrenList_name)
@@ -969,7 +969,7 @@ class plominoKin(object):
         parent = self.doc
         lista = list()
         res = self.idx.dbsearch({'Form': form_name, self.parentKey: parent.id})
-        
+
 #        form = self.db.getForm(form_name)
 #        fieldlist = form.objectValues(spec='PlominoField')
 #        for rec in res:
@@ -981,7 +981,7 @@ class plominoKin(object):
 ##                    dizionario[k] = getFieldRender(form, None, False, creation=False, request={k: rec[k]})
 #                else:
 #                    dizionario[k] = rec[k]
-            
+
         for rec in res:
             obj = rec.getObject()
             dizionario = dict()
@@ -994,7 +994,7 @@ class plominoKin(object):
             etichetta1 = etichetta % dizionario
             lista.append('%s|%s' % (etichetta1, getPath(obj)))
         return lista
-    
+
     def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
         """
         Use it to create a child document from scripts
@@ -1051,12 +1051,12 @@ class batch(object):
         """refresh values according form, and reindex the document
         """
         method = 'save'
-        
+
         # we process computed fields (refresh the value)
         if form is None:
             form = doc.getForm()
         elif not mantainOriginalForm:
-            # questa sostituzione può essere evitata... 
+            # questa sostituzione può essere evitata...
             doc.setItem('Form', form.getFormName())
 
         db=self.db # SONO QUI
@@ -1103,10 +1103,10 @@ class batch(object):
         if asAuthor:
             authors = doc.getItem('Plomino_Authors', []) or []
             name = db.getCurrentUser().getUserName()
-            
+
             if name not in authors:
                 authors.append(name)
-            
+
             doc.setItem('Plomino_Authors', authors)
 
         # execute the onSaveDocument code of the form
@@ -1134,10 +1134,10 @@ class batch(object):
         """save a document using the form submitted content
         """
         method = 'saveDocument'
-        
+
         db = self.db
         form_name = REQUEST.get('Form') or doc.getItem('Form')
-        
+
         form = db.getForm(form_name)
 
         errors=form.validateInputs(REQUEST, doc=doc)
@@ -1170,6 +1170,7 @@ def batch_save(context, doc, form=None, creation=False, refresh_index=True,
     asAuthor=True, onSaveEvent=True, mantainOriginalForm=True):
     pass
 
+
 def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=True):
     req = []
     db = form.getParentDatabase()
@@ -1182,16 +1183,16 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=Tr
 
         if nest_datagrid and len(item_value):
             sub_req = {}
-        
+
         for row in itemvalue:
             for idx,sub_field_name in enumerate(grid_field_names):
                 sub_item_value = row[idx]
 
-                if not nest_datagrid:
+                if nest_datagrid:
+                    sub_req[sub_field_name] = sub_item_value
+                else:
                     prefix = '%s.' % fieldname
                     req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix)
-                else:
-                    sub_req[sub_field_name] = sub_item_value
 
             if nest_datagrid:
                 req += (fieldname, sub_req)
@@ -1210,17 +1211,25 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=Tr
 
     return req
 
+
 def serialDoc(doc, nest_datagrid=True):
-    
+    """
+    Take a Plomino document :doc: and extract its data in a JSON-serializable
+    structure.
+    """
+
+    # bad_items are indistinguishable from good behaved citizen: they are unicode values
+    # that just don't belong to the data (they are in fact metadata)
+    # We want to skip those, and to do that we must explicitly list 'em
     bad_items = ['Plomino_Authors', 'Form']
 
-    req = []
+    res = []
+    form = doc.getForm()
     for itemname in doc.getItems():
         if itemname not in bad_items:
-            form = doc.getForm()
             itemvalue = doc.getItem(itemname)
             fieldname = itemname
             if itemvalue:
-                req += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
+                res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
 
-    return req
+    return res
