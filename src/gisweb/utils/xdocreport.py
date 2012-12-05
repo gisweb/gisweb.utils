@@ -3,8 +3,7 @@ import json
 from collections import namedtuple
 
 
-def report(template, data, template_engine, document_type, output_type=None):
-    url = 'http://127.0.0.1:8080/jaxrs/report'
+def report(url, template, data, template_engine, document_type, output_type=None):
     metadata = get_metadata(data)
     data = {
         'dataType': 'JSON',
