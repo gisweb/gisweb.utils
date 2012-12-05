@@ -1,16 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from AccessControl import allow_module
+from AccessControl import allow_module, ModuleSecurityInfo
 #from z3c.saconfig import named_scoped_session
 
 allow_module('gisweb.utils')
 allow_module('gisweb.utils.plominoKin')
-allow_module('gisweb.utils.spezia_utils')
-
 
 def initialize(con):
     "Being a Zope2 Product we ensure this file will be imported at startup"
 
+from xdocreport import report
 
 ################################################################ PLOMINO UTILS #
 
@@ -118,3 +117,4 @@ from spezia_utils import protocolla_doc, protocolla
 ############################################################# PERMISSION UTILS #
 
 # TO DO
+
