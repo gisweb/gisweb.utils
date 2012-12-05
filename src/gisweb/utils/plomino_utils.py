@@ -1172,6 +1172,9 @@ def batch_save(context, doc, form=None, creation=False, refresh_index=True,
 
 
 def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=True):
+    """
+    Returns a list of 2-tuples with the data contained in the field `fieldname` of form
+    """
     req = []
     db = form.getParentDatabase()
     field = form.getFormField(fieldname)
