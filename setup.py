@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import os
 
 version = '0.1'
 
@@ -29,12 +28,13 @@ setup(name='gisweb.utils',
       url='http://svn.plone.org/svn/collective/',
       license='gpl',
       packages=find_packages('src'),
-      package_dir = {'': 'src'},
+      package_dir={'': 'src'},
       namespace_packages=['gisweb'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'requests',
           # -*- Extra requirements: -*-
       ],
       entry_points="""
