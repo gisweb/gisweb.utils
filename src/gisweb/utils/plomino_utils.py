@@ -1195,7 +1195,7 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=Tr
                     req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix)
 
             if nest_datagrid:
-                req += (fieldname, sub_req)
+                req.append((fieldname, sub_req))
 
     else:
         fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) \
