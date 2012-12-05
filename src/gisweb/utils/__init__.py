@@ -5,7 +5,6 @@ from AccessControl import allow_module
 
 allow_module('gisweb.utils')
 allow_module('gisweb.utils.plominoKin')
-allow_module('gisweb.utils.xdocreport')
 
 def initialize(con):
     "Being a Zope2 Product we ensure this file will be imported at startup"
@@ -40,7 +39,7 @@ def aq_base(obj):
 
 #################################################################### ACL UTILS #
 
-from acl_utils import get_users_info
+from acl_utils import get_users_info, getAllUserRoles
 
     
 ################################################################## PRINT UTILS #
@@ -112,74 +111,8 @@ from spezia_utils import protocolla_doc, protocolla
 
 ################################################################### MAIL UTILS #
 
-#def test_mail(to, mail_text=''):
-#    import smtplib
-
-#server = 'smtp.gmail.com'
-#user = 'manuele.pesenti'
-#password = 'p0TA31le'
-
-#recipients = ['user@mail.com', 'other@mail.com']
-#sender = 'manuele.pesenti@mail.com'
-#message = 'Hello World'
-
-#session = smtplib.SMTP(server, '587')
-## if your SMTP server doesn't need authentications,
-## you don't need the following line:
-#session.login(user, password)
-#session.sendmail(sender, recipients, message)
-#    #    host = getToolByName(context, 'MailHost')
-#    #    sender = context.getProperty('email_from_address')
-#    #    try:
-#    #        host.send(html_message, mto=[to], mfrom=sender, 
-#    #        subject=title, encode=None, 
-#    #        immediate=False, charset='utf8', msg_type=None)
-#    #    except Exception, error:
-#    #        return str(error)
-#    #    else:
-#    #        return ''
-
+# TO DO
 
 ############################################################# PERMISSION UTILS #
 
-#def has_permission(cases, permission_store={}, form_name='', element_name='', permission_name=''):
-#    '''
-#    
-#    DA TESTARE
-#    
-#    form_name: <plominoForm name>
-#    element_name: <plominoAction name> or <plominoHidewhen name>
-#    permission_name: <could be any string "read" "write" are the most used>
-
-#    cases = [dict(ruolo='', status='')]
-
-#    permission_store = {
-#        'form_name|element_name|permission_name': dict(
-#            ruolo = lambda x: x in (..., ) # <- permission definition
-#            status = lambda y: y not in (..., ) # <- permission definition
-#        )
-#    }
-#    '''
-
-#    permission_key = '|'.join((form_name, element_name, permission_name, ))
-
-#    all_possible_keys = ['|'.join([a, b])
-#        for a in (form_name, '')
-#        for b in (element_name, '')]
-
-#    #possible_keys = [k for k in all_possible_keys if k in permission_store]
-
-#    possible_keys = [k for k in permission_store if k.split('|')[:2] in [v.split('|') for v in all_possible_keys]]
-
-#    if not possible_keys: return True 
-
-#    for k in possible_keys:
-#        if k.split('|')[2] in ('', 'any', permission_name, ):
-#            permission = permission_store.get(k)
-#            if not permission: return True # No permissions setted up about your case. You pass the guard!
-#            for case in cases:
-#                ruolo = case.get('ruolo') or ''
-#                status = case.get('status') or ''
-#                if permission(ruolo, status): return True # If just one condition specified is satified you pass the guard.
-
-#    return False
+# TO DO

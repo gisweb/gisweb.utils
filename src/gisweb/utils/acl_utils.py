@@ -43,3 +43,9 @@ def get_users_info(id_list, properties=('fullname', )):
             out.append(myuser)
     
     return out
+
+def getAllUserRoles(context):
+    db = context.getParentDatabase()
+    plominoRoles = db.getCurrentUserRoles()
+    ploneRoles = db.getCurrentUser().getRolesInContext(context)
+    return ploneRoles+plominoRoles
