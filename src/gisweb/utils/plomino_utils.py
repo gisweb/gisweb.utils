@@ -118,7 +118,7 @@ def addToDate(date, addend, units='months', start=1):
 
 def getAllSubforms(frm, doc=None, applyhidewhen=False):
     """
-    Get sub forms recursively.
+    Get sub forms recursively. That is what getSubforms method does not do.
     """
     
     db = frm.getParentDatabase()
@@ -1170,7 +1170,7 @@ def batch_save(context, doc, form=None, creation=False, refresh_index=True,
     asAuthor=True, onSaveEvent=True, mantainOriginalForm=True):
     pass
 
-def serialItem(form, fieldname, itemvalue, doc=None, prefix=''):
+def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=True):
     req = []
     db = form.getParentDatabase()
     field = form.getFormField(fieldname)
@@ -1179,14 +1179,26 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix=''):
     if fieldtype == 'DATAGRID':
         grid_form = db.getForm(field.getSettings().associated_form)
         grid_field_names = field.getSettings().field_mapping.split(',')
+
+        if nest_datagrid and len(item_value):
+            sub_req = {}
         
         for row in itemvalue:
             for idx,sub_field_name in enumerate(grid_field_names):
                 sub_item_value = row[idx]
-                prefix = '%s.' % fieldname
-                req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix)
+
+                if not nest_datagrid:
+                    prefix = '%s.' % fieldname
+                    req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix)
+                else:
+                    sub_req[sub_field_name] = sub_item_value
+
+            if nest_datagrid:
+                req += (fieldname, sub_req)
+
     else:
-        fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) or db.getRenderingTemplate('DefaultFieldRead')
+        fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) \
+            or db.getRenderingTemplate('DefaultFieldRead')
         renderedValue = fieldtemplate(fieldname=fieldname,
             fieldvalue=itemvalue,
             selection=None,
@@ -1198,7 +1210,7 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix=''):
 
     return req
 
-def serialDoc(doc):
+def serialDoc(doc, nest_datagrid=True):
     
     bad_items = ['Plomino_Authors', 'Form']
 
@@ -1209,6 +1221,6 @@ def serialDoc(doc):
             itemvalue = doc.getItem(itemname)
             fieldname = itemname
             if itemvalue:
-                req += serialItem(form, fieldname, itemvalue, doc=doc)
+                req += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
 
     return req
