@@ -3,6 +3,9 @@
 from lxml import etree
 import xmlrpclib
 from datetime import datetime
+from logging import getLogger
+
+logger = getLogger('gisweb.utils')
 
 try:
     from cStringIO import StringIO
