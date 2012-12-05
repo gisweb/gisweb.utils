@@ -1181,11 +1181,11 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=Tr
         grid_form = db.getForm(field.getSettings().associated_form)
         grid_field_names = field.getSettings().field_mapping.split(',')
 
-        if nest_datagrid and len(item_value):
+        if nest_datagrid and len(itemvalue):
             sub_req = {}
 
         for row in itemvalue:
-            for idx,sub_field_name in enumerate(grid_field_names):
+            for idx, sub_field_name in enumerate(grid_field_names):
                 sub_item_value = row[idx]
 
                 if nest_datagrid:
