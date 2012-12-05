@@ -5,6 +5,7 @@ from AccessControl import allow_module
 
 allow_module('gisweb.utils')
 allow_module('gisweb.utils.plominoKin')
+allow_module('gisweb.utils.xdocreport')
 
 def initialize(con):
     "Being a Zope2 Product we ensure this file will be imported at startup"
