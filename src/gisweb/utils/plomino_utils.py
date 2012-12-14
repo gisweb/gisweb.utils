@@ -1241,4 +1241,4 @@ def serialDoc(doc, nest_datagrid=True):
             if itemvalue:
                 res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
 
-    return dict(res)
+    return res
