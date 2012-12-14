@@ -3,7 +3,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 
 import requests
 
-def requests_post(url, data=None, **kwargs)
+def requests_post(url, data=None, **kwargs):
     return requests.post(url, data, **kwargs)
 
 #def get_request(target, data):
