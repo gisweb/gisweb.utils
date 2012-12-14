@@ -1181,20 +1181,26 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=Tr
         grid_field_names = field.getSettings().field_mapping.split(',')
 
         if nest_datagrid and len(item_value):
-            sub_req = {}
+            sub_req = []
         
         for row in itemvalue:
+            el = {}
             for idx,sub_field_name in enumerate(grid_field_names):
                 sub_item_value = row[idx]
 
                 if not nest_datagrid:
                     prefix = '%s.' % fieldname
-                    req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix)
+                    req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix, nest_datagrid=False)
                 else:
-                    sub_req[sub_field_name] = sub_item_value
+                    el[sub_field_name] = sub_item_value
 
             if nest_datagrid:
                 req += (fieldname, sub_req)
+            else:
+                sub_req.append(el)
+
+        if not nest_datagrid:
+            req += (field_name, sub_req)
 
     else:
         fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) \
@@ -1208,7 +1214,7 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=Tr
         key = prefix + fieldname
         req.append((key, renderedValue, ))
 
-    return req
+    return dict(req)
 
 def serialDoc(doc, nest_datagrid=True):
     
