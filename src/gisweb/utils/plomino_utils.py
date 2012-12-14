@@ -1187,7 +1187,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
         if nest_datagrid and len(item_value):
             sub_req = []
         
-        for row in itemvalue:
+        for row in item_value:
             el = {}
             for idx,sub_field_name in enumerate(grid_field_names):
                 sub_item_value = row[idx]
