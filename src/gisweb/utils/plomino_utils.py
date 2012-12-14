@@ -1219,7 +1219,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
     return req
 
 
-def serialDoc(doc, nest_datagrid=True):
+def serialDoc(doc, nest_datagrid=False, json=True):
     """
     Take a Plomino document :doc: and extract its data in a JSON-serializable
     structure.
@@ -1238,5 +1238,8 @@ def serialDoc(doc, nest_datagrid=True):
             fieldname = itemname
             if itemvalue:
                 res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
-
-    return res
+    if json:
+        return json_dumps(dict(res))
+    else:
+        return res
+    
