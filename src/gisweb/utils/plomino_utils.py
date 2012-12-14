@@ -1218,7 +1218,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
         key = prefix + fieldname
         req.append((key, renderedValue, ))
 
-    return dict(req)
+    return req
 
 
 def serialDoc(doc, nest_datagrid=True):
@@ -1241,4 +1241,4 @@ def serialDoc(doc, nest_datagrid=True):
             if itemvalue:
                 res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
 
-    return res
+    return dict(res)
