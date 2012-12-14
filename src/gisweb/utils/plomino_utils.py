@@ -1210,7 +1210,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
         fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) \
             or db.getRenderingTemplate('DefaultFieldRead')
         renderedValue = fieldtemplate(fieldname=fieldname,
-            fieldvalue=itemvalue,
+            fieldvalue=item_value,
             selection=None,
             field=field,
             doc=doc
