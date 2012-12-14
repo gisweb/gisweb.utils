@@ -127,7 +127,6 @@ def getAllSubforms(frm, doc=None, applyhidewhen=False):
     flag_frm = frm
     flag_subs = flag_frm.getSubforms(doc=doc, applyhidewhen=applyhidewhen)
     n = 0
-    test = True
     while n < len(flag_subs):
         sub_forms += flag_subs
         flag_frm_id = flag_subs[n]

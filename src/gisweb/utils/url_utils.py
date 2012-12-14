@@ -1,7 +1,10 @@
 import urllib, urllib2
 from BaseHTTPServer import BaseHTTPRequestHandler
 
+import requests
 
+def requests_post(url, data=None, **kwargs)
+    return requests.post(url, data, **kwargs)
 
 #def get_request(target, data):
 #    return urllib2.Request(target, data)

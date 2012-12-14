@@ -67,7 +67,7 @@ from anagrafica_utils import is_valid_cf, is_valid_piva
 
 #################################################################### URL UTILS #
 
-from url_utils import proxy, urllib_urlencode
+from url_utils import proxy, urllib_urlencode, requests_post
 
 from urllib import urlencode
 from urllib2 import urlopen
