@@ -1184,31 +1184,20 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=Tr
         grid_form = db.getForm(field.getSettings().associated_form)
         grid_field_names = field.getSettings().field_mapping.split(',')
 
-#<<<<<<< HEAD
         if nest_datagrid and len(item_value):
             sub_req = []
         
         for row in itemvalue:
             el = {}
             for idx,sub_field_name in enumerate(grid_field_names):
-#=======
-#        if nest_datagrid and len(itemvalue):
-#            sub_req = {}
-
-#        for row in itemvalue:
-#            for idx, sub_field_name in enumerate(grid_field_names):
-#>>>>>>> c65d8af22d759b495e332d4f1fc6cfb86c4046c5
                 sub_item_value = row[idx]
 
                 if nest_datagrid:
-                    sub_req[sub_field_name] = sub_item_value
+                    el[sub_field_name] = sub_item_value
                 else:
                     prefix = '%s.' % fieldname
-#<<<<<<< HEAD
                     req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix, nest_datagrid=False)
-                else:
-                    el[sub_field_name] = sub_item_value
-
+                    
             if nest_datagrid:
                 req += (fieldname, sub_req)
             else:
@@ -1216,12 +1205,6 @@ def serialItem(form, fieldname, itemvalue, doc=None, prefix='', nest_datagrid=Tr
 
         if not nest_datagrid:
             req.append((fieldname, sub_req))
-#=======
-#                    req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix)
-
-#            if nest_datagrid:
-#                req.append((fieldname, sub_req))
-#>>>>>>> c65d8af22d759b495e332d4f1fc6cfb86c4046c5
 
     else:
         fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) \
