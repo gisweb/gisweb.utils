@@ -11,6 +11,8 @@ def initialize(con):
 
 from xdocreport import report
 
+import re
+
 ################################################################ PLOMINO UTILS #
 
 from plomino_utils import attachThis
@@ -90,6 +92,8 @@ def Type(arg):
 
 #from design_utils import exportElementAsXML
 
+def re_findall(what, where):
+    return re.findall(r'%s' % what, where)
 
 ################################################################### DATE UTILS #
 
