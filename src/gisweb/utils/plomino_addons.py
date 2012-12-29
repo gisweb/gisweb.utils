@@ -94,13 +94,10 @@ def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
     # second take from the request
     if not parent_id:
         parent_id = self.REQUEST.get(parentKey)
-    
-    # no way
-    if not parent_id:
-        raise IOError('GISWEB.UTILS ERROR: Parent id not found!')
-    
-    setParenthood(self, parent_id, child.id, **kwargs)
-    setChildhood(self, parent_id, child.id, backToParent, **kwargs)
+
+    if parent_id:
+        setParenthood(self, parent_id, child.id, **kwargs)
+        setChildhood(self, parent_id, child.id, backToParent, **kwargs)
 
 
 def onsave_child(self):
