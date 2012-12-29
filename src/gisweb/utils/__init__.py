@@ -15,6 +15,10 @@ import re
 
 ################################################################ PLOMINO UTILS #
 
+import plomino_addons
+
+################################################################ PLOMINO UTILS #
+
 from plomino_utils import attachThis
 from plomino_utils import ondelete_parent, oncreate_child, onsave_child, ondelete_child, create_child
 from plomino_utils import get_children_list, get_parent
