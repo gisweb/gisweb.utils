@@ -31,37 +31,37 @@ def getPath(doc, virtual=False):
     return '/'.join(pd_path_list or doc_path)
 
 
-def setParenthood(childDocument, parent_id, CASCADE=True, setDocLink=False, **kwargs):
+def setParenthood(ChildDocument, parent_id, CASCADE=True, setDocLink=False, **kwargs):
     '''
     Set parent reference in child document
     '''
 
-    locals().update(defaults)
-    locals().update(kwargs)
+    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
+    parentLinkKey = kwarg.get('parentLinkKey')s or defaults.get('parentLinkKey')
     
     ParentDocument = self.getParentDatabase().getDocument(parent_id)
     Parent_path = getPath(parentDocument)
 
-    childDocument.setItem(parentKey, ParentDocument.getId())
-    childDocument.setItem('CASCADE', CASCADE)
+    ChildDocument.setItem(parentKey, ParentDocument.getId())
+    ChildDocument.setItem('CASCADE', CASCADE)
     if setDocLink:
-        childDocument.setItem(parentLinkKey, [Parent_path])
+        ChildDocument.setItem(parentLinkKey, [Parent_path])
 
 
-def setChildhood(childDocument, parent_id, backToParent='anchor', **kwargs):
+def setChildhood(ChildDocument, parent_id, backToParent='anchor', **kwargs):
     '''
     Set child reference on parent document
     '''
     
-    locals().update(defaults)
-    locals().update(kwargs)
+    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
+    childrenListKey = kwarg.get('childrenListKey')s or defaults.get('childrenListKey')
     
-    db = childDocument.getParentDatabase()
+    db = ChildDocument.getParentDatabase()
     ParentDocument = db.getDocument(parent_id)
     
-    childrenList_name = childrenListKey % childDocument.Form
+    childrenList_name = childrenListKey % ChildDocument.Form
     childrenList = ParentDocument.getItem(childrenList_name, []) or []
-    childrenList.append(getPath(childDocument))
+    childrenList.append(getPath(ChildDocument))
     
     idx = db.getIndex()
     for fieldname in (parentKey, 'CASCADE', ):
@@ -74,16 +74,15 @@ def setChildhood(childDocument, parent_id, backToParent='anchor', **kwargs):
         backUrl = ParentDocument.absolute_url()
         if backToParent == 'anchor':
             backUrl = '%s#%s' % (backUrl, childrenList_name)
-        childDocument.setItem('plominoredirecturl', backUrl)
+        ChildDocument.setItem('plominoredirecturl', backUrl)
 
 
 def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
     '''
-    Actions to perform on creation of a childDocument
+    Actions to perform on creation of a ChildDocument
     '''
 
-    locals().update(defaults)
-    locals().update(kwargs)
+    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
     
     # if no parent_id passed
     # first take from the child itself
@@ -101,7 +100,7 @@ def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
 
 def onsave_child(self):
     '''
-    Actions to perform on save of a childDocument
+    Actions to perform on save of a ChildDocument
     '''
     if not self.isNewDocument():
         if self.getItem('plominoredirecturl'):
@@ -110,11 +109,11 @@ def onsave_child(self):
 
 def ondelete_child(self, anchor=True, **kwargs):
     '''
-    Actions to perform on deletion of a childDocument
+    Actions to perform on deletion of a ChildDocument
     '''
     
-    locals().update(defaults)
-    locals().update(kwargs)
+    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
+    childrenListKey = kwarg.get('childrenListKey')s or defaults.get('childrenListKey')
     
     db = self.getParentDatabase()
     ParentDocument = db.getDocument(self.getItem(parentKey))
@@ -134,8 +133,7 @@ def ondelete_parent(self, **kwargs):
     Actions to perform on deletion of a parentDocument
     '''
     
-    locals().update(defaults)
-    locals().update(kwargs)
+    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
 
     db = self.getParentDatabase()
     idx = db.getIndex()
