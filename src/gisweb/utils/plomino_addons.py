@@ -36,8 +36,8 @@ def setParenthood(ChildDocument, parent_id, CASCADE=True, setDocLink=False, **kw
     Set parent reference in child document
     '''
 
-    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
-    parentLinkKey = kwarg.get('parentLinkKey')s or defaults.get('parentLinkKey')
+    parentKey = kwarg.get('parentKey') or defaults.get('parentKey')
+    parentLinkKey = kwarg.get('parentLinkKey') or defaults.get('parentLinkKey')
     
     ParentDocument = self.getParentDatabase().getDocument(parent_id)
     Parent_path = getPath(parentDocument)
@@ -53,8 +53,8 @@ def setChildhood(ChildDocument, parent_id, backToParent='anchor', **kwargs):
     Set child reference on parent document
     '''
     
-    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
-    childrenListKey = kwarg.get('childrenListKey')s or defaults.get('childrenListKey')
+    parentKey = kwarg.get('parentKey') or defaults.get('parentKey')
+    childrenListKey = kwarg.get('childrenListKey') or defaults.get('childrenListKey')
     
     db = ChildDocument.getParentDatabase()
     ParentDocument = db.getDocument(parent_id)
@@ -82,7 +82,7 @@ def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
     Actions to perform on creation of a ChildDocument
     '''
 
-    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
+    parentKey = kwarg.get('parentKey') or defaults.get('parentKey')
     
     # if no parent_id passed
     # first take from the child itself
@@ -112,8 +112,8 @@ def ondelete_child(self, anchor=True, **kwargs):
     Actions to perform on deletion of a ChildDocument
     '''
     
-    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
-    childrenListKey = kwarg.get('childrenListKey')s or defaults.get('childrenListKey')
+    parentKey = kwarg.get('parentKey') or defaults.get('parentKey')
+    childrenListKey = kwarg.get('childrenListKey') or defaults.get('childrenListKey')
     
     db = self.getParentDatabase()
     ParentDocument = db.getDocument(self.getItem(parentKey))
@@ -133,7 +133,7 @@ def ondelete_parent(self, **kwargs):
     Actions to perform on deletion of a parentDocument
     '''
     
-    parentKey = kwarg.get('parentKey')s or defaults.get('parentKey')
+    parentKey = kwarg.get('parentKey') or defaults.get('parentKey')
 
     db = self.getParentDatabase()
     idx = db.getIndex()
