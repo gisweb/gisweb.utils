@@ -60,7 +60,6 @@ def setChildhood(childDocument, parent_id, backToParent='anchor', **kwargs):
     ParentDocument = db.getDocument(parent_id)
     
     childrenList_name = childrenListKey % childDocument.Form
-    # se ParentDocument è None va già andare in errore (e va bene così)
     childrenList = ParentDocument.getItem(childrenList_name, []) or []
     childrenList.append(getPath(childDocument))
     
