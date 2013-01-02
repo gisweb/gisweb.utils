@@ -18,7 +18,7 @@ InitializeClass(PlominoDocument)
 defaults = dict(
     parentKey = 'parentDocument',
     parentLinkKey = 'linkToParent',
-    childrenListKey = 'listOf_%s'
+    childrenListKey = 'childrenList_%s'
 )
 
 
@@ -39,8 +39,8 @@ def setParenthood(ChildDocument, parent_id, CASCADE=True, setDocLink=False, **kw
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
     parentLinkKey = kwargs.get('parentLinkKey') or defaults.get('parentLinkKey')
     
-    ParentDocument = self.getParentDatabase().getDocument(parent_id)
-    Parent_path = getPath(parentDocument)
+    ParentDocument = ChildDocument.getParentDatabase().getDocument(parent_id)
+    Parent_path = getPath(ParentDocument)
 
     ChildDocument.setItem(parentKey, ParentDocument.getId())
     ChildDocument.setItem('CASCADE', CASCADE)
@@ -86,17 +86,16 @@ def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
     
     # if no parent_id passed
     # first take from the child itself
-    if not parent_id:
-        parent_id = self.getItem(parentKey)
+    #if not parent_id:
+        #parent_id = self.getItem(parentKey)
     
     # second take from the request
     if not parent_id:
         parent_id = self.REQUEST.get(parentKey)
 
     if parent_id:
-        setParenthood(self, parent_id, child.id, **kwargs)
-        setChildhood(self, parent_id, child.id, backToParent, **kwargs)
-
+        setParenthood(self, parent_id, **kwargs)
+        setChildhood(self, parent_id, backToParent, **kwargs)
 
 def onsave_child(self):
     '''
@@ -114,30 +113,31 @@ def ondelete_child(self, anchor=True, **kwargs):
     
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
     childrenListKey = kwargs.get('childrenListKey') or defaults.get('childrenListKey')
+
+    if parentKey in self.getItems():
+        db = self.getParentDatabase()
+        ParentDocument = db.getDocument(self.getItem(parentKey))
+        childrenList_name = childrenListKey % self.Form
+        childrenList = ParentDocument.getItem(childrenList_name)
+        url = getPath(self)
+        childrenList.remove(url)
+        ParentDocument.setItem(childrenList_name, childrenList)
     
-    db = self.getParentDatabase()
-    ParentDocument = db.getDocument(self.getItem(parentKey))
-    childrenList_name = childrenListKey % self.Form
-    childrenList = ParentDocument.getItem(childrenList_name)
-    url = getPath(self)
-    childrenList.remove(url)
-    ParentDocument.setItem(childrenList_name, childrenList)
-    
-    backUrl = parent.absolute_url()
-    if anchor:
-        backUrl = '%s#%s' % (backUrl, childrenList_name)
-    self.REQUEST.set('returnurl', backUrl)
+        backUrl = ParentDocument.absolute_url()
+        if anchor:
+            backUrl = '%s#%s' % (backUrl, childrenList_name)
+        self.REQUEST.set('returnurl', backUrl)
 
 def ondelete_parent(self, **kwargs):
     '''
-    Actions to perform on deletion of a parentDocument
+    Actions to perform on deletion of a ParentDocument
     '''
     
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
 
     db = self.getParentDatabase()
     idx = db.getIndex()
-    request = {parentKey: parent.id}
+    request = {parentKey: self.id}
     res = idx.dbsearch(request)
     toRemove = []
     for rec in res:
@@ -146,6 +146,7 @@ def ondelete_parent(self, **kwargs):
         else:
             rec.getObject().removeItem(parentKey)
     db.deleteDocuments(ids=toRemove, massive=False)
+    self.REQUEST.set('returnurl', db.absolute_url())
 
 
 def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
@@ -158,8 +159,8 @@ def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
     ChildDocument = db.createDocument()
     ChildDocument.setItem('Form', form_name)
     form.readInputs(ChildDocument, request, applyhidewhen=applyhidewhen)
-    setParenthood(self, parent.id, doc.id, **kwargs)
-    setChildhood(self, parent.id, doc.id, **kwargs)
+    setParenthood(ChildDocument, self.id, **kwargs)
+    setChildhood(ChildDocument, self.id, **kwargs)
     ChildDocument.save()
     return ChildDocument.getId()
 
