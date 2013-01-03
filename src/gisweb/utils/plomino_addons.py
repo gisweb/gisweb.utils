@@ -1,6 +1,11 @@
+from Products.CMFCore.utils import getToolByName
+
 from Products.CMFPlomino.PlominoForm import PlominoForm
 from Products.CMFPlomino.PlominoDocument import PlominoDocument
 from Products.CMFPlomino.index import PlominoIndex
+from Products.CMFPlomino.exceptions import PlominoScriptException
+
+from url_utils import urllib_urlencode
 
 # Security import
 from AccessControl import ClassSecurityInfo
@@ -13,6 +18,7 @@ PlominoIndex.security.declareProtected(READ_PERMISSION, 'oncreate_child')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'onsave_child')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'ondelete_child')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'ondelete_parent')
+PlominoIndex.security.declareProtected(READ_PERMISSION, 'beforecreate_child')
 InitializeClass(PlominoDocument)
 
 defaults = dict(
@@ -148,6 +154,36 @@ def ondelete_parent(self, **kwargs):
     db.deleteDocuments(ids=toRemove, massive=False)
     self.REQUEST.set('returnurl', db.absolute_url())
 
+def beforecreate_child(self, redirect_to='', using='', **kwargs):
+    """
+    Action to take before child creation
+    """
+
+    parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
+    plone_tools = None
+
+    if not self.REQUEST.get(parentKey):
+
+        db = self.getParentDatabase()
+
+        destination = db.getView(redirect_to) or db.getForm(redirect_to) or db
+        if destination==db and redirect_to:
+            plone_tools = getToolByName(db.aq_inner, 'plone_utils')
+            plone_tools.addPortalMessage('Destination "%s" not found.' % redirect_to, 'error', self.REQUEST)
+
+        if hasattr(destination, using):
+            destinationUrl = '%s/%s' % (destination.absolute_url(), using)
+        else:
+            destinationUrl = destination.absolute_url()
+            if using:
+                plone_tools = plone_tools or getToolByName(db.aq_inner, 'plone_utils')
+                plone_tools.addPortalMessage('Template "%s" not found.' % using, 'error', self.REQUEST)
+            
+        if kwargs:
+            query_string = urllib_urlencode(kwargs)
+            destinationUrl += '?%s' % query_string
+
+        self.REQUEST.RESPONSE.redirect(destinationUrl)
 
 def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
     '''
@@ -164,9 +200,9 @@ def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
     ChildDocument.save()
     return ChildDocument.getId()
 
-
 PlominoDocument.create_child = create_child
 PlominoDocument.oncreate_child = oncreate_child
 PlominoDocument.onsave_child = onsave_child
 PlominoDocument.ondelete_child = ondelete_child
 PlominoDocument.ondelete_parent = ondelete_parent
+PlominoForm.beforecreate_child = beforecreate_child
