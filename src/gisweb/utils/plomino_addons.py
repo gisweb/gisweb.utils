@@ -161,15 +161,15 @@ def beforecreate_child(self, redirect_to='', using='', **kwargs):
 
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
     plone_tools = None
+    db = self.getParentDatabase()
 
-    if not self.REQUEST.get(parentKey):
-
-        db = self.getParentDatabase()
+    if db.getDocument(self.REQUEST.get(parentKey)):
 
         destination = db.getView(redirect_to) or db.getForm(redirect_to) or db
         if destination==db and redirect_to:
             plone_tools = getToolByName(db.aq_inner, 'plone_utils')
-            plone_tools.addPortalMessage('Destination "%s" not found.' % redirect_to, 'error', self.REQUEST)
+            message = 'Destination "%s" not found.' % redirect_to
+            plone_tools.addPortalMessage(message, 'error', self.REQUEST)
 
         if hasattr(destination, using):
             destinationUrl = '%s/%s' % (destination.absolute_url(), using)
@@ -184,6 +184,11 @@ def beforecreate_child(self, redirect_to='', using='', **kwargs):
             destinationUrl += '?%s' % query_string
 
         self.REQUEST.RESPONSE.redirect(destinationUrl)
+    else:
+        plone_tools = getToolByName(db.aq_inner, 'plone_utils')
+        message = 'Not a valid document id or no id given al all.'
+        plone_tools.addPortalMessage(message, 'error', self.REQUEST)
+        self.REQUEST.RESPONSE.redirect(db.absolute_url())
 
 def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
     '''
