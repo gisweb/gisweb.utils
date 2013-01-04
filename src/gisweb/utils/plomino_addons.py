@@ -185,6 +185,10 @@ def beforecreate_child(self, redirect_to='', using='', **kwargs):
 
     if not db.getDocument(self.REQUEST.get(parentKey)):
         destinationUrl, messages = getWhereToRedirect(db, redirect_to, using, **kwargs)
+        if self.REQUEST.get(parentKey):
+            messages.append('Given Id seams not to correspond to a valid document.')
+        else:
+            messages.append('A valid Id is needed.')
         plone_tools = getToolByName(db.aq_inner, 'plone_utils')
         for msg in messages:
             plone_tools.addPortalMessage(msg, 'error', self.REQUEST)
