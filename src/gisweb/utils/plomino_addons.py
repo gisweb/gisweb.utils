@@ -154,7 +154,7 @@ def ondelete_parent(self, **kwargs):
     db.deleteDocuments(ids=toRemove, massive=False)
     self.REQUEST.set('returnurl', db.absolute_url())
 
-def getWhereToRedirect(db, redirect_to, using, REQUEST, **kwargs):
+def getWhereToRedirect(db, redirect_to, using, **kwargs):
 
     destination = db.getView(redirect_to) or db.getForm(redirect_to) or db
     messages = []
