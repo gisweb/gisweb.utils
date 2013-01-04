@@ -177,7 +177,7 @@ def getWhereToRedirect(db, redirect_to, using, **kwargs):
 
 def beforecreate_child(self, redirect_to='', using='', **kwargs):
     """
-    Action to take before child creation
+    Action to take before child creation.
     """
 
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
