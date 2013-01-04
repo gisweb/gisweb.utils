@@ -175,6 +175,7 @@ def getWhereToRedirect(db, redirect_to, using, **kwargs):
 
     return destinationUrl, messages
 
+
 def beforecreate_child(self, redirect_to='', using='', **kwargs):
     """
     Action to take before child creation.
@@ -183,12 +184,14 @@ def beforecreate_child(self, redirect_to='', using='', **kwargs):
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
     db = self.getParentDatabase()
 
+    if wf_states and 
+
     if not db.getDocument(self.REQUEST.get(parentKey)):
         destinationUrl, messages = getWhereToRedirect(db, redirect_to, using, **kwargs)
         if self.REQUEST.get(parentKey):
-            messages.append('Given Id seams not to correspond to a valid document.')
+            messages.append('Given id seams not to correspond to a valid plominoDocument.')
         else:
-            messages.append('A valid Id is needed.')
+            messages.append('No plominoDocument id given.')
         plone_tools = getToolByName(db.aq_inner, 'plone_utils')
         for msg in messages:
             plone_tools.addPortalMessage(msg, 'error', self.REQUEST)

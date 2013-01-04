@@ -16,10 +16,10 @@ def getStatesInfo(doc, *args):
     if 'title' not in args:
         args.append('title')
 
-    pw = getToolByName(doc, 'portal_workflow')
+    pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
     
     infos = []
-    for wf_id in getChainFor(doc):
+    for wf_id in pw.getChainFor(doc):
 
         wf = getToolByName(pw, wf_id)
         status_id = wf.getInfoFor(doc, 'review_state', None)
