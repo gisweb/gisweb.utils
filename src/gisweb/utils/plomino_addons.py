@@ -184,8 +184,6 @@ def beforecreate_child(self, redirect_to='', using='', **kwargs):
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
     db = self.getParentDatabase()
 
-    if wf_states and 
-
     if not db.getDocument(self.REQUEST.get(parentKey)):
         destinationUrl, messages = getWhereToRedirect(db, redirect_to, using, **kwargs)
         if self.REQUEST.get(parentKey):
