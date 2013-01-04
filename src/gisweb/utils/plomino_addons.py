@@ -154,41 +154,42 @@ def ondelete_parent(self, **kwargs):
     db.deleteDocuments(ids=toRemove, massive=False)
     self.REQUEST.set('returnurl', db.absolute_url())
 
+def getWhereToRedirect(db, redirect_to, using, REQUEST, **kwargs):
+
+    destination = db.getView(redirect_to) or db.getForm(redirect_to) or db
+    messages = []
+
+    if destination==db and redirect_to:
+        messages.append('Destination "%s" not found.' % redirect_to)
+
+    if hasattr(destination, using):
+        destinationUrl = '%s/%s' % (destination.absolute_url(), using)
+    else:
+        destinationUrl = destination.absolute_url()
+        if using:
+            messages.append('Template "%s" not found.' % using)
+
+    if kwargs:
+        query_string = urllib_urlencode(kwargs)
+        destinationUrl += '?%s' % query_string
+
+    return destinationUrl, messages
+
 def beforecreate_child(self, redirect_to='', using='', **kwargs):
     """
     Action to take before child creation
     """
 
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
-    plone_tools = None
     db = self.getParentDatabase()
 
-    if db.getDocument(self.REQUEST.get(parentKey)):
-
-        destination = db.getView(redirect_to) or db.getForm(redirect_to) or db
-        if destination==db and redirect_to:
-            plone_tools = getToolByName(db.aq_inner, 'plone_utils')
-            message = 'Destination "%s" not found.' % redirect_to
-            plone_tools.addPortalMessage(message, 'error', self.REQUEST)
-
-        if hasattr(destination, using):
-            destinationUrl = '%s/%s' % (destination.absolute_url(), using)
-        else:
-            destinationUrl = destination.absolute_url()
-            if using:
-                plone_tools = plone_tools or getToolByName(db.aq_inner, 'plone_utils')
-                plone_tools.addPortalMessage('Template "%s" not found.' % using, 'error', self.REQUEST)
-            
-        if kwargs:
-            query_string = urllib_urlencode(kwargs)
-            destinationUrl += '?%s' % query_string
-
-        self.REQUEST.RESPONSE.redirect(destinationUrl)
-    else:
+    if not db.getDocument(self.REQUEST.get(parentKey)):
+        destinationUrl, messages = getWhereToRedirect(db, redirect_to, using, **kwargs)
         plone_tools = getToolByName(db.aq_inner, 'plone_utils')
-        message = 'Not a valid document id or no id given al all.'
-        plone_tools.addPortalMessage(message, 'error', self.REQUEST)
-        self.REQUEST.RESPONSE.redirect(db.absolute_url())
+        for msg in messages:
+            plone_tools.addPortalMessage(msg, 'error', self.REQUEST)
+        self.REQUEST.RESPONSE.redirect(destinationUrl)
+
 
 def create_child(self, form_name, request={}, applyhidewhen=True, **kwargs):
     '''
