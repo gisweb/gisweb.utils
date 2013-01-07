@@ -55,7 +55,7 @@ def doActionIfAny(doc, wf_var='transition_on_save', *args):
                 execute = tr in wf.getInfoFor(doc, wf_var, [])
             else:
                 execute = True
-            if execute and tr in wf.isActionSupported(doc, tr):
+            if execute and wf.isActionSupported(doc, tr):
                 wf.doActionFor(doc, tr)
 
     return getStatesInfo(doc, *args)
