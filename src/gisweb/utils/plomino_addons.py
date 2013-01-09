@@ -195,7 +195,7 @@ def beforecreate_child(self, redirect_to='', using='', message=(), **kwargs):
             messages.append(message or ('No plominoDocument id given.', 'warning'))
         plone_tools = getToolByName(db.aq_inner, 'plone_utils')
         for msg in messages:
-            plone_tools.addPortalMessage(*msg, self.REQUEST)
+            plone_tools.addPortalMessage(*msg, request=self.REQUEST)
         self.REQUEST.RESPONSE.redirect(destinationUrl)
 
 
