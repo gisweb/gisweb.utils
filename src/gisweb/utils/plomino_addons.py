@@ -160,14 +160,14 @@ def getWhereToRedirect(db, redirect_to, using, **kwargs):
     messages = []
 
     if destination==db and redirect_to:
-        messages.append('Destination "%s" not found.' % redirect_to)
+        messages.append(('Destination "%s" not found.' % redirect_to, 'error'))
 
     if hasattr(destination, using):
         destinationUrl = '%s/%s' % (destination.absolute_url(), using)
     else:
         destinationUrl = destination.absolute_url()
         if using:
-            messages.append('Template "%s" not found.' % using)
+            messages.append(('Template "%s" not found.' % using, 'error'))
 
     if kwargs:
         query_string = urllib_urlencode(kwargs)
@@ -176,9 +176,10 @@ def getWhereToRedirect(db, redirect_to, using, **kwargs):
     return destinationUrl, messages
 
 
-def beforecreate_child(self, redirect_to='', using='', **kwargs):
+def beforecreate_child(self, redirect_to='', using='', message=(), **kwargs):
     """
     Action to take before child creation.
+    message: ("Indicazioni per l'utente", 'info')
     """
 
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
@@ -187,12 +188,14 @@ def beforecreate_child(self, redirect_to='', using='', **kwargs):
     if not db.getDocument(self.REQUEST.get(parentKey)):
         destinationUrl, messages = getWhereToRedirect(db, redirect_to, using, **kwargs)
         if self.REQUEST.get(parentKey):
-            messages.append('Given id seams not to correspond to a valid plominoDocument.')
+            messages.append(('Given id seams not to correspond to a valid plominoDocument.', 'error'))
         else:
-            messages.append('No plominoDocument id given.')
+            if isinstance(message, basestring):
+                message = (message, )
+            messages.append(message or ('No plominoDocument id given.', 'warning'))
         plone_tools = getToolByName(db.aq_inner, 'plone_utils')
         for msg in messages:
-            plone_tools.addPortalMessage(msg, 'error', self.REQUEST)
+            plone_tools.addPortalMessage(*msg, self.REQUEST)
         self.REQUEST.RESPONSE.redirect(destinationUrl)
 
 
