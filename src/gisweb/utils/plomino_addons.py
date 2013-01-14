@@ -4,6 +4,9 @@ from Products.CMFPlomino.PlominoForm import PlominoForm
 from Products.CMFPlomino.PlominoDocument import PlominoDocument
 from Products.CMFPlomino.index import PlominoIndex
 from Products.CMFPlomino.exceptions import PlominoScriptException
+#from Products.CMFPlomino.PlominoAction import PlominoAction
+
+from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo
 
 from url_utils import urllib_urlencode
 
@@ -19,6 +22,10 @@ PlominoIndex.security.declareProtected(READ_PERMISSION, 'onsave_child')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'ondelete_child')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'ondelete_parent')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'beforecreate_child')
+PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_getChainFor')
+PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_statesInfo')
+PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_transitionsInfo')
+
 InitializeClass(PlominoDocument)
 
 defaults = dict(
@@ -220,3 +227,18 @@ PlominoDocument.onsave_child = onsave_child
 PlominoDocument.ondelete_child = ondelete_child
 PlominoDocument.ondelete_parent = ondelete_parent
 PlominoForm.beforecreate_child = beforecreate_child
+
+def wf_getChainFor(self):
+    return getChainFor(context)
+
+def wf_statesInfo(self, single=True, *args):
+    return getStatesInfo(self, single, *args)
+
+def wf_transitionsInfo(self, single=True, *args):
+    return getTransitionsInfo(self, single, *args)
+
+PlominoDocument.wf_getChainFor = wf_getChainFor
+PlominoDocument.wf_statesInfo = wf_statesInfo
+PlominoDocument.wf_transitionsInfo = wf_transitionsInfo
+
+#PlominoAction.schema.ActionType.vocabulary = [["WORKFLOWACTIONS", "DCWorkflow actions"]]
