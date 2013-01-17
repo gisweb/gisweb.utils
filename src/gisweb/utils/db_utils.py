@@ -68,10 +68,12 @@ def suggestFromTable(sessionname, name, columnname, others=[], schema='public', 
         query = table
 
     column = table.c[columnname]
+    tip = tip.rstrip()
 
     # ilike '%(tip)s%%'
     where = or_(column.startswith(tip),
         column.startswith(tip.capitalize()),
+        column.startswith(tip.title()),
         column.startswith(tip.lower()),
         column.startswith(tip.upper()))
     # other simple filters
