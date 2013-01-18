@@ -110,12 +110,12 @@ def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
         setParenthood(self, parent_id, **kwargs)
         setChildhood(self, parent_id, backToParent, **kwargs)
 
-def onsave_child(self):
+def onsave_child(self, backToParent=False):
     '''
     Actions to perform on save of a ChildDocument
     '''
     if not self.isNewDocument():
-        if self.getItem('plominoredirecturl'):
+        if self.getItem('plominoredirecturl') and not backToParent:
             self.removeItem('plominoredirecturl')
 
 
