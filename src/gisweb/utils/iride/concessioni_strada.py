@@ -2,14 +2,14 @@
 from suds.client import Client
 from datetime import datetime, date
 from base64 import b64encode
-from iride.plomino_conversion import FIELDS_MAP, get_tabledata_for
+from gisweb.utils.iride.plomino_conversion import FIELDS_MAP, get_tabledata_for
 
 
 # this url is good if you
 # ssh siti.provincia.sp.it -L 3340:10.94.128.230:80 -p 2229
-URL = 'http://127.0.0.1:3340/ulissetest/iride/web_services_20/WSProtocolloDM/WSProtocolloDM.asmx?WSDL'
+#URL = 'http://127.0.0.1:3340/ulissetest/iride/web_services_20/WSProtocolloDM/WSProtocolloDM.asmx?WSDL'
 # This one is good at Spezia
-# URL = 'http://10.94.128.230/ulissetest/iride/web_services_20/WSProtocolloDM/WSProtocolloDM.asmx?WSDL'
+URL = 'http://10.94.128.230/ulissetest/iride/web_services_20/WSProtocolloDM/WSProtocolloDM.asmx?WSDL'
 UTENTE = 'AMMINISTRATORE'
 RUOLO = 'AMMINISTRATORE'
 APPARTENENZA = 'DOCUMENTO'
@@ -67,9 +67,8 @@ def insert_documento(doc):
     protocollo.Classifica = metadata['__Classifica']
 
     if 'domanda_inviata.pdf' in doc:
-        import ipdb;ipdb.set_trace()
         allegato = client.factory.create('AllegatoIn')
-        allegato.Image = b64encode(open('/tmp/pdf_prova.pdf').read())
+        allegato.Image = b64encode(doc['domanda_inviata.pdf'].data)
         allegato.TipoFile = 'pdf'
         allegato.ContentType = 'application/pdf'
         protocollo.Allegati.Allegato.append(allegato)
@@ -134,10 +133,7 @@ def fill_from_fisica(doc, obj):
 if __name__ == '__main__':
     # To run this thing use
     # bin/client1 run path/to/this/thing.py
-    from iride.plomino_conversion import FIELDS_MAP
-    portal = app.istanze
-    for brain in portal.portal_catalog({'portal_type':'PlominoDatabase'}):
-        db = brain.getObject()
-        for doc in db.plomino_documents.objectValues():
-            if doc.getForm() and doc.getForm().id in FIELDS_MAP:
-                insert_documento(doc)
+    db = app.istanze.iol_provsp
+    for doc in db.plomino_documents.objectValues():
+        if doc.getForm() and doc.getForm().id in FIELDS_MAP:
+	    insert_documento(doc)
