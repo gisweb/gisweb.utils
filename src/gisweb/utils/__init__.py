@@ -4,6 +4,7 @@ from AccessControl import allow_module, ModuleSecurityInfo
 #from z3c.saconfig import named_scoped_session
 
 allow_module('gisweb.utils')
+allow_module('gisweb.utils.iride')
 allow_module('gisweb.utils.plominoKin')
 
 def initialize(con):
