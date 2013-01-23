@@ -37,7 +37,7 @@ def getStatesInfo(doc, single=True, *args):
     else:
         return infos
 
-def getTransitionsInfo(doc, single=True, *args):
+def getTransitionsInfo(doc, single=True, supported_only=True, *args):
     """
     Restituisce informazioni sulle transizioni disponibili per la pratica
     relative ai workflow ad essa associati.
@@ -57,12 +57,13 @@ def getTransitionsInfo(doc, single=True, *args):
         wf = getToolByName(pw, i['wf_id'])
         tr_def = {'wf_id': i['wf_id']}
         for tr_id in i['transitions']:
-            transition = getToolByName(wf.transitions, tr_id)
-            info = dict([(k, getattr(transition, k)) for k in args])
-            info['id'] = transition.getId()
-            info.update(tr_def)
+            if (supported_only and wf.isActionSupported(doc, tr_id)) or not supported_only:
+                transition = getToolByName(wf.transitions, tr_id)
+                info = dict([(k, getattr(transition, k)) for k in args])
+                info['id'] = transition.getId()
+                info.update(tr_def)
 
-            infos.append(info)
+                infos.append(info)
 
     if len(infos) == 1 and single:
         return infos[0]
