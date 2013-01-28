@@ -69,7 +69,7 @@ from db_utils import suggestFromTable
 
 ############################################################### CF P.IVA UTILS #
 
-from anagrafica_utils import is_valid_cf, is_valid_piva
+from anagrafica_utils import is_valid_cf, is_valid_piva, cf_build
 
 
 #################################################################### URL UTILS #

@@ -1,6 +1,21 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import codicefiscale as cf
+import datetime
+
+def cf_build(surname, name, year, month, day, sex, municipality):
+    """``build(surname, name, year, month, day, sex, municipality) -> string``
+
+    Computes the fiscal code for the given person data.
+
+    eg: build('Rocca', 'Emanuele', 1983, 11, 18, 'M', 'D969') 
+        -> RCCMNL83S18D969H
+    """
+    birthday = datetime.datetime(year, month, day)
+
+    return cf.build(surname, name, birthday, sex, municipality)
+
 def is_valid_cf(cf):
     ''' Verify the validity of an (italian) fiscal code 
     courtesy of: http://www.icosaedro.it/cf-pi/index.html
