@@ -58,7 +58,7 @@ def insert_documento(doc):
 
     protocollo.Utente = 'AMMINISTRATORE'
     protocollo.Ruolo = 'AMMINISTRATORE'
-    protocollo.Origine = 'GW'
+    protocollo.Origine = 'A'
     protocollo.MittenteInterno = 'PROTO02'
 
     metadata = get_metadata_for(doc)
@@ -74,10 +74,15 @@ def insert_documento(doc):
         protocollo.Allegati.Allegato.append(allegato)
 
     res = client.service.InserisciProtocollo(protocollo)
-    IdDocumento = res.IdProtocollo
+    IdDocumento = res.IdDocumento
 
     if hasattr(res, 'Errore') and unicode(res.Errore):
-        raise RuntimeError(unicode(res.Errore))
+        # XXX FIXME: working around evil error ## TODO
+        # Exception from HRESULT: 0xFFFDB5F4
+        print RuntimeError(unicode(res.Errore))
+        import time
+        IdDocumento = int(time.mktime(time.gmtime())) - 1358700000
+        # raise RuntimeError(unicode(res.Errore))
 
     xmlstring = prepare_string(data, IdDocumento)
     resp = client.service.InserisciDatiUtente(
