@@ -5,11 +5,11 @@ import codicefiscale as cf
 import datetime
 
 def cf_build(surname, name, year, month, day, sex, municipality):
-    """``build(surname, name, year, month, day, sex, municipality) -> string``
+    """``cf_build(surname, name, year, month, day, sex, municipality) -> string``
 
     Computes the fiscal code for the given person data.
 
-    eg: build('Rocca', 'Emanuele', 1983, 11, 18, 'M', 'D969') 
+    eg: cf_build('Rocca', 'Emanuele', 1983, 11, 18, 'M', 'D969') 
         -> RCCMNL83S18D969H
     """
     birthday = datetime.datetime(year, month, day)
@@ -23,7 +23,9 @@ def is_valid_cf(cf):
 
     cf = str(cf)
 
-    if len(cf) <> 16: return False
+    #if len(cf) <> 16: return False
+
+    if not cf.isvalid(cf): return False
 
     alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
