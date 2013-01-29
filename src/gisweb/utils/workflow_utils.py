@@ -46,7 +46,7 @@ def getTransitionsInfo(doc, single=False, supported_only=True, args=[]):
     if 'title' not in args:
         args.append('title')
 
-    tr_infos = getStatesInfo(doc, False, 'transitions')
+    tr_infos = getStatesInfo(doc, False, args=['transitions'])
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
 
