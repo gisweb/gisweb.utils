@@ -35,7 +35,7 @@ def getStatesInfo(doc, single=True, args=[]):
     else:
         return infos
 
-def getTransitionsInfo(doc, single=False, supported_only=True, args=[]]):
+def getTransitionsInfo(doc, single=False, supported_only=True, args=[]):
     """
     Restituisce informazioni sulle transizioni disponibili per la pratica
     relative ai workflow ad essa associati.
