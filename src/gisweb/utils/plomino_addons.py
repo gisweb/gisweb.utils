@@ -231,7 +231,7 @@ PlominoForm.beforecreate_child = beforecreate_child
 def wf_getChainFor(self):
     return getChainFor(context)
 
-def wf_statesInfo(self, single=True, *args):
+def wf_statesInfo(self, single=True, args=[]):
     return getStatesInfo(self, single, *args)
 
 def wf_transitionsInfo(self, single=True, supported_only=True, args=[]):
