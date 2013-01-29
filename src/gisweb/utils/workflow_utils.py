@@ -4,17 +4,15 @@ def getChainFor(context):
     pw = getToolByName(context, 'portal_workflow')
     return pw.getChainFor(context)
 
-def getStatesInfo(doc, single=True, *args):
+def getStatesInfo(doc, single=True, args=[]):
     """
     Restituisce informazioni sugli stati della pratica per tutti i
     workflow ad essa associati.
     Argomenti richiedibili: title (default), description,
         transitions, permission_roles, group_roles, var_values
+    single=True: solitamente di ha a che fare con un workflow quindi ci
+        si aspetta un solo stato
     """
-
-    args = list(args)
-    if 'title' not in args:
-        args.append('title')
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
     
@@ -26,7 +24,7 @@ def getStatesInfo(doc, single=True, *args):
 
         if status_id:
             status = getToolByName(wf.states, status_id)
-            info = dict([(k, getattr(status, k)) for k in args])
+            info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
             info['id'] = status.getId()
             info['wf_id'] = wf_id
 
@@ -37,7 +35,7 @@ def getStatesInfo(doc, single=True, *args):
     else:
         return infos
 
-def getTransitionsInfo(doc, single=True, supported_only=True, *args):
+def getTransitionsInfo(doc, single=False, supported_only=True, args=[]]):
     """
     Restituisce informazioni sulle transizioni disponibili per la pratica
     relative ai workflow ad essa associati.
@@ -59,7 +57,7 @@ def getTransitionsInfo(doc, single=True, supported_only=True, *args):
         for tr_id in i['transitions']:
             if (supported_only and wf.isActionSupported(doc, tr_id)) or not supported_only:
                 transition = getToolByName(wf.transitions, tr_id)
-                info = dict([(k, getattr(transition, k)) for k in args])
+                info = dict([(k, getattr(transition, k)) for k in set(['title']+args)])
                 info['id'] = transition.getId()
                 info.update(tr_def)
 
@@ -70,13 +68,13 @@ def getTransitionsInfo(doc, single=True, supported_only=True, *args):
     else:
         return infos
 
-def doActionIfAny(doc, wf_var='transition_on_save', *args):
+def doActionIfAny(doc, wf_var='transition_on_save', args=[]):
     """
     Esegue le transizioni del workflow che devono essere eseguite al
     salvataggio della pratica.
     wf_var: nome della variabile di workflow contenente la lista delle
         transizioni abilitate. Se valutata come falsa le transizioni
-        disponibili sono considerate tutte eseguibili.
+        disponibili sono considerate tutte da eseguire.
     """
     
     pw = getToolByName(doc, 'portal_workflow')
@@ -92,4 +90,4 @@ def doActionIfAny(doc, wf_var='transition_on_save', *args):
             if execute and wf.isActionSupported(doc, tr):
                 wf.doActionFor(doc, tr)
 
-    return getStatesInfo(doc, *args)
+    return getStatesInfo(doc, args=args)

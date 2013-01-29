@@ -234,8 +234,8 @@ def wf_getChainFor(self):
 def wf_statesInfo(self, single=True, *args):
     return getStatesInfo(self, single, *args)
 
-def wf_transitionsInfo(self, single=True, supported_only=True, *args):
-    return getTransitionsInfo(self, single=single, supported_only=supported_only, *args)
+def wf_transitionsInfo(self, single=True, supported_only=True, args=[]):
+    return getTransitionsInfo(self, single=single, supported_only=supported_only, args=args)
 
 PlominoDocument.wf_getChainFor = wf_getChainFor
 PlominoDocument.wf_statesInfo = wf_statesInfo
