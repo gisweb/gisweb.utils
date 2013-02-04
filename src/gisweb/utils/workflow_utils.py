@@ -39,7 +39,7 @@ def getInfoForState(context, wf_id, state_id, args=[]):
     status = getToolByName(wf.states, state_id)
 
     return dict([(k, getattr(status, k)) for k in set(['title']+args) \
-        if isinstance(getattr(wf, k), basestring)])
+        if isinstance(getattr(status, k), basestring)])
 
 
 def getStatesInfo(doc, state_id=None, single=True, args=[]):
