@@ -19,7 +19,8 @@ def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
     infos = []
     for wf_id in wf_ids or getChainFor(doc):
         wf = getToolByName(pw, wf_id)
-        info = dict([(k, getattr(wf, k)) for k in set(['title']+args) if isinstance(getattr(wf, k), basestring)])
+        info = dict([(k, getattr(wf, k)) for k in set(['title']+args) \
+            if isinstance(getattr(wf, k), basestring)])
         info['id'] = wf.getId()
         infos.append(info)
 
@@ -27,6 +28,19 @@ def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
         return infos[0]
     else:
         return infos
+
+def getInfoForState(context, wf_id, state_id, args=[]):
+    """
+    Restituisce informazioni sullo stato richiesto.
+    """
+
+    pw = getToolByName(context.getParentDatabase(), 'portal_workflow')
+    wf = getToolByName(pw, wf_id)
+    status = getToolByName(wf.states, state_id)
+
+    return dict([(k, getattr(status, k)) for k in set(['title']+args) \
+        if isinstance(getattr(wf, k), basestring)])
+
 
 def getStatesInfo(doc, state_id=None, single=True, args=[]):
     """
@@ -48,7 +62,8 @@ def getStatesInfo(doc, state_id=None, single=True, args=[]):
 
         if status_id:
             status = getToolByName(wf.states, status_id)
-            info = dict([(k, getattr(status, k)) for k in set(['title']+args) if isinstance(getattr(wf, k), basestring)])
+            info = dict([(k, getattr(status, k)) for k in set(['title']+args) \
+                if isinstance(getattr(wf, k), basestring)])
             info['id'] = status.getId()
             info['wf_id'] = wf_id
 
@@ -82,7 +97,8 @@ def getTransitionsInfo(doc, single=False, supported_only=True, args=[]):
         for tr_id in i['transitions']:
             if (supported_only and wf.isActionSupported(doc, tr_id)) or not supported_only:
                 transition = getToolByName(wf.transitions, tr_id)
-                info = dict([(k, getattr(transition, k)) for k in set(['title']+args) if isinstance(getattr(wf, k), basestring)])
+                info = dict([(k, getattr(transition, k)) for k in set(['title']+args) \
+                    if isinstance(getattr(wf, k), basestring)])
                 info['id'] = transition.getId()
                 info.update(tr_def)
 
