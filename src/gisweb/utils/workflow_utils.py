@@ -1,30 +1,54 @@
 from Products.CMFCore.utils import getToolByName
 
 def getChainFor(context):
+    """
+    Restituisce gli id dei workflow associati al contesto.
+    """
     pw = getToolByName(context, 'portal_workflow')
     return pw.getChainFor(context)
 
-def getStatesInfo(doc, single=True, args=[]):
+def getWorkflowInfo(doc, single=True, args=[]):
+    """
+    Restituisce informazioni su tutti i workflow associati alla pratica.
+    Argomenti richiedibili: title (default), description,
+        initial_state, state_var
+    """
+
+    pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
+
+    infos = []
+    for wf_id in getChainFor(doc):
+        wf = getToolByName(pw, wf_id)
+        info = dict([(k, getattr(wf, k)) for k in set(['title']+args) if isinstance(getattr(wf, k), basestring)])
+        info['id'] = wf.getId()
+        infos.append(info)
+
+    if len(infos) == 1 and single:
+        return infos[0]
+    else:
+        return infos
+
+def getStatesInfo(doc, state_id=None, single=True, args=[]):
     """
     Restituisce informazioni sugli stati della pratica per tutti i
     workflow ad essa associati.
     Argomenti richiedibili: title (default), description,
         transitions, permission_roles, group_roles, var_values
-    single=True: solitamente di ha a che fare con un workflow quindi ci
-        si aspetta un solo stato
+    single=True: solitamente si ha a che fare con un workflow solo quindi
+        ci si aspetta un solo stato
     """
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
-    
+
     infos = []
-    for wf_id in pw.getChainFor(doc):
+    for wf_id in getChainFor(doc):
 
         wf = getToolByName(pw, wf_id)
-        status_id = wf.getInfoFor(doc, 'review_state', None)
+        status_id = state_id or wf.getInfoFor(doc, 'review_state', None)
 
         if status_id:
             status = getToolByName(wf.states, status_id)
-            info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
+            info = dict([(k, getattr(status, k)) for k in set(['title']+args) if isinstance(getattr(wf, k), basestring)])
             info['id'] = status.getId()
             info['wf_id'] = wf_id
 
@@ -34,6 +58,7 @@ def getStatesInfo(doc, single=True, args=[]):
         return infos[0]
     else:
         return infos
+
 
 def getTransitionsInfo(doc, single=False, supported_only=True, args=[]):
     """
@@ -57,7 +82,7 @@ def getTransitionsInfo(doc, single=False, supported_only=True, args=[]):
         for tr_id in i['transitions']:
             if (supported_only and wf.isActionSupported(doc, tr_id)) or not supported_only:
                 transition = getToolByName(wf.transitions, tr_id)
-                info = dict([(k, getattr(transition, k)) for k in set(['title']+args)])
+                info = dict([(k, getattr(transition, k)) for k in set(['title']+args) if isinstance(getattr(wf, k), basestring)])
                 info['id'] = transition.getId()
                 info.update(tr_def)
 
@@ -76,7 +101,7 @@ def doActionIfAny(doc, wf_var='transition_on_save', args=[]):
         transizioni abilitate. Se valutata come falsa le transizioni
         disponibili sono considerate tutte da eseguire.
     """
-    
+
     pw = getToolByName(doc, 'portal_workflow')
     transitions = []
     for wf_id in getChainFor(doc):

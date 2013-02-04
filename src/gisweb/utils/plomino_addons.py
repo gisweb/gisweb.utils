@@ -7,6 +7,7 @@ from Products.CMFPlomino.exceptions import PlominoScriptException
 #from Products.CMFPlomino.PlominoAction import PlominoAction
 
 from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo
+from workflow_utils import getWorkflowInfo
 
 from url_utils import urllib_urlencode
 
@@ -25,6 +26,7 @@ PlominoIndex.security.declareProtected(READ_PERMISSION, 'beforecreate_child')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_getChainFor')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_statesInfo')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_transitionsInfo')
+PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_workflowInfo')
 
 InitializeClass(PlominoDocument)
 
@@ -38,7 +40,7 @@ defaults = dict(
 def getPath(doc, virtual=False):
 
     doc_path = doc.doc_path()
-    
+
     pd_path_list = doc.REQUEST.physicalPathToVirtualPath(doc_path) if virtual else None
 
     return '/'.join(pd_path_list or doc_path)
@@ -51,7 +53,7 @@ def setParenthood(ChildDocument, parent_id, CASCADE=True, setDocLink=False, **kw
 
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
     parentLinkKey = kwargs.get('parentLinkKey') or defaults.get('parentLinkKey')
-    
+
     ParentDocument = ChildDocument.getParentDatabase().getDocument(parent_id)
     Parent_path = getPath(ParentDocument)
 
@@ -65,24 +67,24 @@ def setChildhood(ChildDocument, parent_id, backToParent='anchor', **kwargs):
     '''
     Set child reference on parent document
     '''
-    
+
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
     childrenListKey = kwargs.get('childrenListKey') or defaults.get('childrenListKey')
-    
+
     db = ChildDocument.getParentDatabase()
     ParentDocument = db.getDocument(parent_id)
-    
+
     childrenList_name = childrenListKey % ChildDocument.Form
     childrenList = ParentDocument.getItem(childrenList_name, []) or []
     childrenList.append(getPath(ChildDocument))
-    
+
     idx = db.getIndex()
     for fieldname in (parentKey, 'CASCADE', ):
         if fieldname not in idx.indexes():
             idx.createFieldIndex(fieldname, 'TEXT', refresh=True)
-    
+
     ParentDocument.setItem(childrenList_name, childrenList)
-    
+
     if backToParent:
         backUrl = ParentDocument.absolute_url()
         if backToParent == 'anchor':
@@ -101,7 +103,7 @@ def oncreate_child(self, parent_id='', backToParent='anchor', **kwargs):
     # first take from the child itself
     #if not parent_id:
         #parent_id = self.getItem(parentKey)
-    
+
     # second take from the request
     if not parent_id:
         parent_id = self.REQUEST.get(parentKey)
@@ -123,7 +125,7 @@ def ondelete_child(self, anchor=True, **kwargs):
     '''
     Actions to perform on deletion of a ChildDocument
     '''
-    
+
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
     childrenListKey = kwargs.get('childrenListKey') or defaults.get('childrenListKey')
 
@@ -135,7 +137,7 @@ def ondelete_child(self, anchor=True, **kwargs):
         url = getPath(self)
         childrenList.remove(url)
         ParentDocument.setItem(childrenList_name, childrenList)
-    
+
         backUrl = ParentDocument.absolute_url()
         if anchor:
             backUrl = '%s#%s' % (backUrl, childrenList_name)
@@ -145,7 +147,7 @@ def ondelete_parent(self, **kwargs):
     '''
     Actions to perform on deletion of a ParentDocument
     '''
-    
+
     parentKey = kwargs.get('parentKey') or defaults.get('parentKey')
 
     db = self.getParentDatabase()
@@ -231,14 +233,19 @@ PlominoForm.beforecreate_child = beforecreate_child
 def wf_getChainFor(self):
     return getChainFor(context)
 
-def wf_statesInfo(self, single=True, args=[]):
-    return getStatesInfo(self, single, *args)
+def wf_workflowInfo(self, single=True, args=[]):
+    return getWorkflowInfo(self, single=single, args=args)
+
+def wf_statesInfo(self, state_id=None, single=True, args=[]):
+    return getStatesInfo(self, state_id=state_id, single=single, args=args)
 
 def wf_transitionsInfo(self, single=True, supported_only=True, args=[]):
     return getTransitionsInfo(self, single=single, supported_only=supported_only, args=args)
 
 PlominoDocument.wf_getChainFor = wf_getChainFor
+PlominoDocument.wf_workflowInfo = wf_workflowInfo
 PlominoDocument.wf_statesInfo = wf_statesInfo
 PlominoDocument.wf_transitionsInfo = wf_transitionsInfo
+
 
 #PlominoAction.schema.ActionType.vocabulary = [["WORKFLOWACTIONS", "DCWorkflow actions"]]
