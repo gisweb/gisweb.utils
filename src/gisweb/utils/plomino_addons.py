@@ -246,6 +246,7 @@ PlominoDocument.wf_getChainFor = wf_getChainFor
 PlominoDocument.wf_workflowInfo = wf_workflowInfo
 PlominoDocument.wf_statesInfo = wf_statesInfo
 PlominoDocument.wf_transitionsInfo = wf_transitionsInfo
-
-
-#PlominoAction.schema.ActionType.vocabulary = [["WORKFLOWACTIONS", "DCWorkflow actions"]]
+PlominoForm.wf_getChainFor = wf_getChainFor
+PlominoForm.wf_workflowInfo = wf_workflowInfo
+PlominoForm.wf_statesInfo = wf_statesInfo
+PlominoForm.wf_transitionsInfo = wf_transitionsInfo
