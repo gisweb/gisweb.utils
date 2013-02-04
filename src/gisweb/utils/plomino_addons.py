@@ -7,7 +7,7 @@ from Products.CMFPlomino.exceptions import PlominoScriptException
 #from Products.CMFPlomino.PlominoAction import PlominoAction
 
 from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo
-from workflow_utils import getWorkflowInfo, getInfoForState
+from workflow_utils import getWorkflowInfo, getInfoForState, getInfoFor
 
 from url_utils import urllib_urlencode
 
@@ -245,10 +245,14 @@ def wf_transitionsInfo(self, single=False, supported_only=True, args=[]):
 def wf_getInfoForState(self, wf_id, state_id, args=[]):
     return getInfoForState(self, wf_id, state_id, args=args)
 
+def wf_getInfoFor(self, arg, *args, **kwargs):
+    return getInfoFor(self, arg, *args, **kwargs)
+
 PlominoDocument.wf_getChainFor = wf_getChainFor
 PlominoDocument.wf_workflowInfo = wf_workflowInfo
 PlominoDocument.wf_statesInfo = wf_statesInfo
 PlominoDocument.wf_transitionsInfo = wf_transitionsInfo
+PlominoDocument.wf_getInfoFor = wf_getInfoFor
 PlominoForm.wf_getChainFor = wf_getChainFor
 PlominoForm.wf_workflowInfo = wf_workflowInfo
 PlominoForm.wf_statesInfo = wf_statesInfo

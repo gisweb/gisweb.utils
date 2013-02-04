@@ -122,7 +122,7 @@ from spezia_utils import protocolla_doc, protocolla
 
 ############################################################### WORKFLOW UTILS #
 
-from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny
+from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny, getInfoFor
 
 
 ################################################################### MAIL UTILS #

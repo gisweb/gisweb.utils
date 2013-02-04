@@ -7,6 +7,31 @@ def getChainFor(context):
     pw = getToolByName(context.getParentDatabase(), 'portal_workflow')
     return pw.getChainFor(context)
 
+
+def getInfoFor(context, arg, *args, **kwargs):
+    """
+    Cicla getInfoFor su tutti i workflow richiesti o su quelli assegnati
+    al documento.
+    """
+
+    pw = getToolByName(context.getParentDatabase(), 'portal_workflow')
+
+    infos = {}
+    for wf_id in kwargs.get('wf_ids') or getChainFor(context):
+        wf = getToolByName(pw, wf_id)
+        infos[wf_id] = dict([(var, wf.getInfoFor(context, var, None)) \
+            for var in set([arg]+list(args))])
+
+    if kwargs.get('single') in (None, True, ) and len(infos)==1:
+        val = infos.values()[0]
+        if len(val) == 1:
+            return val.values()[0]
+        else:
+            return val
+    else:
+        return infos
+
+
 def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
     """
     Restituisce informazioni su tutti i workflow associati alla pratica.
@@ -63,7 +88,6 @@ def getStatesInfo(doc, state_id=None, single=True, args=[]):
             info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
             info['id'] = status.getId()
             info['wf_id'] = wf_id
-
             infos.append(info)
 
     if len(infos) == 1 and single:
