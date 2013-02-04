@@ -243,7 +243,7 @@ def wf_transitionsInfo(self, single=True, supported_only=True, args=[]):
     return getTransitionsInfo(self, single=single, supported_only=supported_only, args=args)
 
 def wf_getInfoForState(self, wf_id, state_id, args=[]):
-    return getInfoForState(self, wf_id, state_id, args=[])
+    return getInfoForState(self, wf_id, state_id, args=args)
 
 PlominoDocument.wf_getChainFor = wf_getChainFor
 PlominoDocument.wf_workflowInfo = wf_workflowInfo
