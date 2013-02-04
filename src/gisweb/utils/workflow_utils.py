@@ -4,7 +4,7 @@ def getChainFor(context):
     """
     Restituisce gli id dei workflow associati al contesto.
     """
-    pw = getToolByName(context, 'portal_workflow')
+    pw = getToolByName(context.getParentDatabase(), 'portal_workflow')
     return pw.getChainFor(context)
 
 def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
