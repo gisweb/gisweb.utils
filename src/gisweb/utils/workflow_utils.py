@@ -7,7 +7,7 @@ def getChainFor(context):
     pw = getToolByName(context, 'portal_workflow')
     return pw.getChainFor(context)
 
-def getWorkflowInfo(doc, single=True, args=[]):
+def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
     """
     Restituisce informazioni su tutti i workflow associati alla pratica.
     Argomenti richiedibili: title (default), description,
@@ -17,7 +17,7 @@ def getWorkflowInfo(doc, single=True, args=[]):
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
 
     infos = []
-    for wf_id in getChainFor(doc):
+    for wf_id in wf_ids or getChainFor(doc):
         wf = getToolByName(pw, wf_id)
         info = dict([(k, getattr(wf, k)) for k in set(['title']+args) if isinstance(getattr(wf, k), basestring)])
         info['id'] = wf.getId()

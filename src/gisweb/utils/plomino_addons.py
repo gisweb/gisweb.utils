@@ -233,8 +233,8 @@ PlominoForm.beforecreate_child = beforecreate_child
 def wf_getChainFor(self):
     return getChainFor(context)
 
-def wf_workflowInfo(self, single=True, args=[]):
-    return getWorkflowInfo(self, single=single, args=args)
+def wf_workflowInfo(self, wf_ids=None, single=True, args=[]):
+    return getWorkflowInfo(self, wf_ids=wf_ids, single=single, args=args)
 
 def wf_statesInfo(self, state_id=None, single=True, args=[]):
     return getStatesInfo(self, state_id=state_id, single=single, args=args)
