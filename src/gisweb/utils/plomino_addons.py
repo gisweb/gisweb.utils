@@ -239,7 +239,7 @@ def wf_workflowInfo(self, wf_ids=None, single=True, args=[]):
 def wf_statesInfo(self, state_id=None, single=True, args=[]):
     return getStatesInfo(self, state_id=state_id, single=single, args=args)
 
-def wf_transitionsInfo(self, single=True, supported_only=True, args=[]):
+def wf_transitionsInfo(self, single=False, supported_only=True, args=[]):
     return getTransitionsInfo(self, single=single, supported_only=supported_only, args=args)
 
 def wf_getInfoForState(self, wf_id, state_id, args=[]):
