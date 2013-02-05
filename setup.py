@@ -35,6 +35,7 @@ setup(name='gisweb.utils',
       install_requires=[
           'setuptools',
           'requests',
+          'dict2xml'
           # -*- Extra requirements: -*-
       ],
       entry_points="""

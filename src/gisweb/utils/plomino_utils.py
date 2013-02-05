@@ -15,10 +15,6 @@ import Missing
 
 from json_utils import json_dumps
 
-#from dict2xml.dict2xml import dict2xml as xmlify
-
-from dict2xml import dict2xml
-
 def StartDayofMonth(d):
     # return DateTime(d.year(), d.month(), 1)
     return StringToDate(DateToString(d,'%m-%Y'),'%m-%Y')
@@ -1244,6 +1240,7 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     if serial_as == 'json':
         return json_dumps(dict(res))
     elif serial_as == 'xml':
+        from dict2xml import dict2xml
         return dict2xml(dict(res))
     else:
         return res
