@@ -15,6 +15,10 @@ import Missing
 
 from json_utils import json_dumps
 
+#from dict2xml.dict2xml import dict2xml as xmlify
+
+from dict2xml import dict2xml
+
 def StartDayofMonth(d):
     # return DateTime(d.year(), d.month(), 1)
     return StringToDate(DateToString(d,'%m-%Y'),'%m-%Y')
@@ -1185,7 +1189,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
 
         if nest_datagrid and len(item_value):
             sub_req = []
-        
+
         for row in item_value:
             el = {}
             for idx,sub_field_name in enumerate(grid_field_names):
@@ -1196,7 +1200,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
                 else:
                     prefix = '%s.' % fieldname
                     req += serialItem(grid_form, sub_field_name, sub_item_value, prefix=prefix, nest_datagrid=False)
-                    
+
             if nest_datagrid:
                 sub_req.append(el)
 
@@ -1218,7 +1222,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
     return req
 
 
-def serialDoc(doc, nest_datagrid=True, json=True):
+def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     """
     Take a Plomino document :doc: and extract its data in a JSON-serializable
     structure.
@@ -1237,8 +1241,10 @@ def serialDoc(doc, nest_datagrid=True, json=True):
             fieldname = itemname
             if itemvalue:
                 res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
-    if json:
+    if serial_as == 'json':
         return json_dumps(dict(res))
+    elif serial_as == 'xml':
+        return dict2xml(dict(res))
     else:
         return res
-    
+

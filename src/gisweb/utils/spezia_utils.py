@@ -33,6 +33,11 @@ except ImportError:
         except ImportError:
             logger.error("No ElementTree found")
 
+
+# *********
+# README
+# *********
+
 # nel caso in cui questo file venga usato nelle Extensions ho riscontrato difficoltà
 # nell'importazione di moduli locali per cui i file XmlDict e UnicodeDammit
 # vanno accodati al presente. È sufficiente fare:
