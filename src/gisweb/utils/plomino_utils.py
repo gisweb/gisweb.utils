@@ -1183,10 +1183,10 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
         grid_form = db.getForm(field.getSettings().associated_form)
         grid_field_names = field.getSettings().field_mapping.split(',')
 
-        if nest_datagrid and len(item_value):
+        if nest_datagrid:
             sub_req = []
 
-        for row in item_value:
+        for row in item_value or []:
             el = {}
             for idx,sub_field_name in enumerate(grid_field_names):
                 sub_item_value = row[idx]
@@ -1231,12 +1231,14 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json'):
 
     res = []
     form = doc.getForm()
-    for itemname in doc.getItems():
+    for field in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False):
+    #for itemname in doc.getItems():
+        itemname = field.id
         if itemname not in bad_items:
             itemvalue = doc.getItem(itemname)
             fieldname = itemname
-            if itemvalue:
-                res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
+            res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
+
     if serial_as == 'json':
         return json_dumps(dict(res))
     elif serial_as == 'xml':
