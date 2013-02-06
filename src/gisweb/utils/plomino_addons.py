@@ -38,11 +38,11 @@ defaults = dict(
 
 
 def getPath(doc, virtual=False):
-
+    '''
+    uniformo il recupero del valore per il doclink
+    '''
     doc_path = doc.doc_path()
-
     pd_path_list = doc.REQUEST.physicalPathToVirtualPath(doc_path) if virtual else None
-
     return '/'.join(pd_path_list or doc_path)
 
 
@@ -61,6 +61,7 @@ def setParenthood(ChildDocument, parent_id, CASCADE=True, setDocLink=False, **kw
     ChildDocument.setItem('CASCADE', CASCADE)
     if setDocLink:
         ChildDocument.setItem(parentLinkKey, [Parent_path])
+        ChildDocument.REQUEST.set(parentLinkKey, [Parent_path])
 
 
 def setChildhood(ChildDocument, parent_id, backToParent='anchor', **kwargs):
