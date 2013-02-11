@@ -591,7 +591,7 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
         contenttype = guessMimetype(tmpFile, filename)
         tmpFile.close()
     current_files = plominoDocument.getItem(itemname, {}) or {}
-    current_files[new_file] = contenttype or 'sconosciuto'
+    current_files[new_file] = contenttype or 'unknown filetype'
     plominoDocument.setItem(itemname, current_files)
     return
 

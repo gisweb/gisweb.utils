@@ -65,7 +65,7 @@ def getInfoForState(context, wf_id, state_id, args=[]):
     return dict([(k, getattr(status, k)) for k in set(['title']+args)])
 
 
-def getStatesInfo(doc, state_id=None, single=True, args=[]):
+def getStatesInfo(doc, state_id='review_state', single=True, args=[]):
     """
     Restituisce informazioni sugli stati della pratica per tutti i
     workflow ad essa associati.
@@ -79,16 +79,24 @@ def getStatesInfo(doc, state_id=None, single=True, args=[]):
 
     infos = []
     for wf_id in getChainFor(doc):
-
         wf = getToolByName(pw, wf_id)
-        status_id = state_id or wf.getInfoFor(doc, 'review_state', None)
 
-        if status_id:
-            status = getToolByName(wf.states, status_id)
+        if state_id in ('review_state', ):
+            state_id = wf.getInfoFor(doc, 'review_state', None)
+
+        if state_id:
+            status = getToolByName(wf.states, state_id)
             info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
             info['id'] = status.getId()
             info['wf_id'] = wf_id
             infos.append(info)
+        else:
+            for state_id in wf.states.keys():
+                status = getToolByName(wf.states, state_id)
+                info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
+                info['id'] = status.getId()
+                info['wf_id'] = wf_id
+                infos.append(info)
 
     if len(infos) == 1 and single:
         return infos[0]
@@ -96,7 +104,7 @@ def getStatesInfo(doc, state_id=None, single=True, args=[]):
         return infos
 
 
-def getTransitionsInfo(doc, single=False, supported_only=True, args=[]):
+def getTransitionsInfo(doc, single=False, supported_only=True, state_id='review_state', args=[]):
     """
     Restituisce informazioni sulle transizioni disponibili per la pratica
     relative ai workflow ad essa associati.
@@ -107,7 +115,7 @@ def getTransitionsInfo(doc, single=False, supported_only=True, args=[]):
     if 'title' not in args:
         args.append('title')
 
-    tr_infos = getStatesInfo(doc, state_id=None, single=False, args=['transitions'])
+    tr_infos = getStatesInfo(doc, state_id=state_id, single=False, args=['transitions'])
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
 

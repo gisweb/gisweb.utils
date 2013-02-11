@@ -240,7 +240,7 @@ def wf_getChainFor(self):
 def wf_workflowInfo(self, wf_ids=None, single=True, args=[]):
     return getWorkflowInfo(self, wf_ids=wf_ids, single=single, args=args)
 
-def wf_statesInfo(self, state_id=None, single=True, args=[]):
+def wf_statesInfo(self, state_id='review_state', single=True, args=[]):
     return getStatesInfo(self, state_id=state_id, single=single, args=args)
 
 def wf_transitionsInfo(self, single=False, supported_only=True, args=[]):
