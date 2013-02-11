@@ -27,6 +27,7 @@ PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_getChainFor')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_statesInfo')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_transitionsInfo')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_workflowInfo')
+PlominoIndex.security.declareProtected(READ_PERMISSION, 'addLocalRoles')
 
 InitializeClass(PlominoDocument)
 
@@ -60,7 +61,9 @@ def setParenthood(ChildDocument, parent_id, CASCADE=True, setDocLink=False, **kw
     ChildDocument.setItem(parentKey, ParentDocument.getId())
     ChildDocument.setItem('CASCADE', CASCADE)
     if setDocLink:
+        # utile per la procedura bash
         ChildDocument.setItem(parentLinkKey, [Parent_path])
+        # utile per la creazione via web
         ChildDocument.REQUEST.set(parentLinkKey, [Parent_path])
 
 
@@ -249,11 +252,16 @@ def wf_getInfoForState(self, wf_id, state_id, args=[]):
 def wf_getInfoFor(self, arg, *args, **kwargs):
     return getInfoFor(self, arg, *args, **kwargs)
 
+def addLocalRoles(self, group, roles):
+    return doc.manage_addLocalRoles(group, roles)
+
 PlominoDocument.wf_getChainFor = wf_getChainFor
 PlominoDocument.wf_workflowInfo = wf_workflowInfo
 PlominoDocument.wf_statesInfo = wf_statesInfo
 PlominoDocument.wf_transitionsInfo = wf_transitionsInfo
 PlominoDocument.wf_getInfoFor = wf_getInfoFor
+PlominoDocument.addLocalRoles = addLocalRoles
+
 PlominoForm.wf_getChainFor = wf_getChainFor
 PlominoForm.wf_workflowInfo = wf_workflowInfo
 PlominoForm.wf_statesInfo = wf_statesInfo

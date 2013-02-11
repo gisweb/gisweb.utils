@@ -1204,7 +1204,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
             req.append((fieldname, sub_req))
 
     else:
-        fieldtemplate = db.getRenderingTemplate('Base%sFieldRead' % fieldtype) \
+        fieldtemplate = db.getRenderingTemplate('%sFieldRead' % fieldtype) \
             or db.getRenderingTemplate('DefaultFieldRead')
         renderedValue = fieldtemplate(fieldname=fieldname,
             fieldvalue=item_value,
