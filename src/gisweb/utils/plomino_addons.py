@@ -253,7 +253,7 @@ def wf_getInfoFor(self, arg, *args, **kwargs):
     return getInfoFor(self, arg, *args, **kwargs)
 
 def addLocalRoles(self, group, roles):
-    return doc.manage_addLocalRoles(group, roles)
+    return self.manage_addLocalRoles(group, roles)
 
 PlominoDocument.wf_getChainFor = wf_getChainFor
 PlominoDocument.wf_workflowInfo = wf_workflowInfo
