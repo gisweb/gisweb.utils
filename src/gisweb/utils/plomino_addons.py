@@ -28,6 +28,7 @@ PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_statesInfo')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_transitionsInfo')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'wf_workflowInfo')
 PlominoIndex.security.declareProtected(READ_PERMISSION, 'addLocalRoles')
+PlominoIndex.security.declareProtected(READ_PERMISSION, 'get_js_hidden_fields')
 
 InitializeClass(PlominoDocument)
 
@@ -243,8 +244,9 @@ def wf_workflowInfo(self, wf_ids=None, single=True, args=[]):
 def wf_statesInfo(self, state_id='review_state', single=True, args=[]):
     return getStatesInfo(self, state_id=state_id, single=single, args=args)
 
-def wf_transitionsInfo(self, single=False, supported_only=True, args=[]):
-    return getTransitionsInfo(self, single=single, supported_only=supported_only, args=args)
+def wf_transitionsInfo(self, single=False, supported_only=True, state_id='review_state', args=[]):
+    return getTransitionsInfo(self, single=single,
+        supported_only=supported_only, state_id=state_id, args=args)
 
 def wf_getInfoForState(self, wf_id, state_id, args=[]):
     return getInfoForState(self, wf_id, state_id, args=args)
@@ -267,3 +269,11 @@ PlominoForm.wf_workflowInfo = wf_workflowInfo
 PlominoForm.wf_statesInfo = wf_statesInfo
 PlominoForm.wf_transitionsInfo = wf_transitionsInfo
 PlominoForm.wf_getInfoForState = wf_getInfoForState
+
+def get_js_hidden_fields(self, REQUEST, doc):
+    '''
+    expose the protected method _get_js_hidden_fields
+    '''
+    return self._get_js_hidden_fields(REQUEST=REQUEST, doc=doc)
+
+PlominoForm.get_js_hidden_fields = get_js_hidden_fields

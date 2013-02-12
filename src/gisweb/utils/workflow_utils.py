@@ -53,6 +53,7 @@ def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
     else:
         return infos
 
+
 def getInfoForState(context, wf_id, state_id, args=[]):
     """
     Restituisce informazioni sullo stato richiesto.
@@ -104,7 +105,8 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[]):
         return infos
 
 
-def getTransitionsInfo(doc, single=False, supported_only=True, state_id='review_state', args=[]):
+def getTransitionsInfo(doc, single=False, supported_only=True,
+    state_id='review_state', args=[]):
     """
     Restituisce informazioni sulle transizioni disponibili per la pratica
     relative ai workflow ad essa associati.
@@ -115,6 +117,9 @@ def getTransitionsInfo(doc, single=False, supported_only=True, state_id='review_
     if 'title' not in args:
         args.append('title')
 
+    # supported_only=True ha senso solo per le transizioni disponibili allo stato corrente
+    supported_only = supported_only and state_id=='review_state'
+
     tr_infos = getStatesInfo(doc, state_id=state_id, single=False, args=['transitions'])
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
@@ -124,18 +129,20 @@ def getTransitionsInfo(doc, single=False, supported_only=True, state_id='review_
         wf = getToolByName(pw, i['wf_id'])
         tr_def = {'wf_id': i['wf_id']}
         for tr_id in i['transitions']:
-            if (supported_only and wf.isActionSupported(doc, tr_id)) or not supported_only:
+
+            if (state_id=='review_state' and supported_only \
+                and wf.isActionSupported(doc, tr_id)) or not supported_only:
                 transition = getToolByName(wf.transitions, tr_id)
                 info = dict([(k, getattr(transition, k)) for k in set(['title']+args)])
                 info['id'] = transition.getId()
                 info.update(tr_def)
-
                 infos.append(info)
 
     if len(infos) == 1 and single:
         return infos[0]
     else:
         return infos
+
 
 def doActionIfAny(doc, wf_var='transition_on_save', args=[]):
     """
