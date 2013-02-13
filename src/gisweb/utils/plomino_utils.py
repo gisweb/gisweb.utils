@@ -1203,17 +1203,27 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
         if nest_datagrid:
             req.append((fieldname, sub_req))
 
-    else:
-        fieldtemplate = db.getRenderingTemplate('%sFieldRead' % fieldtype) \
-            or db.getRenderingTemplate('DefaultFieldRead')
+    fieldtemplate = db.getRenderingTemplate('%sFieldRead' % fieldtype) \
+        or db.getRenderingTemplate('DefaultFieldRead')
+    if fieldtype == 'SELECTION':
         renderedValue = fieldtemplate(fieldname=fieldname,
             fieldvalue=item_value,
-            selection=None,
+            selection=field.getSelectionList(doc),
             field=field,
             doc=doc
         ).strip()
-        key = prefix + fieldname
-        req.append((key, renderedValue, ))
+    else:
+        #fieldtemplate = db.getRenderingTemplate('%sFieldRead' % fieldtype) \
+            #or db.getRenderingTemplate('DefaultFieldRead')
+        renderedValue = fieldtemplate(fieldname=fieldname,
+            fieldvalue=item_value,
+            #selection=None,
+            field=field,
+            doc=doc
+        ).strip()
+
+    key = prefix + fieldname
+    req.append((key, renderedValue, ))
 
     return req
 
