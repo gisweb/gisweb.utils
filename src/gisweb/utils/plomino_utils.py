@@ -1245,7 +1245,7 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     #for itemname in doc.getItems():
         itemname = field.id
         if itemname not in bad_items:
-            itemvalue = doc.getItem(itemname)
+            itemvalue = doc.getItem(itemname, '') or ''
             fieldname = itemname
             res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
 
