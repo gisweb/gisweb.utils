@@ -1208,7 +1208,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
     if fieldtype == 'SELECTION':
         renderedValue = fieldtemplate(fieldname=fieldname,
             fieldvalue=item_value,
-            selection=field.getSelectionList(doc),
+            selection=field.getSettings().getSelectionList(doc),
             field=field,
             doc=doc
         ).strip()
