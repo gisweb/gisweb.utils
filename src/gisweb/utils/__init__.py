@@ -134,7 +134,3 @@ from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doAct
 ############################################################# PERMISSION UTILS #
 
 # TO DO
-
-def stop(context):
-    import ipdb; ipdb.set_trace()
-    return None
