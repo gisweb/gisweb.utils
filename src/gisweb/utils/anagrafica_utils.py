@@ -16,16 +16,16 @@ def cf_build(surname, name, year, month, day, sex, municipality):
 
     return cf.build(surname, name, birthday, sex, municipality)
 
-def is_valid_cf(cf):
+def is_valid_cf(string):
     ''' Verify the validity of an (italian) fiscal code 
     courtesy of: http://www.icosaedro.it/cf-pi/index.html
     '''
 
-    cf = str(cf)
+    string = str(string)
 
     #if len(cf) <> 16: return False
 
-    if not cf.isvalid(cf): return False
+    if not cf.isvalid(string): return False
 
     alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -48,16 +48,16 @@ def is_valid_cf(cf):
     }
     
     s = 0
-    for char in cf[:-1][1::2]:
+    for char in string[:-1][1::2]:
         s += even_conv[char.upper()]
-    for char in cf[:-1][::2]:
+    for char in string[:-1][::2]:
         s += odd_conv[char.upper()]
         
     r = s%26
     
     r1 = alpha[r]
     
-    return cf[-1].upper()==r1
+    return string[-1].upper()==r1
     
 def is_valid_piva(piva):
     ''' Vefify the validity of "partita IVA"  
