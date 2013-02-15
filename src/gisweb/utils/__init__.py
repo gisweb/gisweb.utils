@@ -101,6 +101,8 @@ def Type(arg):
 def re_findall(what, where):
     return re.findall(r'%s' % what, where)
 
+from StringValidator import isEmail, isEmpty
+
 ################################################################### DATE UTILS #
 
 import locale
@@ -133,3 +135,6 @@ from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doAct
 
 # TO DO
 
+def stop(context):
+    import ipdb; ipdb.set_trace()
+    return None

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re, codecs
 try:
     import chardet

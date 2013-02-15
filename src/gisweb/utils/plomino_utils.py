@@ -1179,6 +1179,10 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
     field = form.getFormField(fieldname)
     fieldtype = '' if not field else field.getFieldType()
 
+    # custom DATE field type are considered as DATETIME stansard ones
+    if fieldtype == 'DATE':
+        fieldtype = 'DATETIME'
+
     if fieldtype == 'DATAGRID':
         grid_form = db.getForm(field.getSettings().associated_form)
         grid_field_names = field.getSettings().field_mapping.split(',')
