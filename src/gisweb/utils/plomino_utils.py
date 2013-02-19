@@ -570,7 +570,7 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **flts)
 
     return out
 
-def attachThis(plominoDocument, submittedValue, itemname, filename=''):
+def attachThis(plominoDocument, submittedValue, itemname, filename='', overwrite=True):
     '''
     Funcion with the aim to simplify the setting of a file as an attachment of a plominoDocument
     Usage sample:
@@ -581,7 +581,8 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
     https://github.com/plomino/Plomino/issues/172#issuecomment-9494835
     ###############
     '''
-    (new_file, contenttype) = plominoDocument.setfile(submittedValue, filename=filename, overwrite=True)
+    (new_file, contenttype) = plominoDocument.setfile(submittedValue,
+        filename=filename, overwrite=overwrite)
     if not contenttype:
         # then try a guess
         import cStringIO
@@ -593,7 +594,7 @@ def attachThis(plominoDocument, submittedValue, itemname, filename=''):
     current_files = plominoDocument.getItem(itemname, {}) or {}
     current_files[new_file] = contenttype or 'unknown filetype'
     plominoDocument.setItem(itemname, current_files)
-    return
+    return new_file
 
 def fiatDoc(request, form, applyhidewhen=False):
     db = form.getParentDatabase()

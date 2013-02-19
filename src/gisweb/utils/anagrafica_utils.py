@@ -23,7 +23,7 @@ def is_valid_cf(string):
 
     string = str(string)
 
-    #if len(cf) <> 16: return False
+    #if len(string) <> 16: return False
 
     if not cf.isvalid(string): return False
 
