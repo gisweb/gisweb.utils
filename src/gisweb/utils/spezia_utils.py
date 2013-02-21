@@ -282,7 +282,7 @@ def protocolla(served_url,
     arg_list = (date, num, served_url, xml_content.encode('base64'), )
 
     if test:
-        response = server.test_accoda(*arg_list)
+        response = server.testaccoda(*arg_list)
     else:
         response = server.accoda(*arg_list)
 
