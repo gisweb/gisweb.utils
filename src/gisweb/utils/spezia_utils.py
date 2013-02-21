@@ -244,7 +244,8 @@ def xml2obj(xml):
 
 def protocolla(served_url,
     responseURL,
-    adapter=None,
+    adapter = None,
+    test = False,
     **kwargs):
     """
     served_url: URL chiamante
@@ -278,9 +279,14 @@ def protocolla(served_url,
         return dict(numero=num)
 
     server = xmlrpclib.Server(responseURL)
-    response = server.accoda(date, num, served_url, xml_content.encode('base64')).decode('base64')
+    arg_list = (date, num, served_url, xml_content.encode('base64'), )
 
-    return xml2obj(response)
+    if test:
+        response = server.test_accoda(*arg_list)
+    else:
+        response = server.accoda(*arg_list)
+
+    return xml2obj(response.decode('base64'))
 
 def get_params(doc, tipo, **kwargs):
     '''
