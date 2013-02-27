@@ -1,5 +1,27 @@
 # coutesy of: http://code.activestate.com/recipes/410469-xml-as-dictionary/download/1/
-import cElementTree as ElementTree
+#import cElementTree as ElementTree
+
+try:
+  from lxml import ElementTree
+except ImportError:
+  try:
+    # Python 2.5
+    import xml.etree.cElementTree as ElementTree
+  except ImportError:
+    try:
+      # Python 2.5
+      import xml.etree.ElementTree as ElementTree
+    except ImportError:
+      try:
+        # normal cElementTree install
+        import cElementTree as ElementTree
+      except ImportError:
+        try:
+          # normal ElementTree install
+          import elementtree.ElementTree as ElementTree
+        except ImportError:
+            logger.error("No ElementTree found")
+
 
 class XmlListConfig(list):
     def __init__(self, aList):

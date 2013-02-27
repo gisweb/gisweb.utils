@@ -12,27 +12,28 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-try:
-  from lxml import ElementTree
-except ImportError:
-  try:
-    # Python 2.5
-    import xml.etree.cElementTree as ElementTree
-  except ImportError:
-    try:
-      # Python 2.5
-      import xml.etree.ElementTree as ElementTree
-    except ImportError:
-      try:
-        # normal cElementTree install
-        import cElementTree as ElementTree
-      except ImportError:
-        try:
-          # normal ElementTree install
-          import elementtree.ElementTree as ElementTree
-        except ImportError:
-            logger.error("No ElementTree found")
+#try:
+#  from lxml import ElementTree
+#except ImportError:
+#  try:
+#    # Python 2.5
+#    import xml.etree.cElementTree as ElementTree
+#  except ImportError:
+#    try:
+#      # Python 2.5
+#      import xml.etree.ElementTree as ElementTree
+#    except ImportError:
+#      try:
+#        # normal cElementTree install
+#        import cElementTree as ElementTree
+#      except ImportError:
+#        try:
+#          # normal ElementTree install
+#          import elementtree.ElementTree as ElementTree
+#        except ImportError:
+#            logger.error("No ElementTree found")
 
+from XmlDict import ElementTree
 
 # *********
 # README
@@ -285,7 +286,6 @@ def protocolla(served_url,
         response = server.testaccoda(*arg_list)
     else:
         response = server.accoda(*arg_list)
-
     return xml2obj(response.decode('base64'))
 
 def get_params(doc, tipo, **kwargs):
