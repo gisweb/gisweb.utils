@@ -127,6 +127,11 @@ from spezia_utils import protocolla_doc, protocolla
 from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny, getInfoFor
 
 
+##################################################################### FS UTILS #
+
+from fs_utils import os_listdir, os_path_join
+from fs_utils import os_listdir, os_path_join
+
 ################################################################### MAIL UTILS #
 
 # TO DO
