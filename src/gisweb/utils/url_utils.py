@@ -3,9 +3,12 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 
 import requests
 
-def requests_post(url, data=None, **kwargs):
+def requests_post(url, data=None, *args, **kwargs):
+    
+    args = list(set(['ok', 'text', 'json', 'status_code']+args))
+    
     resp = requests.post(url, data, **kwargs)
-    return resp.__dict__
+    return dict([(k, getattr(resp, k)) for k in args])
 
 
 #def requests_post(url, data=None, **kwargs):
