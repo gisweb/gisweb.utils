@@ -9,7 +9,7 @@ from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate, htmlenc
 from DateTime import DateTime
 from DateTime.interfaces import DateError
 
-import re
+import re, os
 
 import Missing
 
@@ -581,16 +581,31 @@ def attachThis(plominoDocument, submittedValue, itemname, filename='', overwrite
     https://github.com/plomino/Plomino/issues/172#issuecomment-9494835
     ###############
     '''
-    (new_file, contenttype) = plominoDocument.setfile(submittedValue,
-        filename=filename, overwrite=overwrite)
+    
+    if isinstance(submittedValue, basestring):
+        if os.path.isfile(submittedValue):
+            with open(submittedValue, 'r') as ff:
+                (new_file, contenttype) = plominoDocument.setfile(ff,
+                    filename=filename, overwrite=overwrite)
+        else:
+            (new_file, contenttype) = plominoDocument.setfile(submittedValue,
+                filename=filename, overwrite=overwrite)
+    else:
+        (new_file, contenttype) = plominoDocument.setfile(submittedValue,
+            filename=filename, overwrite=overwrite)
+
     if not contenttype:
         # then try a guess
-        import cStringIO
-        from plone.app.blob.utils import guessMimetype
-        tmpFile = cStringIO.StringIO()
-        tmpFile.write(submittedValue)
-        contenttype = guessMimetype(tmpFile, filename)
-        tmpFile.close()
+        try:
+            import cStringIO
+            from plone.app.blob.utils import guessMimetype
+            tmpFile = cStringIO.StringIO()
+            tmpFile.write(submittedValue)
+            contenttype = guessMimetype(tmpFile, filename)
+            tmpFile.close()
+        except:
+            pass
+
     current_files = plominoDocument.getItem(itemname, {}) or {}
     current_files[new_file] = contenttype or 'unknown filetype'
     plominoDocument.setItem(itemname, current_files)
