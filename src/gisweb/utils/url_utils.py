@@ -5,10 +5,18 @@ import requests
 
 def requests_post(url, data=None, *args, **kwargs):
     
-    args = list(set(['ok', 'text', 'json', 'status_code']+list(args)))
+    args = list(set(['ok', 'text', 'status_code']+list(args)))
     
     resp = requests.post(url, data, **kwargs)
-    return dict([(k, getattr(resp, k)) for k in args])
+    
+    out = dict()
+    for k in args:
+        if collable(getattr(resp, k)):
+            out[k] = getattr(resp, k)()
+        else:
+            out[k] = getattr(resp, k)
+    
+    return out
 
 
 #def requests_post(url, data=None, **kwargs):
