@@ -130,7 +130,6 @@ from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doAct
 ##################################################################### FS UTILS #
 
 from fs_utils import os_listdir, os_path_join
-from fs_utils import os_listdir, os_path_join
 
 ################################################################### MAIL UTILS #
 

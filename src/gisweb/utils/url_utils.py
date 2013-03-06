@@ -4,14 +4,19 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 import requests
 
 def requests_post(url, data=None, **kwargs):
-    result = requests.post(url, data, **kwargs)
-    return dict(
-        text = result.text,
-        error = result.error,
-        headers = result.headers,
-        status_code = result.status_code,
-        reason = result.reason
-    )
+    resp = requests.post(url, data, **kwargs)
+    return resp.__dict__
+
+
+#def requests_post(url, data=None, **kwargs):
+    #result = requests.post(url, data, **kwargs)
+    #return dict(
+        #text = result.text,
+        #error = result.error,
+        #headers = result.headers,
+        #status_code = result.status_code,
+        #reason = result.reason
+    #)
 
 #def get_request(target, data):
 #    return urllib2.Request(target, data)
