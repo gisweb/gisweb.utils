@@ -5,7 +5,7 @@ import requests
 
 def requests_post(url, data=None, *args, **kwargs):
     
-    args = list(set(['ok', 'text', 'json', 'status_code']+args))
+    args = list(set(['ok', 'text', 'json', 'status_code']+list(args)))
     
     resp = requests.post(url, data, **kwargs)
     return dict([(k, getattr(resp, k)) for k in args])
