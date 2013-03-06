@@ -11,7 +11,7 @@ def requests_post(url, data=None, *args, **kwargs):
     
     out = dict()
     for k in args:
-        if collable(getattr(resp, k)):
+        if callable(getattr(resp, k)):
             out[k] = getattr(resp, k)()
         else:
             out[k] = getattr(resp, k)
