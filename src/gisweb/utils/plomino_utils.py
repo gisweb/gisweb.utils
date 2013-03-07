@@ -581,14 +581,20 @@ def attachThis(plominoDocument, submittedValue, itemname, filename='', overwrite
     https://github.com/plomino/Plomino/issues/172#issuecomment-9494835
     ###############
     '''
-    
-    if os.path.isfile(u'%s' % submittedValue):
-        with open(submittedValue, 'r') as ff:
-            (new_file, contenttype) = plominoDocument.setfile(ff,
-                filename=filename, overwrite=overwrite)
+    new_file = None
+    try:
+        os.path.isfile(submittedValue)
+    except TypeError:
+        pass
     else:
+        if os.path.isfile(submittedValue):
+            with open(submittedValue, 'r') as ff:
+                (new_file, contenttype) = plominoDocument.setfile(ff,
+                    filename=filename, overwrite=overwrite)
+    if not new_file:
         (new_file, contenttype) = plominoDocument.setfile(submittedValue,
             filename=filename, overwrite=overwrite)
+
 
     if not contenttype:
         # then try a guess
