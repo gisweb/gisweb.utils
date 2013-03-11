@@ -15,6 +15,10 @@ import Missing
 
 from json_utils import json_dumps
 
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 def StartDayofMonth(d):
     # return DateTime(d.year(), d.month(), 1)
     return StringToDate(DateToString(d,'%m-%Y'),'%m-%Y')
@@ -584,7 +588,7 @@ def attachThis(plominoDocument, submittedValue, itemname, filename='', overwrite
     new_file = None
     try:
         os.path.isfile(submittedValue)
-    except TypeError:
+    except:
         pass
     else:
         if os.path.isfile(submittedValue):
