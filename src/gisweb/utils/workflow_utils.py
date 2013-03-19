@@ -71,7 +71,7 @@ def getInfos(From, default, *args):
     info = dict()
     for k in args:
         try:
-            info[k] = getattr(transition, k)
+            info[k] = getattr(From, k)
         except AttributeError, err:
             if default:
                 info[k] = default
