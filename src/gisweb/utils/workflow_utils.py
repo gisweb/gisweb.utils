@@ -65,7 +65,7 @@ def getInfoForState(context, wf_id, state_id, args=[]):
 
     return dict([(k, getattr(status, k)) for k in set(['title']+args)])
 
-def getInfos(From, default=None, *args):
+def getInfos(From, default, *args):
     """
     """
     info = dict()
@@ -101,7 +101,7 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[], default=No
 
         if state_id:
             status = getToolByName(wf.states, state_id)
-            info = getInfos(status, default=default, *args)
+            info = getInfos(status, default, *args)
             #info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
             info['id'] = status.getId()
             info['wf_id'] = wf_id
@@ -109,7 +109,7 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[], default=No
         else:
             for state_id in wf.states.keys():
                 status = getToolByName(wf.states, state_id)
-                info = getInfos(status, default=default, *args)
+                info = getInfos(status, default, *args)
                 #info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
                 info['id'] = status.getId()
                 info['wf_id'] = wf_id
@@ -150,7 +150,7 @@ def getTransitionsInfo(doc, single=False, supported_only=True,
                 and wf.isActionSupported(doc, tr_id)) or not supported_only:
                 transition = getToolByName(wf.transitions, tr_id)
                 
-                info = getInfos(transition, default=default, *set(['title']+args))
+                info = getInfos(transition, default, *set(['title']+args))
                 
                 #info = dict([(k, getattr(transition, k)) for k in set(['title']+args)])
                 
