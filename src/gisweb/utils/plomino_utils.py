@@ -574,6 +574,30 @@ def search_around(plominoDocument, parentKey='parentDocument', *targets, **flts)
 
     return out
 
+def guessType(submittedValue, filename):
+    
+    out = dict()
+    
+    try:
+        import cStringIO
+        from plone.app.blob.utils import guessMimetype
+    except ImportError, err:
+        out.update(dict(
+            contenttype = None,
+            success = 0,
+            err_msg = '%s' % err
+        ))
+        out['contenttype'] = None
+    else:
+        with cStringIO.StringIO() as tmpFile:
+            tmpFile.write(submittedValue)
+            out.update(dict(
+                contenttype = guessMimetype(tmpFile, filename),
+                success = 1,
+            ))
+    
+    return out
+
 def attachThis(plominoDocument, submittedValue, itemname, filename='', overwrite=True):
     '''
     Funcion with the aim to simplify the setting of a file as an attachment of a plominoDocument
