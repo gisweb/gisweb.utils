@@ -65,8 +65,20 @@ def getInfoForState(context, wf_id, state_id, args=[]):
 
     return dict([(k, getattr(status, k)) for k in set(['title']+args)])
 
+def getInfos(From, default=None, *args):
+    """
+    """
+    info = dict()
+    for k in args:
+        try:
+            info[k] = getattr(transition, k)
+        except AttributeError, err:
+            if default:
+                info[k] = default
+    
+    return info
 
-def getStatesInfo(doc, state_id='review_state', single=True, args=[]):
+def getStatesInfo(doc, state_id='review_state', single=True, args=[], default=None):
     """
     Restituisce informazioni sugli stati della pratica per tutti i
     workflow ad essa associati.
@@ -85,16 +97,20 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[]):
         if state_id in ('review_state', ):
             state_id = wf.getInfoFor(doc, 'review_state', None)
 
+        args = set(['title']+args)
+
         if state_id:
             status = getToolByName(wf.states, state_id)
-            info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
+            info = getInfos(status, default=default, *args)
+            #info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
             info['id'] = status.getId()
             info['wf_id'] = wf_id
             infos.append(info)
         else:
             for state_id in wf.states.keys():
                 status = getToolByName(wf.states, state_id)
-                info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
+                info = getInfos(status, default=default, *args)
+                #info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
                 info['id'] = status.getId()
                 info['wf_id'] = wf_id
                 infos.append(info)
@@ -106,7 +122,7 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[]):
 
 
 def getTransitionsInfo(doc, single=False, supported_only=True,
-    state_id='review_state', args=[]):
+    state_id='review_state', args=[], default=None):
     """
     Restituisce informazioni sulle transizioni disponibili per la pratica
     relative ai workflow ad essa associati.
@@ -133,7 +149,11 @@ def getTransitionsInfo(doc, single=False, supported_only=True,
             if (state_id=='review_state' and supported_only \
                 and wf.isActionSupported(doc, tr_id)) or not supported_only:
                 transition = getToolByName(wf.transitions, tr_id)
-                info = dict([(k, getattr(transition, k)) for k in set(['title']+args)])
+                
+                info = getInfos(transition, default=default, *set(['title']+args))
+                
+                #info = dict([(k, getattr(transition, k)) for k in set(['title']+args)])
+                
                 info['id'] = transition.getId()
                 info.update(tr_def)
                 infos.append(info)
