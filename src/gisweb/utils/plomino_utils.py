@@ -589,13 +589,16 @@ def guessType(submittedValue, filename):
         ))
         out['contenttype'] = None
     else:
-        with cStringIO.StringIO() as tmpFile:
-            tmpFile.write(submittedValue)
-            out.update(dict(
-                contenttype = guessMimetype(tmpFile, filename),
-                success = 1,
-            ))
-    
+        
+        tmpFile = cStringIO.StringIO()
+        tmpFile.write(submittedValue)
+        out.update(dict(
+            contenttype = guessMimetype(tmpFile, filename),
+            success = 1,
+        ))
+        contenttype = guessMimetype(tmpFile, filename)
+        tmpFile.close()
+        
     return out
 
 def attachThis(plominoDocument, submittedValue, itemname, filename='', overwrite=True):
