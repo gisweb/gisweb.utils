@@ -589,14 +589,12 @@ def guessType(submittedValue, filename):
         ))
         out['contenttype'] = None
     else:
-        
         tmpFile = cStringIO.StringIO()
         tmpFile.write(submittedValue)
         out.update(dict(
             contenttype = guessMimetype(tmpFile, filename),
             success = 1,
         ))
-        contenttype = guessMimetype(tmpFile, filename)
         tmpFile.close()
         
     return out
