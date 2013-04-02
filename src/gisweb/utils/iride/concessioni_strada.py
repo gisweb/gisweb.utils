@@ -42,8 +42,7 @@ def get_datetime():
 def insert_documento(doc):
     "Returns IdProtocollo"
     client = Client(URL, location=URL)
-    data = get_tabledata_for(doc)
-    oggetto = doc.getForm().Title().decode('ascii', errors='replace')
+    oggetto = doc.getForm().Title().decode('ascii', errors='replace').encode('ascii', errors='replace')
 
     protocollo = client.factory.create('ProtocolloIn')
     protocollo.Data = date.today().isoformat()
@@ -61,10 +60,15 @@ def insert_documento(doc):
     protocollo.Origine = 'A'
     protocollo.MittenteInterno = 'PROTO02'
 
-    metadata = get_metadata_for(doc)
-    protocollo.TipoDocumento = metadata['__TipoDocumento']
-    protocollo.InCaricoA = metadata['__InCaricoA']
-    protocollo.Classifica = metadata['__Classifica']
+    try:
+        metadata = get_metadata_for(doc)
+        protocollo.TipoDocumento = metadata['__TipoDocumento']
+        protocollo.InCaricoA = metadata['__InCaricoA']
+        protocollo.Classifica = metadata['__Classifica']
+    except KeyError:
+        protocollo.TipoDocumento = "CONSC"
+        protocollo.InCaricoA = "CONCESNEW"
+        protocollo.Classifica = 'XVIII.02.03.'
 
     if 'domanda_inviata.pdf' in doc:
         allegato = client.factory.create('AllegatoIn')
@@ -91,6 +95,10 @@ def insert_documento(doc):
         #return IdDocumento, date.today()
         raise RuntimeError(unicode(res.Errore))
 
+    plomino_table = doc.getForm().id
+    if plomino_table not in FIELDS_MAP:
+        return res.NumeroProtocollo, res.DataProtocollo
+    data = get_tabledata_for(doc)
     xmlstring = prepare_string(data, IdDocumento)
     resp = client.service.InserisciDatiUtente(
         Appartenenza=APPARTENENZA,

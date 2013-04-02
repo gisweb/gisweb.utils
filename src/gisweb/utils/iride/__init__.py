@@ -14,4 +14,5 @@ def inserisci_protocollo(doc, tipo, oggetto, data):
     tipo -> 'E' per 'Entrata' o 'U' per 'Uscita'
     data -> una data
     """
-    return insert_documento(doc)    
+    res = insert_documento(doc)    
+    return {'numero': res[0], 'data': str(res[1])}
