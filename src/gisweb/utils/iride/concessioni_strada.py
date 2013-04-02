@@ -40,7 +40,7 @@ def get_datetime():
 
 
 def insert_documento(doc):
-    "Returns IdDocumento"
+    "Returns IdProtocollo"
     client = Client(URL, location=URL)
     data = get_tabledata_for(doc)
     oggetto = doc.getForm().Title().decode('ascii', errors='replace')
@@ -73,7 +73,13 @@ def insert_documento(doc):
         allegato.ContentType = 'application/pdf'
         protocollo.Allegati.Allegato.append(allegato)
 
-    res = client.service.InserisciProtocollo(protocollo)
+    try:
+        res = client.service.InserisciProtocollo(protocollo)
+    except Exception, e:
+        import sys
+        #type, value, tb = sys.exc_info()
+        #import pdb;pdb.post_mortem(tb)
+        raise e
     IdDocumento = res.IdDocumento
 
     if hasattr(res, 'Errore') and unicode(res.Errore):
@@ -81,8 +87,9 @@ def insert_documento(doc):
         # Exception from HRESULT: 0xFFFDB5F4
         print RuntimeError(unicode(res.Errore))
         import time
-        IdDocumento = int(time.mktime(time.gmtime())) - 1358700000
-        # raise RuntimeError(unicode(res.Errore))
+        #IdDocumento = int(time.mktime(time.gmtime())) - 1358700000
+        #return IdDocumento, date.today()
+        raise RuntimeError(unicode(res.Errore))
 
     xmlstring = prepare_string(data, IdDocumento)
     resp = client.service.InserisciDatiUtente(
@@ -94,8 +101,7 @@ def insert_documento(doc):
         CodiceAmministrazione='',
         CodiceAOO=''
     )
-    doc.setItem('numero_protocollo', str(IdDocumento))
-    return res.IdDocumento
+    return res.NumeroProtocollo, res.DataProtocollo
 
 
 def get_metadata_for(doc):

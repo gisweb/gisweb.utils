@@ -18,7 +18,7 @@ FIELDS_MAP = {
         '__tablename': 'POR_COMPSTRA',
         '__TipoDocumento': 'COMP',
         '__InCaricoA': 'COMPSTRANEW',
-        '__Classifica': '002.000.000',
+        '__Classifica': 'XVIII.02.03.',
         'gara_denominazione': 'COMP_DENGARA',
         'gara_data_gara': 'COMP_DATACOMP',
         'gara_comune_gara': 'COMP_LOCALITA',
@@ -82,6 +82,7 @@ FIELDS_MAP = {
 }
 
 FIELDS_MAP['frm_gara_b'] = FIELDS_MAP['frm_gara_a']
+FIELDS_MAP['frm_gara_base'] = FIELDS_MAP['frm_gara_a']
 
 
 def frm_gara_a_postprocessing(doc, data):
