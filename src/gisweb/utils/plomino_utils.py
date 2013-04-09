@@ -1260,14 +1260,15 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
             or db.getRenderingTemplate('DefaultFieldRead')
         renderedValue = fieldtemplate(fieldname=fieldname,
             fieldvalue = item_value,
-            selection = '' if not field else field.getSettings().getSelectionList(doc),
+            selection = field.getSettings().getSelectionList(doc),
             field = field,
             doc = doc
         ).strip()
         key = prefix + fieldname
         req.append((key, renderedValue, ))
 
-    return req    
+    return req
+
 
 def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     """
@@ -1280,18 +1281,15 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     # We want to skip those, and to do that we must explicitly list 'em
     bad_items = ['Plomino_Authors', 'Form']
 
-    def whatToDo(itemname):
+    res = []
+    form = doc.getForm()
+    for field in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False):
+    #for itemname in doc.getItems():
+        itemname = field.id
         if itemname not in bad_items:
             itemvalue = doc.getItem(itemname, '') or ''
             fieldname = itemname
-            return serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
-        
-    res = []
-    form = doc.getForm()
-    
-    names = set(doc.getItems() + [i.getId() for i in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False)])
-    for name in names:
-        res += whatToDo(name)
+            res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
 
     if serial_as == 'json':
         return json_dumps(dict(res))
