@@ -1269,6 +1269,8 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
 
     return req
 
+def foo():
+    
 
 def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     """
@@ -1281,15 +1283,18 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     # We want to skip those, and to do that we must explicitly list 'em
     bad_items = ['Plomino_Authors', 'Form']
 
-    res = []
-    form = doc.getForm()
-    for field in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False):
-    #for itemname in doc.getItems():
-        itemname = field.id
+    def whatToDo(itemname):
         if itemname not in bad_items:
             itemvalue = doc.getItem(itemname, '') or ''
             fieldname = itemname
-            res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
+            return serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
+        
+    res = []
+    form = doc.getForm()
+    
+    names = set(doc.getItems() + [i.getId() for i in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False)])
+    for name in names:
+        res += whatToDo(name)
 
     if serial_as == 'json':
         return json_dumps(dict(res))
