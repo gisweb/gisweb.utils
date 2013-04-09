@@ -1273,7 +1273,9 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
 def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     """
     Take a Plomino document :doc: and extract its data in a JSON-serializable
-    structure.
+    structure for printing porposes.
+    Item values are renderized according to the field definition and only
+    defined fields will be considered.
     """
 
     # bad_items are indistinguishable from good behaved citizen: they are unicode values
