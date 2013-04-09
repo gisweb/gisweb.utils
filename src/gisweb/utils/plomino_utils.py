@@ -1267,10 +1267,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
         key = prefix + fieldname
         req.append((key, renderedValue, ))
 
-    return req
-
-def foo():
-    
+    return req    
 
 def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     """
