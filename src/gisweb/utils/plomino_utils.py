@@ -1301,3 +1301,17 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     else:
         return res
 
+def idx_createFieldIndex(plominoIndex, field_name, fieldtype='TEXT', **args):
+    """
+    Espongo il metodo protetto createFieldIndex
+    
+    definizione:
+    createFieldIndex(self, fieldname, fieldtype, refresh=True, indextype='DEFAULT')
+    """
+    
+    if not hasattr(plominoIndex, 'createFieldIndex'):
+        plominoIndex = plominoIndex.getParentDatabase().getIndex()
+    
+    if not field_name in plominoIndex.indexes():
+        plominoIndex.createFieldIndex(fieldname, fieldtype, **args)
+    

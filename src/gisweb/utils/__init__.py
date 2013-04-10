@@ -55,6 +55,7 @@ from acl_utils import get_users_info, getAllUserRoles
 
 from print_utils import plominoPrint
 from print_utils import UnicodeDammit
+from print_utils import idx_createFieldIndex
 
 
 #################################################################### PDF UTILS #
