@@ -34,6 +34,7 @@ from plomino_utils import render_as_dataTable
 from plomino_utils import get_dataFor, get_gridDataFor, renderRaw
 from plomino_utils import getAllSubforms
 from plomino_utils import serialItem, serialDoc
+from plomino_utils import idx_createFieldIndex
 
 ################################################################### JSON UTILS #
 
@@ -55,7 +56,6 @@ from acl_utils import get_users_info, getAllUserRoles
 
 from print_utils import plominoPrint
 from print_utils import UnicodeDammit
-from print_utils import idx_createFieldIndex
 
 
 #################################################################### PDF UTILS #
