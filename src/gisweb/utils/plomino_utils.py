@@ -1312,6 +1312,6 @@ def idx_createFieldIndex(plominoIndex, fieldname, fieldtype='TEXT', **args):
     if not hasattr(plominoIndex, 'createFieldIndex'):
         plominoIndex = plominoIndex.getParentDatabase().getIndex()
     
-    if not field_name in plominoIndex.indexes():
+    if not fieldname in plominoIndex.indexes():
         plominoIndex.createFieldIndex(fieldname, fieldtype, **args)
     
