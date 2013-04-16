@@ -1301,7 +1301,7 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json'):
     else:
         return res
 
-def idx_createFieldIndex(plominoIndex, field_name, fieldtype='TEXT', **args):
+def idx_createFieldIndex(plominoIndex, fieldname, fieldtype='TEXT', **args):
     """
     Espongo il metodo protetto createFieldIndex
     
