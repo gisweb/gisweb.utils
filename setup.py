@@ -35,7 +35,10 @@ setup(name='gisweb.utils',
       install_requires=[
           'setuptools',
           'requests',
-          'dict2xml'
+          'dict2xml',
+          'xhtml2pdf',
+          'z3c.saconfig',
+          'codicefiscale',
           # -*- Extra requirements: -*-
       ],
       entry_points="""
