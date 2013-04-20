@@ -67,6 +67,7 @@ from pdf_utils import generate_pdf
 
 try:
     import sqlalchemy
+    import z3c.saconfig
 except ImportError:
     pass
 else:
