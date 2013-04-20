@@ -65,8 +65,14 @@ from pdf_utils import generate_pdf
 
 ##################################################################### DB UTILS #
 
-from db_utils import get_session, get_soup, plominoSqlSync
-from db_utils import suggestFromTable
+try:
+    import sqlalchemy
+except ImportError:
+    pass
+else:
+    # We're ok without those in case sqlalchemy is not available
+    from db_utils import get_session, get_soup, plominoSqlSync
+    from db_utils import suggestFromTable
 
 
 ############################################################### CF P.IVA UTILS #
