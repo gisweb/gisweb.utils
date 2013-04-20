@@ -39,6 +39,7 @@ setup(name='gisweb.utils',
           'xhtml2pdf',
           'z3c.saconfig',
           'codicefiscale',
+          'sqlalchemy'
           # -*- Extra requirements: -*-
       ],
       entry_points="""
