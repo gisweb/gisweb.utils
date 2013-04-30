@@ -23,6 +23,12 @@ def get_soup(sessionname):
     engine = session.get_bind()
     return SqlSoup(engine)
 
+def execute_sql(sessionname, statement, method='fetchall', *multiparams, **params):
+    session = get_session(sessionname)
+    engine = session.get_bind()
+    result = engine.execute(statement, *multiparams, **params)
+    return getattr(result, method)()
+
 #def sql_test(session, tname):
 #    if isinstance(session, basestring):
 #        session = get_session(session)

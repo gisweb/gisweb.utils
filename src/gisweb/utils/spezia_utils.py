@@ -5,6 +5,8 @@ import xmlrpclib
 from datetime import datetime
 from logging import getLogger
 
+import cgi
+
 logger = getLogger('gisweb.utils')
 
 try:
@@ -307,7 +309,9 @@ def get_params(doc, tipo, **kwargs):
     # i valori in kwargs eventualmente sovrascrivono quelli settati sopra
     params.update(kwargs)
 
-    return params
+    foo = lambda x: x if not isinstance(x, basestring) else cgi.escape(x) 
+
+    return dict([(k, foo(v)) for k,v in params.items()])
 
 def protocolla_doc(doc, tipo, served_url,
     responseURL = 'http://protocollo.spezia.vmserver/ws_protocollo.php', # servizio di test,

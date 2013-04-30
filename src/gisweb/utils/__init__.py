@@ -52,10 +52,14 @@ def aq_base(obj):
 from acl_utils import get_users_info, getAllUserRoles
 
 
+################################################################ UNICODEDAMMIT #
+
+from UnicodeDammit import getUnicodeFrom
+
+
 ################################################################## PRINT UTILS #
 
 from print_utils import plominoPrint
-from print_utils import UnicodeDammit
 
 
 #################################################################### PDF UTILS #
@@ -72,7 +76,7 @@ except ImportError:
     pass
 else:
     # We're ok without those in case sqlalchemy is not available
-    from db_utils import get_session, get_soup, plominoSqlSync
+    from db_utils import get_session, get_soup, plominoSqlSync, execute_sql
     from db_utils import suggestFromTable
 
 

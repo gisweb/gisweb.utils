@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# UNICODEDAMMIT ########################################################
+
 import re, codecs
 try:
     import chardet
@@ -262,3 +265,9 @@ class UnicodeDammit:
                  '\x9e' : ('#x17E', '17E'),
                  '\x9f' : ('Yuml', ''),}
 
+# / UNICODEDAMMIT ######################################################
+
+def getUnicodeFrom(source):
+    dammit = UnicodeDammit(source)
+    source_enc = dammit.originalEncoding
+    return dammit.unicode, source_enc
