@@ -150,3 +150,5 @@ from fs_utils import os_listdir, os_path_join
 ############################################################# PERMISSION UTILS #
 
 # TO DO
+
+from plone_utils import rolesOfPermission
