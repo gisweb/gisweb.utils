@@ -49,3 +49,35 @@ def getAllUserRoles(context):
     plominoRoles = db.getCurrentUserRoles()
     ploneRoles = db.getCurrentUser().getRolesInContext(context)
     return ploneRoles+plominoRoles
+
+def getPlominoPermissions():
+    """
+    Get all permission defined in Plomino
+    """
+    from Products.CMFPlomino.AppConfig import *
+    return dict((k,v) for k,v in locals().items() if 'PERMISSION' in k)
+
+from AccessControl import getSecurityManager
+
+def getUserPermissions(doc, user_id=''):
+    """
+    For test/debug porposes it returns the list of permissions of a
+    user on a content
+    """
+    
+    from Products.CMFCore.utils import getToolByName
+    mt = getToolByName(doc, 'portal_membership')
+    if user_id:
+        member = mt.getMemberById(user_id)
+    else:
+        member = mt.getAuthenticatedMember()
+    
+    roles = member.getRolesInContext(doc)
+    
+    def test(perm):
+        for info in doc.rolesOfPermission(perm):
+            if info['name'] in roles and info['selected']:
+                return True
+        return False
+        
+    return dict((k,v) for k,v in getPlominoPermissions().items() if test(v))

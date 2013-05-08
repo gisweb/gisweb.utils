@@ -49,7 +49,7 @@ def aq_base(obj):
 
 #################################################################### ACL UTILS #
 
-from acl_utils import get_users_info, getAllUserRoles
+from acl_utils import get_users_info, getAllUserRoles, getUserPermissions
 
 
 ################################################################ UNICODEDAMMIT #
@@ -143,12 +143,7 @@ from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doAct
 
 from fs_utils import os_listdir, os_path_join
 
-################################################################### MAIL UTILS #
 
-# TO DO
+################################################################### PLONE UTILS #
 
-############################################################# PERMISSION UTILS #
-
-# TO DO
-
-from plone_utils import rolesOfPermission
+from plone_utils import sendMail
