@@ -66,7 +66,6 @@ def getUserPermissions(doc, user_id=''):
     It returns the list of permissions of a user on a portal content
     """
     
-    from Products.CMFCore.utils import getToolByName
     mt = getToolByName(doc, 'portal_membership')
     if user_id:
         member = mt.getMemberById(user_id)
