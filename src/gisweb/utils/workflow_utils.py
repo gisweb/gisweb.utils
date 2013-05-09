@@ -189,6 +189,6 @@ def doActionIfAny(doc, wf_var='transition_on_save', args=[]):
     return getStatesInfo(doc, args=args)
 
 
-def updateRoleMappingsFor(ob)
+def updateRoleMappingsFor(ob):
     pw = getToolByName(ob.getParentDatabase(), 'portal_workflow')
     return pw.updateRoleMappingsFor(ob)
