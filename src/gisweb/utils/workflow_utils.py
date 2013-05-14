@@ -87,27 +87,29 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[], default=No
     single=True: solitamente si ha a che fare con un workflow solo quindi
         ci si aspetta un solo stato
     """
-
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
 
     infos = []
     args = set(['title']+args)
+    
     for wf_id in getChainFor(doc):
         wf = getToolByName(pw, wf_id)
 
         if state_id in ('review_state', ):
-            state_id = wf.getInfoFor(doc, 'review_state', None)
+            local_state_id = wf.getInfoFor(doc, 'review_state', None)
+        else:
+            local_state_id = state_id
 
-        if state_id:
-            status = getToolByName(wf.states, state_id)
+        if local_state_id:
+            status = getToolByName(wf.states, local_state_id)
             info = getInfos(status, default, *args)
             #info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
             info['id'] = status.getId()
             info['wf_id'] = wf_id
             infos.append(info)
         else:
-            for state_id in wf.states.keys():
-                status = getToolByName(wf.states, state_id)
+            for tmp_state_id in wf.states.keys():
+                status = getToolByName(wf.states, tmp_state_id)
                 info = getInfos(status, default, *args)
                 #info = dict([(k, getattr(status, k)) for k in set(['title']+args)])
                 info['id'] = status.getId()
@@ -118,7 +120,6 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[], default=No
         return infos[0]
     else:
         return infos
-
 
 def getTransitionsInfo(doc, single=False, supported_only=True,
     state_id='review_state', args=[], default=None):
