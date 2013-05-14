@@ -22,7 +22,7 @@ def getInfoFor(context, arg, *args, **kwargs):
             for var in set([arg]+list(args))])
 
 
-def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
+def getWorkflowInfo(doc, single=True, args=[], **kwargs):
     """
     Restituisce informazioni su tutti i workflow associati alla pratica.
     Argomenti richiedibili: title (default), description,
@@ -30,6 +30,13 @@ def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
     """
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
+
+    wf_ids = kwargs.get('wf_ids') or []
+    if not wf_ids and 'wf_id' in kwargs:
+        single = True
+        wf_ids = [kwargs['wf_id']]
+    else:
+        single = False
 
     infos = []
     for wf_id in wf_ids or getChainFor(doc):
