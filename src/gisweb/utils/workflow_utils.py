@@ -16,20 +16,10 @@ def getInfoFor(context, arg, *args, **kwargs):
 
     pw = getToolByName(context.getParentDatabase(), 'portal_workflow')
 
-    infos = {}
-    for wf_id in kwargs.get('wf_ids') or getChainFor(context):
-        wf = getToolByName(pw, wf_id)
-        infos[wf_id] = dict([(var, wf.getInfoFor(context, var, None)) \
+    wf_id = kwargs.get('wf_ids') or context.wf_statesInfo(single=False)[0]['wf_id']
+    wf = getToolByName(pw, wf_id)
+    return dict([(var, wf.getInfoFor(context, var, None)) \
             for var in set([arg]+list(args))])
-
-    if kwargs.get('single') in (None, True, ) and len(infos)==1:
-        val = infos.values()[0]
-        if len(val) == 1:
-            return val.values()[0]
-        else:
-            return val
-    else:
-        return infos
 
 
 def getWorkflowInfo(doc, wf_ids=[], single=True, args=[]):
@@ -78,21 +68,29 @@ def getInfos(From, default, *args):
     
     return info
 
-def getStatesInfo(doc, state_id='review_state', single=True, args=[], default=None):
+def getStatesInfo(doc, state_id='review_state', args=[], default=None, **kwargs):
     """
     Restituisce informazioni sugli stati della pratica per tutti i
     workflow ad essa associati.
     Argomenti richiedibili: title (default), description,
         transitions, permission_roles, group_roles, var_values
-    single=True: solitamente si ha a che fare con un workflow solo quindi
-        ci si aspetta un solo stato
+    args: lista degli attributi richiesti
+    default: valore di default (vedi getInfos)
     """
-    pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
 
-    infos = []
+    pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
+    
     args = set(['title']+args)
     
-    for wf_id in getChainFor(doc):
+    single = False
+    if 'wf_id' in kwargs:
+        wf_list = (kwargs['wf_id'], )
+        single = True
+    else:
+        wf_list = getChainFor(doc)
+    
+    infos = []
+    for wf_id in wf_list:
         wf = getToolByName(pw, wf_id)
 
         if state_id in ('review_state', ):
@@ -121,8 +119,8 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[], default=No
     else:
         return infos
 
-def getTransitionsInfo(doc, single=False, supported_only=True,
-    state_id='review_state', args=[], default=None):
+def getTransitionsInfo(doc, supported_only=True, state_id='review_state',
+    args=[], default=None, **kwargs):
     """
     Restituisce informazioni sulle transizioni disponibili per la pratica
     relative ai workflow ad essa associati.
@@ -136,7 +134,7 @@ def getTransitionsInfo(doc, single=False, supported_only=True,
     # supported_only=True ha senso solo per le transizioni disponibili allo stato corrente
     supported_only = supported_only and state_id=='review_state'
 
-    tr_infos = getStatesInfo(doc, state_id=state_id, single=False, args=['transitions'])
+    tr_infos = getStatesInfo(doc, state_id=state_id, args=['transitions'])
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
 
@@ -152,16 +150,11 @@ def getTransitionsInfo(doc, single=False, supported_only=True,
                 
                 info = getInfos(transition, default, *set(['title']+args))
                 
-                #info = dict([(k, getattr(transition, k)) for k in set(['title']+args)])
-                
                 info['id'] = transition.getId()
                 info.update(tr_def)
                 infos.append(info)
 
-    if len(infos) == 1 and single:
-        return infos[0]
-    else:
-        return infos
+    return infos
 
 
 def doActionIfAny(doc, wf_var='transition_on_save', args=[]):
@@ -192,3 +185,4 @@ def doActionIfAny(doc, wf_var='transition_on_save', args=[]):
 def updateRoleMappingsFor(ob):
     pw = getToolByName(ob.getParentDatabase(), 'portal_workflow')
     return pw.updateRoleMappingsFor(ob)
+
