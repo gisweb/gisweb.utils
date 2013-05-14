@@ -91,13 +91,12 @@ def getStatesInfo(doc, state_id='review_state', single=True, args=[], default=No
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
 
     infos = []
+    args = set(['title']+args)
     for wf_id in getChainFor(doc):
         wf = getToolByName(pw, wf_id)
 
         if state_id in ('review_state', ):
             state_id = wf.getInfoFor(doc, 'review_state', None)
-
-        args = set(['title']+args)
 
         if state_id:
             status = getToolByName(wf.states, state_id)
