@@ -245,8 +245,7 @@ def wf_statesInfo(self, state_id='review_state', args=[], **kwargs):
     return getStatesInfo(self, state_id=state_id, args=args, **kwargs)
 
 def wf_transitionsInfo(self, supported_only=True, state_id='review_state', args=[], **kwargs):
-    return getTransitionsInfo(self, single=single,
-        supported_only=supported_only, state_id=state_id, args=args)
+    return getTransitionsInfo(self, supported_only=supported_only, state_id=state_id, args=args, **kwargs)
 
 def wf_getInfoForState(self, wf_id, state_id, args=[]):
     return getInfoForState(self, wf_id, state_id, args=args)
