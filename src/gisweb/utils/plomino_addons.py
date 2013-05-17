@@ -238,15 +238,14 @@ PlominoForm.beforecreate_child = beforecreate_child
 def wf_getChainFor(self):
     return getChainFor(context)
 
-def wf_workflowInfo(self, wf_ids=None, single=True, args=[]):
-    return getWorkflowInfo(self, wf_ids=wf_ids, single=single, args=args)
+def wf_workflowInfo(self, wf_ids=None, single=True, args=[], **kwargs):
+    return getWorkflowInfo(self, wf_ids=wf_ids, args=args, **kwargs)
 
-def wf_statesInfo(self, state_id='review_state', single=True, args=[]):
-    return getStatesInfo(self, state_id=state_id, single=single, args=args)
+def wf_statesInfo(self, state_id='review_state', args=[], **kwargs):
+    return getStatesInfo(self, state_id=state_id, args=args, **kwargs)
 
-def wf_transitionsInfo(self, single=False, supported_only=True, state_id='review_state', args=[]):
-    return getTransitionsInfo(self, single=single,
-        supported_only=supported_only, state_id=state_id, args=args)
+def wf_transitionsInfo(self, supported_only=True, state_id='review_state', args=[], **kwargs):
+    return getTransitionsInfo(self, supported_only=supported_only, state_id=state_id, args=args, **kwargs)
 
 def wf_getInfoForState(self, wf_id, state_id, args=[]):
     return getInfoForState(self, wf_id, state_id, args=args)
