@@ -10,17 +10,27 @@ def getChainFor(context):
 
 def getInfoFor(context, arg, *args, **kwargs):
     """
-    Restituisce il dizionario delle associazioni chiavi valori per le
-    variabili di workflow richieste.
-    Il wf considerato se non specificato viene considerato il primo.
+    Basically expose the getInfoFor method of the associated workflows.
+    Accepted args:
+    * wf_id: id of the desidered workflow to probe
+        (by default the first is considered).
+    * as_list: if true the result is returned in a list
     """
 
     pw = getToolByName(context.getParentDatabase(), 'portal_workflow')
 
-    wf_id = kwargs.get('wf_ids') or context.wf_statesInfo()[0]['wf_id']
+    wf_id = kwargs.get('wf_id') or context.wf_statesInfo()[0]['wf_id']
     wf = getToolByName(pw, wf_id)
-    return dict([(var, wf.getInfoFor(context, var, None)) \
-            for var in set([arg]+list(args))])
+    
+    if args:
+        args = set(i for i in (arg, )+args)
+        if kwargs.get('as_list'):
+            return [wf.getInfoFor(context, var, None) for var in args]
+        else:
+            return dict((var, wf.getInfoFor(context, var, None), ) \
+                for var in args)
+    else:
+        return wf.getInfoFor(context, arg, None)
 
 
 def getWorkflowInfo(doc, single=True, args=[], **kwargs):
