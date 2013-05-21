@@ -10,13 +10,14 @@ def getChainFor(context):
 
 def getInfoFor(context, arg, *args, **kwargs):
     """
-    Cicla getInfoFor su tutti i workflow richiesti o su quelli assegnati
-    al documento.
+    Restituisce il dizionario delle associazioni chiavi valori per le
+    variabili di workflow richieste.
+    Il wf considerato se non specificato viene considerato il primo.
     """
 
     pw = getToolByName(context.getParentDatabase(), 'portal_workflow')
 
-    wf_id = kwargs.get('wf_ids') or context.wf_statesInfo(single=False)[0]['wf_id']
+    wf_id = kwargs.get('wf_ids') or context.wf_statesInfo()[0]['wf_id']
     wf = getToolByName(pw, wf_id)
     return dict([(var, wf.getInfoFor(context, var, None)) \
             for var in set([arg]+list(args))])
@@ -93,6 +94,8 @@ def getStatesInfo(doc, state_id='review_state', args=[], default=None, **kwargs)
     if 'wf_id' in kwargs:
         wf_list = (kwargs['wf_id'], )
         single = True
+    elif 'wf_ids' in kwargs:
+        wf_list = kwargs['wf_ids']
     else:
         wf_list = getChainFor(doc)
     
@@ -141,7 +144,11 @@ def getTransitionsInfo(doc, supported_only=True, state_id='review_state',
     # supported_only=True ha senso solo per le transizioni disponibili allo stato corrente
     supported_only = supported_only and state_id=='review_state'
 
-    tr_infos = getStatesInfo(doc, state_id=state_id, args=['transitions'])
+    if 'wf_id' in kwargs:
+        v = kwargs.pop('wf_id')
+        kwargs['wf_ids'] = (v, )
+
+    tr_infos = getStatesInfo(doc, state_id=state_id, args=['transitions'], **kwargs)
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
 
