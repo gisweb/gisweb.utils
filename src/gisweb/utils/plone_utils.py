@@ -12,16 +12,15 @@ def rolesOfPermission(obj, permission):
     """ Exposes rolesOfPermission """
     return obj.rolesOfPermission(permission)
 
-def sendMail(Object, Text, To, From='', Attachment='', Attachment_name='', as_script=False):
-    """ Facility for sending emails using Plone MailHost """
+def sendMail(Object, msg, To, From='', as_script=False):
+    """
+    Facility for sending emails using Plone MailHost
+    
+    msg: dtml is requested
+    
+    """
     
     success = 0
-    
-    if Attachment:
-        Attachment_name = Attachment_name or 'test'
-        msg = context.mime_file(file=Attachment, text=Text, nomefile=Attachment_name)
-    else:
-        msg = Text
     
     messages = []
     mail_host = getToolByName(context, 'MailHost')
@@ -42,8 +41,8 @@ def sendMail(Object, Text, To, From='', Attachment='', Attachment_name='', as_sc
     
     if not as_script:
         plone_tools = getToolByName(context.getParentDatabase().aq_inner, 'plone_utils')
-        for msg in messages:    
-            plone_tools.addPortalMessage(*msg, request=context.REQUEST)
+        for imsg in messages:    
+            plone_tools.addPortalMessage(*imsg, request=context.REQUEST)
         return success
     else:
         return dict(success=success, messages=messages)
