@@ -16,8 +16,11 @@ def sendMail(context, Object, msg, To, From='', as_script=False):
     """
     Facility for sending emails using Plone MailHost
     
-    msg: dtml is requested
-    
+    * context: the context (ex. portal) from which get the MailHost
+    * msg: dtml type is requested
+    * To: the recipient list
+    * From: the sender address
+    * as_script: if true error message will not be notified through PortalMessage
     """
     
     success = 0
