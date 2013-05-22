@@ -12,7 +12,7 @@ def rolesOfPermission(obj, permission):
     """ Exposes rolesOfPermission """
     return obj.rolesOfPermission(permission)
 
-def sendMail(Object, msg, To, From='', as_script=False):
+def sendMail(context, Object, msg, To, From='', as_script=False):
     """
     Facility for sending emails using Plone MailHost
     
