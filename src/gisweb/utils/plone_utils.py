@@ -8,6 +8,7 @@ accessibili
 
 from Products.CMFCore.utils import getToolByName
 
+
 def rolesOfPermission(obj, permission):
     """ Exposes rolesOfPermission """
     return obj.rolesOfPermission(permission)

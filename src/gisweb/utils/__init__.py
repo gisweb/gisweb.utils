@@ -136,7 +136,7 @@ from spezia_utils import protocolla_doc, protocolla
 
 ############################################################### WORKFLOW UTILS #
 
-from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny, getInfoFor, updateRoleMappingsFor
+from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny, getInfoFor, updateRoleMappingsFor, updateAllRoleMappingsFor
 
 
 ##################################################################### FS UTILS #

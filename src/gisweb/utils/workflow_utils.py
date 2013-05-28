@@ -8,6 +8,31 @@ def getChainFor(context):
     return pw.getChainFor(context)
 
 
+def updateAllRoleMappingsFor(doc, script=False):
+    """ Changes the object permissions according to the current workflow states. """
+    
+    pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
+    changes = dict()
+    
+    wf_ids = pw.getChainFor(doc)
+    
+    # do precedenza al primo wf della catena
+    for wf_id in reversed(wf_ids):
+        wf = getToolByName(pw, wf_id)
+        changes[wf_id] = dict(review_state=0)
+        if not pw.getStatusOf(wf_id, doc):
+            new_state = wf._executeTransition(doc)
+            if new_state:
+                changes[wf_id]['new_state'] = new_state.getId()
+        changes[wf_id]['permissions'] = wf.updateRoleMappingsFor(doc)
+    
+    if script:
+        import transaction
+        transaction.commit()
+    
+    return changes
+
+
 def getInfoFor(context, arg, *args, **kwargs):
     """
     Basically expose the getInfoFor method of the associated workflows.
