@@ -1256,21 +1256,25 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
             req.append((fieldname, sub_req))
 
     else:
-        fieldtemplate = db.getRenderingTemplate('%sFieldRead' % fieldtype) \
-            or db.getRenderingTemplate('DefaultFieldRead')
-        renderedValue = fieldtemplate(fieldname=fieldname,
-            fieldvalue = item_value,
-            selection = field.getSettings().getSelectionList(doc),
-            field = field,
-            doc = doc
-        ).strip()
+        if fieldtype not in ('TEXT', 'NUMBER', ):
+            fieldtemplate = db.getRenderingTemplate('%sFieldRead' % fieldtype) \
+                or db.getRenderingTemplate('DefaultFieldRead')
+            renderedValue = fieldtemplate(fieldname=fieldname,
+                fieldvalue = item_value,
+                selection = field.getSettings().getSelectionList(doc),
+                field = field,
+                doc = doc
+            ).strip()
+        else:
+            # trying to increase speed
+            renderedValue = '%s' % item_value
         key = prefix + fieldname
         req.append((key, renderedValue, ))
 
     return req
 
 
-def serialDoc(doc, nest_datagrid=True, serial_as='json'):
+def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[]):
     """
     Take a Plomino document :doc: and extract its data in a JSON-serializable
     structure for printing porposes.
@@ -1285,9 +1289,11 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json'):
 
     res = []
     form = doc.getForm()
-    for field in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False):
+    fieldlist = field_list or [i.id in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False)]
+    for itemname in fieldlist:
+    #for field in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False):
     #for itemname in doc.getItems():
-        itemname = field.id
+        #itemname = field.id
         if itemname not in bad_items:
             itemvalue = doc.getItem(itemname, '') or ''
             fieldname = itemname
