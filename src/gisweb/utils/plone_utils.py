@@ -8,6 +8,12 @@ accessibili
 
 from Products.CMFCore.utils import getToolByName
 
+#try:
+#    from plone.app.content.batching import Batch as ploneBatch # Plone < 4.3
+#    HAS_PLONE43 = False
+#except ImportError:
+#    from plone.batching import Batch as ploneBatch # Plone >= 4.3
+#    HAS_PLONE43 = True
 
 def rolesOfPermission(obj, permission):
     """ Exposes rolesOfPermission """
@@ -50,3 +56,16 @@ def sendMail(context, Object, msg, To, From='', as_script=False):
         return success
     else:
         return dict(success=success, messages=messages)
+
+#def Batch(**kwargs):
+#    """
+#    così non si può usare per problemi di permessi sugli oggetti in output
+#    """
+#    for keys in (('pagesize', 'size', ), ('pagenumber', 'start', ), ):
+#        if not HAS_PLONE43:
+#            keys = list(reversed(keys))
+#        ok, nk = keys
+#        if ok in kwargs:
+#            kwargs[nk] = kwargs.pop(ok)
+#        
+#    return ploneBatch(**kwargs)

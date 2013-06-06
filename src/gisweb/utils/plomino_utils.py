@@ -1320,4 +1320,15 @@ def idx_createFieldIndex(plominoIndex, fieldname, fieldtype='TEXT', **args):
     
     if not fieldname in plominoIndex.indexes():
         plominoIndex.createFieldIndex(fieldname, fieldtype, **args)
+
+def getIndexType(plominoContext, key):
+    """
+    """
+    indexes = plominoContext.getParentDatabase().getIndex().Indexes
+    return '%s' % indexes[key]
+    
+
+
+
+
     
