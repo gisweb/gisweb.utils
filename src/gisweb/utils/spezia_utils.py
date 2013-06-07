@@ -200,7 +200,7 @@ def get_id_request(adapter=None, data={}):
     '''
 
     now = datetime.now()
-    num = now.strftime('%s')
+    num = now.strftime('%s%f')
     pid = num
     if adapter:
         if isinstance(adapter, basestring):
@@ -270,7 +270,7 @@ def protocolla(served_url,
     data = dict(
         tipologia = kwargs['tipo'],
         utente = kwargs['username'],
-        tms_req = date_req.strftime('%s%f'),
+        tms_req = date_req.strftime('%s'),
         pid = kwargs['pid']
     )
 
