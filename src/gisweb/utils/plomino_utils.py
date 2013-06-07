@@ -1289,7 +1289,7 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[]):
 
     res = []
     form = doc.getForm()
-    fieldlist = field_list or [i.id in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False)]
+    fieldlist = field_list or [i.id for i in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False)]
     for itemname in fieldlist:
     #for field in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False):
     #for itemname in doc.getItems():
