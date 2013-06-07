@@ -1217,9 +1217,18 @@ def batch_save(context, doc, form=None, creation=False, refresh_index=True,
     pass
 
 
-def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=True):
+def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=True, render=True):
     """
     Returns a list of 2-tuples with the data contained in the field `fieldname` of form
+
+    @param form                 : the PlominoForm containing the item that would be serialied;
+    @param fieldname      C{str}: id of a PlominoField contained in the PlominoForm
+    @param item_value           : the item value;
+    @param doc                  : the PlominoDocument;
+    @param nest_datagrid C{bool}: whether the fields of type DATAGRID has to be serialized nested;
+    @param render        C{bool}: if you are interested in the data value serialization set it to False,
+        otherwise you'll obtain the data renderization through the item basic read template.
+    
     """
     req = []
     db = form.getParentDatabase()
@@ -1256,7 +1265,10 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
             req.append((fieldname, sub_req))
 
     else:
-        if fieldtype not in ('TEXT', 'NUMBER', ):
+        # if I need data representation (or metadata) for printing porposes
+        if item_value and render and fieldtype not in ('TEXT', 'NUMBER', ):
+            # not worth it to call the template to render text and numbers
+            # it is an expensive operation
             fieldtemplate = db.getRenderingTemplate('%sFieldRead' % fieldtype) \
                 or db.getRenderingTemplate('DefaultFieldRead')
             renderedValue = fieldtemplate(fieldname=fieldname,
@@ -1265,25 +1277,46 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
                 field = field,
                 doc = doc
             ).strip()
+        # if I need data value
         else:
-            # trying to increase speed
-            renderedValue = '%s' % item_value
+            if not item_value:
+                renderedValue = ''
+            elif fieldtype == 'NUMBER':
+                custom_format = field.getSettings('format')
+                renderedValue = str(item_value) if not custom_format else custom_format % rendered_value
+            elif fieldtype == 'DATETIME':
+                custom_format = field.getSettings('format') or db.getDateTimeFormat()
+                renderedValue = item_value.strftime(custom_format)
+            else:
+                # in order to prevent TypeError for unknown not JSON serializable objects
+                try:
+                    json_dumps(item_value)
+                except TypeError:
+                    renderedValue = '%s' % item_value
+                else:
+                    renderedValue = item_value
         key = prefix + fieldname
         req.append((key, renderedValue, ))
-
     return req
 
 
-def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[]):
+def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[], render=True):
     """
     Take a Plomino document :doc: and extract its data in a JSON-serializable
     structure for printing porposes.
-    Item values are renderized according to the field definition and only
+    Item values are renderized according to the field definition and by default only
     defined fields will be considered.
+
+    @param doc           : the PlominoDocument to serialize;
+    @param nest_datagrid : see serialItem;
+    @param serial_as     : json/xml;
+    @param field_list    : if you need a subset of item to be serialized you can just
+                           specify the list if item name you need;
+    @param render        : see serialItem.
     """
 
-    # bad_items are indistinguishable from good behaved citizen: they are unicode values
-    # that just don't belong to the data (they are in fact metadata)
+    # bad_items are indistinguishable from good behaved citizen: they are unicode
+    # values that just don't belong to the data (they are in fact metadata)
     # We want to skip those, and to do that we must explicitly list 'em
     bad_items = ['Plomino_Authors', 'Form']
 
@@ -1297,7 +1330,7 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[]):
         if itemname not in bad_items:
             itemvalue = doc.getItem(itemname, '') or ''
             fieldname = itemname
-            res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid)
+            res += serialItem(form, fieldname, itemvalue, doc=doc, nest_datagrid=nest_datagrid, render=render)
 
     if serial_as == 'json':
         return json_dumps(dict(res))
@@ -1325,7 +1358,10 @@ def getIndexType(plominoContext, key):
     """
     """
     indexes = plominoContext.getParentDatabase().getIndex().Indexes
-    return '%s' % indexes[key]
+    try:
+        return '%s' % indexes[key]
+    except KeyError:
+        return None
     
 
 
