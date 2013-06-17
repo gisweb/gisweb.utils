@@ -1228,7 +1228,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
     @param nest_datagrid C{bool}: whether the fields of type DATAGRID has to be serialized nested;
     @param render        C{bool}: if you are interested in the data value serialization set it to False,
         otherwise you'll obtain the data renderization through the item basic read template.
-    
+
     """
     req = []
     db = form.getParentDatabase()
@@ -1239,7 +1239,25 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
     if fieldtype == 'DATE':
         fieldtype = 'DATETIME'
 
-    if fieldtype == 'DATAGRID':
+    if fieldtype == 'DOCLINK':
+
+        if nest_datagrid:
+            sub_req = []
+
+        for link in item_value or []:
+            sub_doc = db.getDocument(link)
+            # I choose not to follow nested doclink, from now on follow_doclink is false
+            el = dict(serialDoc(sub_doc, nest_datagrid=True, serial_as=False,
+                field_list=[], render=render, follow_doclink=False))
+            if nest_datagrid:
+                sub_req.append(el)
+            else:
+                req += [('%s.%s' % (fieldname, k), v) for k,v in el.items()]
+
+        if nest_datagrid:
+            req.append((fieldname, sub_req))
+
+    elif fieldtype == 'DATAGRID':
         grid_form = db.getForm(field.getSettings().associated_form)
         grid_field_names = field.getSettings().field_mapping.split(',')
 
@@ -1300,7 +1318,7 @@ def serialItem(form, fieldname, item_value, doc=None, prefix='', nest_datagrid=T
     return req
 
 
-def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[], render=True):
+def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[], render=True, follow_doclink=False):
     """
     Take a Plomino document :doc: and extract its data in a JSON-serializable
     structure for printing porposes.
@@ -1322,7 +1340,8 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[], render=T
 
     res = []
     form = doc.getForm()
-    fieldlist = field_list or [i.id for i in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False)]
+    fieldlist = field_list or [i.id for i in form.getFormFields(includesubforms=True,
+        doc=None, applyhidewhen=False) if i.getFieldType()!='DOCLINK' or follow_doclink]
     for itemname in fieldlist:
     #for field in form.getFormFields(includesubforms=True, doc=None, applyhidewhen=False):
     #for itemname in doc.getItems():

@@ -236,7 +236,7 @@ PlominoDocument.ondelete_parent = ondelete_parent
 PlominoForm.beforecreate_child = beforecreate_child
 
 def wf_getChainFor(self):
-    return getChainFor(context)
+    return getChainFor(self)
 
 def wf_workflowInfo(self, wf_ids=None, single=True, args=[], **kwargs):
     return getWorkflowInfo(self, wf_ids=wf_ids, args=args, **kwargs)

@@ -154,11 +154,24 @@ def getcwd():
     return os.getcwd()
 
 def isRepoUpToDate(path):
+    """
+    0 : repo surely up to date
+    1 : indexes do not correspond, maybe you need an upgrade
+    """
     fullpath = os.path.join(os.getcwd(), path)
     command = 'git diff-index HEAD --quiet'
     p = subprocess.Popen(command.split(' '), cwd=fullpath)
-    out = p.wait()
-    return str(out)
+    return '%s' % p.wait()
     
+def getRepoRemotes(path):
+    """
+    returns the list of repositories you can get with "git remote -v"
+    """
+    fullpath = os.path.join(os.getcwd(), path)
+    command = 'git remote -v'
+    p = subprocess.Popen(command.split(' '), cwd=fullpath, stdout=subprocess.PIPE)
+    result = [i.strip() for i in p.stdout.readlines()]
+    p.wait()
+    return result
 
 #def popopen(command)
