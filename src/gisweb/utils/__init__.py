@@ -147,3 +147,18 @@ from fs_utils import os_listdir, os_path_join
 ################################################################### PLONE UTILS #
 
 from plone_utils import sendMail
+
+import os, subprocess
+
+def getcwd():
+    return os.getcwd()
+
+def isRepoUpToDate(path):
+    fullpath = os.path.join(os.getcwd(), path)
+    command = 'git diff-index HEAD --quiet'
+    p = subprocess.Popen(command.split(' '), cwd=fullpath)
+    out = p.wait()
+    return str(out)
+    
+
+#def popopen(command)
