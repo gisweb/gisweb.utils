@@ -4,6 +4,8 @@
 from Products.CMFPlomino.interfaces import IPlominoDatabase
 from Products.CMFPlomino.PlominoDocument import PlominoDocument
 
+import cStringIO
+
 from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate, htmlencode
 
 from DateTime import DateTime
@@ -611,24 +613,30 @@ def attachThis(plominoDocument, submittedValue, itemname, filename='', overwrite
     ###############
     '''
     new_file = None
-    try:
-        os.path.isfile(submittedValue)
-    except:
-        pass
-    else:
-        if os.path.isfile(submittedValue):
-            with open(submittedValue, 'r') as ff:
-                (new_file, contenttype) = plominoDocument.setfile(ff,
-                    filename=filename, overwrite=overwrite)
+
+    if isinstance(submittedValue, basestring):
+        
+        try:
+            os.path.isfile(submittedValue)
+        except:
+            tmpFile = cStringIO.StringIO()
+            tmpFile.write(submittedValue)
+            (new_file, contenttype) = plominoDocument.setfile(tmpFile,
+                        filename=filename, overwrite=overwrite)
+        else:
+            if os.path.isfile(submittedValue):
+                with open(submittedValue, 'r') as ff:
+                    (new_file, contenttype) = plominoDocument.setfile(ff,
+                        filename=filename, overwrite=overwrite)
+
     if not new_file:
         (new_file, contenttype) = plominoDocument.setfile(submittedValue,
             filename=filename, overwrite=overwrite)
 
-
     if not contenttype:
         # then try a guess
         try:
-            import cStringIO
+            #import cStringIO
             from plone.app.blob.utils import guessMimetype
             tmpFile = cStringIO.StringIO()
             tmpFile.write(submittedValue)
