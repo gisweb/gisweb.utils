@@ -34,14 +34,19 @@ def leggi_documento(docid, **kw):
 
 def lista_procedimenti(testinfo=False, **kw):
     """
-    Extraction of the proceedings of a subject.
+    Estrazione dei procedimenti / Extraction of the proceedings of a subject.
 
-    Acceped keyword args:
-        CodiceFiscale (str): personal fiscal code;
-        SessionID (int):
-        DataInizio (DateTime):
-        DataFine (DateTime):
-        Stato (str):
+    Argomenti possibili:
+    CodiceFiscale   (str): codice fiscale dell'utente;
+    SessionID       (str): -- NON UTILIZZATO --- ;
+    DataInizio (DateTime): Se valorizzata, estrae i procedimenti con data di
+                            protocollo a partire dalla data indicata (gg/mm/aaaa);
+    DataFine   (DateTime): Se valorizzata, estrae i procedimenti con data di
+                            protocollo  fino alla data indicata (gg/mm/aaaa);
+    Stato           (str): Valori possibili:
+                            "In corso": estrae i procedimenti attivi,
+                            "Terminati": estrare i procedimenti terminati,
+                            "Tutti": estrae sia i procedimenti attivi sia quelli terminati.
     """
     conn = IrideProcedimento(testinfo=testinfo)
     return conn.ListaProcedimenti(**kw)
@@ -61,7 +66,7 @@ def test_ListaProcedimenti(testinfo=True, **kw):
     conn = IrideProcedimento(testinfo=testinfo)
     return conn.build_xml('ListaProcedimenti', **kw)
 
-def inserisci_protocollo(doc, testinfo=False):
+def inserisci_protocollo(doc, testinfo=False, **kw):
     """
     doc (PlominoDocument): the document to be registered;
     testinfo (bool): whether debug info has to be added to the result.
@@ -71,6 +76,9 @@ def inserisci_protocollo(doc, testinfo=False):
 
     layer = doc.getParentDatabase().resources.irideLayer
     dati_protocollo = layer('ProtocolloIn', doc)
+    for k,v in dati_protocollo.items():
+        if k in kw:
+            dati_protocollo[k] = v
     dati_mittente = layer('MittenteDestinatarioIn', doc)
     dati_allegato = layer('AllegatoIn', doc)
     

@@ -448,7 +448,21 @@ class IrideProcedimento(Iride):
 
 
     def ListaProcedimenti(self, **kw):
-        """ Estrazione dei procedimenti """
+        """
+        Estrazione dei procedimenti / Extraction of the proceedings of a subject.
+
+        Argomenti possibili:
+        CodiceFiscale   (str): codice fiscale dell'utente;
+        SessionID       (str): -- NON UTILIZZATO --- ;
+        DataInizio (DateTime): Se valorizzata, estrae i procedimenti con data di
+                               protocollo a partire dalla data indicata (gg/mm/aaaa);
+        DataFine   (DateTime): Se valorizzata, estrae i procedimenti con data di
+                               protocollo  fino alla data indicata (gg/mm/aaaa);
+        Stato           (str): Valori possibili:
+                               "In corso": estrae i procedimenti attivi,
+                               "Terminati": estrare i procedimenti terminati,
+                               "Tutti": estrae sia i procedimenti attivi sia quelli terminati.
+        """
         
         request = self.build_xml('ListaProcedimenti', **kw)
         res = self.query_service(self.client.service.ListaProcedimenti, request)
