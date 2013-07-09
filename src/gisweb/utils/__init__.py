@@ -175,3 +175,8 @@ def getRepoRemotes(path):
     return result
 
 #def popopen(command)
+
+
+################################################################### IRIDE UTILS #
+
+from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti, leggi_documento

@@ -13,10 +13,17 @@ except:
 def handler(obj, format='ISO'):
 
     if hasattr(obj, 'strftime'):
-        if format == 'ISO':
-            return obj.ISO()
+        if format.upper() == 'ISO':
+            try:
+                return obj.ISO()
+            except AttributeError as err:
+                return obj.isoformat()
         else:
-            return obj.strftime(format)
+            try:
+                return obj.strftime(format)
+            # the datetime strftime() methods require year >= 1900 
+            except ValueError as err:
+                return handler(obj, format='ISO')
     else:
         return obj
     

@@ -53,7 +53,7 @@ doc.Utente = 'AMMINISTRATORE'
 doc.Ruolo = 'AMMINISTRATORE'
 doc.InCaricoA = 'COMPSTRA'
 
-doc.Classifica = '002.000.000'
+doc.Classifica = 'XVIII.02.03.'
 
 # allegato = client_protocollo.factory.create('AllegatoIn')
 # allegato.Image = b64encode(open('/tmp/pdf_prova.pdf').read())
@@ -63,6 +63,7 @@ doc.Classifica = '002.000.000'
 
 res = client_protocollo.service.InserisciDocumento(doc)
 
+#import ipdb; ipdb.set_trace()
 for method in client_tabelle.wsdl.services[0].ports[0].methods.values():
     print '%s(%s)' % (method.name, ', '.join('%s: %s' % (part.type, part.name) for part in method.soap.input.body.parts))
 # restituisce un oggetto ProtocolloOut vuoto con attributi Messaggio ed Errore
