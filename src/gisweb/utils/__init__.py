@@ -129,11 +129,6 @@ def strftime(date, format, custom_locale):
     return date.strftime(format), err
 
 
-################################################################# SPEZIA UTILS #
-
-from spezia_utils import protocolla_doc, protocolla
-
-
 ############################################################### WORKFLOW UTILS #
 
 from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny, getInfoFor, updateRoleMappingsFor, updateAllRoleMappingsFor
@@ -174,7 +169,10 @@ def getRepoRemotes(path):
     p.wait()
     return result
 
-#def popopen(command)
+
+################################################################# SPEZIA UTILS #
+
+from spezia_utils import protocolla_doc, protocolla
 
 
 ################################################################### IRIDE UTILS #
