@@ -77,7 +77,7 @@ def inserisci_protocollo(doc, testinfo=False, **kw):
     layer = doc.getParentDatabase().resources.irideLayer
     dati_protocollo = layer('ProtocolloIn', doc)
     for k,v in dati_protocollo.items():
-        if k in kw:
+        if k in kw and v:
             dati_protocollo[k] = v
     dati_mittente = layer('MittenteDestinatarioIn', doc)
     dati_allegato = layer('AllegatoIn', doc)
