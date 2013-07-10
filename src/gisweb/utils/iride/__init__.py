@@ -138,7 +138,8 @@ def procedimento_pratica(cf, docid, testinfo=False):
                     flt_res = [{}]
             if testinfo:
                 flt_res[0]['time_elapsed'] = res_procedimenti['time_elapsed']
-            return flt_res[0]
+            res_procedimenti['result'] = flt_res[0]
+            return res_procedimenti
         else:
             return res_procedimenti
     else:

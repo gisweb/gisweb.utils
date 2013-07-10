@@ -305,7 +305,10 @@ class Iride():
             # for debug purposes in case of exception reasons are in input data
             out['request'] = deep_normalize(dict(request))
         else:
-            if self.testinfo: out['time_elapsed'] = (datetime.now()-t0).seconds
+            if self.testinfo:
+                # for backward compatibility with python 2.6
+                total_seconds = lambda x: x.seconds + x.microseconds*10**-6
+                out['time_elapsed'] = total_seconds(datetime.now()-t0)
             out['success'] = 1
             out['result'] = deep_normalize(dict(res))
         return out
