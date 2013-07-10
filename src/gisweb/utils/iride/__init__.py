@@ -133,11 +133,13 @@ def procedimento_pratica(cf, docid, testinfo=False):
     if res_procedimenti['success']:
         if not res_procedimenti['result'].get('Errore'):
             # 2. si filtra i procedimenti trovati in base al parametro IdDocumento
-            flt_res = [rec['TestataProcedimento'] for rec in res_procedimenti['result']['Procedimenti']['Procedimento'] if rec['EstremiDocumento']['IdDocumento']==docid]
-            if not flt_res:
-                    flt_res = [{}]
-            if testinfo:
-                flt_res[0]['time_elapsed'] = res_procedimenti['time_elapsed']
+            flt_res = [rec['TestataProcedimento'] \
+                for rec in res_procedimenti['result']['Procedimenti']['Procedimento'] \
+                    if rec['EstremiDocumento']['IdDocumento']==docid] or [{}]
+            #if not flt_res:
+                    #flt_res = [{}]
+            #if testinfo:
+                #flt_res[0]['time_elapsed'] = res_procedimenti['time_elapsed']
             res_procedimenti['result'] = flt_res[0]
             return res_procedimenti
         else:
