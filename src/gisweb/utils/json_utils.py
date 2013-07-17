@@ -1,7 +1,7 @@
 #import simplejson as json
 
 import json
-
+from decimal import Decimal
 import locale
 
 try:
@@ -9,39 +9,37 @@ try:
 except:
     locale.setlocale(locale.LC_TIME, '')
 
-
 def handler(obj, format='ISO'):
-
+    # datetime and DateTime handling
     if hasattr(obj, 'strftime'):
         if format.upper() == 'ISO':
             try:
                 return obj.ISO()
-            except AttributeError as err:
+            except AttributeError:
                 return obj.isoformat()
         else:
             try:
                 return obj.strftime(format)
             # the datetime strftime() methods require year >= 1900 
-            except ValueError as err:
+            except ValueError:
                 return handler(obj, format='ISO')
+    # Decimal handling
+    elif isinstance(obj, Decimal):
+        return float(obj)
+    # other...
     else:
-        return obj
-    
-#def handler(obj):
-    #if hasattr(obj, 'strftime'):
-        #if obj.strftime('%H:%M:%S') == '00:00:00':
-            #srepr = '%d/%m/%Y'
-##            srepr = '%a %d %b %Y'
-        #else:
-            #srepr = '%d/%m/%Y %H:%M:%S'
-        #return obj.strftime(srepr)
-    #else:
-        #return None
+        try:
+            json.dumps(obj)
+        except Exception as err:
+            # I assume that the string version is better than raise an error
+            return str(obj)
+        else:
+            return None
 
-def json_dumps(obj, dateformat='%d/%m/%Y %H:%M:%S', **kwargs):
+def json_dumps(obj, customformat='%d/%m/%Y %H:%M:%S', **kwargs):
 
     kw = dict(
-        default=lambda o: handler(o, format=dateformat),
+        default=lambda o: handler(o, format=customformat),
         **kwargs
     )
     
