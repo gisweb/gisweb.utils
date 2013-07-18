@@ -200,7 +200,7 @@ def fill_from_fisica(doc, obj):
     obj.Indirizzo = doc.getItem('fisica_domicilio_indirizzo')
     obj.Localita = doc.getItem('fisica_residenza_loc')
     obj.DataNascita = doc.getItem('fisica_data_nato')
-    ############### I have NO IDEA about how to set those: ############################
+    ############### I have NO IDEA about how to set those: #################
     # CodiceComuneResidenza
     # CodiceComuneNascita
     # Nazionalita
@@ -241,14 +241,25 @@ class Iride():
     Utente = UTENTE
     Ruolo = RUOLO
 
-    def __init__(self, SERVICE_NAME, testinfo=False, **kw):
+    def __init__(self, SERVICE_NAME, testinfo=False, pcontext=None, **kw):
         self.testinfo = testinfo
+        
+        from Products.CMFCore.utils import getToolByName
+        pp = getToolByName(context,'portal_properties')
+        # così posso prendere alcuni attributi di default dalle
+        # portal_properties del portale
+        # (es. HOST è una impostazione propria del portale)
+        if 'Iride' in pp.keys():
+            for k,v in pp['Iride'].propertyItems():
+                setattr(self, k, v)
+
         for k,v in kw.items():
             setattr(self, k, v)
+
         self.__set_client__(SERVICE_NAME)
 
     def __set_client__(self, service):
-        """ Returns the client asspciated to the service """
+        """ Set the right client associated to the service as an attribute """
         WSProtocolloDM = 'WSProtocolloDM/WSProtocolloDM.asmx?WSDL'
         WSProcedimenti = 'WSProcedimenti/WSProcedimenti.asmx?WSDL'
 

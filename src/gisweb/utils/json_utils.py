@@ -28,13 +28,9 @@ def handler(obj, format='ISO'):
         return float(obj)
     # other...
     else:
-        try:
-            json.dumps(obj)
-        except Exception as err:
-            # I assume that the string version is better than raise an error
-            return str(obj)
-        else:
-            return None
+        # I assume that return a string is better than raise an error
+        return str(obj)
+
 
 def json_dumps(obj, customformat='%d/%m/%Y %H:%M:%S', **kwargs):
 
