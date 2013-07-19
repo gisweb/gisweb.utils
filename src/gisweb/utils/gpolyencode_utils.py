@@ -1,6 +1,6 @@
 import gpolyencode
 
-def encode(points):
+def gpoly_encode(points):
 	try:
 		encoder = gpolyencode.GPolyEncoder()
 		return encoder.encode(points)
