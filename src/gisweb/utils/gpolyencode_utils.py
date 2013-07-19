@@ -5,4 +5,5 @@ def gpoly_encode(points):
 		encoder = gpolyencode.GPolyEncoder()
 		return encoder.encode(points)
 	except:
-		return dict(error:'Errore')
+		return dict(error='Errore')
+		
