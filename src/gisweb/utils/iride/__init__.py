@@ -32,9 +32,11 @@ def leggi_documento(docid, **kw):
     conn = IrideProtocollo(**kw)
     return conn.LeggiDocumento(docid)
 
-def lista_procedimenti(testinfo=False, **kw):
+def lista_procedimenti(testinfo=False, ccp={}, **kw):
     """
     Estrazione dei procedimenti / Extraction of the proceedings of a subject.
+
+    ccp (dict): Custom connection parameters
 
     Argomenti possibili:
     CodiceFiscale   (str): codice fiscale dell'utente;
@@ -48,31 +50,31 @@ def lista_procedimenti(testinfo=False, **kw):
                             "Terminati": estrare i procedimenti terminati,
                             "Tutti": estrae sia i procedimenti attivi sia quelli terminati.
     """
-    conn = IrideProcedimento(testinfo=testinfo)
+    conn = IrideProcedimento(testinfo=testinfo, **ccp)
     return conn.ListaProcedimenti(**kw)
 
-def leggi_procedimento(IDProcedimento, testinfo=False, **kw):
+def leggi_procedimento(IDProcedimento, testinfo=False, ccp={}, **kw):
     """
     Extracts detail data of proceedings
 
     Args:
         IDProcedimento (int): proceeding Iride idetifier
     """
-    conn = IrideProcedimento(testinfo=testinfo)
+    conn = IrideProcedimento(testinfo=testinfo, **ccp)
     return conn.DettaglioProcedimento(IDProcedimento, **kw)
 
-def test_ListaProcedimenti(testinfo=True, **kw):
+def test_ListaProcedimenti(testinfo=True, ccp={}, **kw):
     """ Test: ricavo e visualizzo il formato del template xml ListaProcedimenti """
-    conn = IrideProcedimento(testinfo=testinfo)
+    conn = IrideProcedimento(testinfo=testinfo, **ccp)
     return conn.build_xml('ListaProcedimenti', **kw)
 
-def inserisci_protocollo(doc, testinfo=False, **kw):
+def inserisci_protocollo(doc, testinfo=False, ccp={}, **kw):
     """
     doc (PlominoDocument): the document to be registered;
     testinfo (bool): whether debug info has to be added to the result.
     """
 
-    conn = IrideProtocollo(testinfo=testinfo)
+    conn = IrideProtocollo(testinfo=testinfo, **ccp)
 
     layer = doc.getParentDatabase().resources.irideLayer
     dati_protocollo = layer('ProtocolloIn', doc)
@@ -97,8 +99,8 @@ def inserisci_protocollo(doc, testinfo=False, **kw):
     
     return (res_protocollo, res_utente, )
 
-def inserisci_documento(doc, testinfo=False):
-    conn = IrideProtocollo(testinfo=testinfo)
+def inserisci_documento(doc, testinfo=False, **ccp):
+    conn = IrideProtocollo(testinfo=testinfo, **ccp)
 
     layer = doc.getParentDatabase().resources.irideLayer
     dati = layer('ProtocolloIn', doc)
@@ -107,10 +109,10 @@ def inserisci_documento(doc, testinfo=False):
 
     return conn.InserisciDocumentoEAnagrafiche(mittenti=[dati_mittente], allegati=[dati_allegato], **dati)
 
-def inserisci_procedimento(doc, testinfo=False):
+def inserisci_procedimento(doc, testinfo=False, **ccp):
     """ """
 
-    conn = IrideProcedimento(testinfo=testinfo)
+    conn = IrideProcedimento(testinfo=testinfo, **ccp)
 
     layer = doc.getParentDatabase().resources.irideLayer
     dati_procedimento = layer('ProtocolloIn', doc)
@@ -119,13 +121,13 @@ def inserisci_procedimento(doc, testinfo=False):
 
     return conn.AttivaProcedimento(mittenti=[dati_mittente], allegati=[dati_allegato], **dati_procedimento)
     
-def procedimento_pratica(cf, docid, testinfo=False):
+def procedimento_pratica(cf, docid, testinfo=False, **ccp):
     """
     Shortcut per ricavare le informazioni del procedimento direttamente a partire
     da una pratica.
     """
 
-    conn = IrideProcedimento(testinfo=True)
+    conn = IrideProcedimento(testinfo=True, **ccp)
     
     # 1. si ricava la lista dei procedimenti in capo al mittente attraverso il CF
     res_procedimenti = conn.ListaProcedimenti(CodiceFiscale=cf)
@@ -146,16 +148,3 @@ def procedimento_pratica(cf, docid, testinfo=False):
             return res_procedimenti
     else:
         return res_procedimenti
-    
-
-
-
-
-
-
-
-
-
-
-
-    

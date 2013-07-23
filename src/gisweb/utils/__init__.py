@@ -175,9 +175,12 @@ def getRepoRemotes(path):
 from spezia_utils import protocolla_doc, protocolla
 
 
-################################################################### IRIDE UTILS #
+################################################################## IRIDE UTILS #
 
 from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti, leggi_documento
 
-################################################################### gpolyencode utils #
-from gpolyencode_utils import gpoly_encode
+
+############################################################ GPOLYENCODE UTILS #
+
+from gpolyencode_utils import gpoly_encode, decode_line
+

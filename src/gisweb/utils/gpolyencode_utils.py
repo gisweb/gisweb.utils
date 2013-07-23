@@ -1,11 +1,12 @@
-import gpolyencode
 
 def gpoly_encode(points):
     try:
+        import gpolyencode
         encoder = gpolyencode.GPolyEncoder()
-        return encoder.encode(points)
     except Exception as err:
         return dict(error='%s: %s' % (type(err), err, ))
+    else:
+        return encoder.encode(points)
 
 def decode_line(encoded):
     """

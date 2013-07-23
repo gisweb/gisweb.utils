@@ -236,22 +236,13 @@ def deep_normalize(d):
 
 class Iride():
 
-    HOST = 'http://127.0.0.1:3340'
+    HOST = 'http://10.94.128.230' # 'http://127.0.0.1:3340' #
     SPATH = 'ulissetest/iride/web_services_20'
     Utente = UTENTE
     Ruolo = RUOLO
 
-    def __init__(self, SERVICE_NAME, testinfo=False, pcontext=None, **kw):
+    def __init__(self, SERVICE_NAME, testinfo=False, **kw):
         self.testinfo = testinfo
-        
-        from Products.CMFCore.utils import getToolByName
-        pp = getToolByName(context,'portal_properties')
-        # così posso prendere alcuni attributi di default dalle
-        # portal_properties del portale
-        # (es. HOST è una impostazione propria del portale)
-        if 'Iride' in pp.keys():
-            for k,v in pp['Iride'].propertyItems():
-                setattr(self, k, v)
 
         for k,v in kw.items():
             setattr(self, k, v)
