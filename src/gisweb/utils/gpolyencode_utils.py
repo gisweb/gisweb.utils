@@ -1,5 +1,11 @@
 
 def gpoly_encode(points):
+    """
+    Expose the encode method from gpolyencode library
+
+    points (list): list of latlon 2-tuples.
+    
+    """
     try:
         import gpolyencode
         encoder = gpolyencode.GPolyEncoder()
@@ -19,6 +25,9 @@ def decode_line(encoded):
     (http://facstaff.unca.edu/mcmcclur/GoogleMaps/EncodePolyline/decode.js)
     and Peter Chng's PHP polyline decode
     (http://unitstep.net/blog/2008/08/02/decoding-google-maps-encoded-polylines-using-php/)
+
+    encoded (str): encoded latlon sequence.
+    
     """
 
     encoded_len = len(encoded)
@@ -63,6 +72,12 @@ def decode_line(encoded):
     return array
 
 if __name__ == "__main__":
-    latlngs = decode_line("grkyHhpc@B[[_IYiLiEgj@a@q@yEoAGi@bEyH_@aHj@m@^qAB{@IkHi@cHcAkPSiMJqEj@s@CkFp@sDfB}Ex@iBj@S_AyIkCcUWgAaA_JUyAFk@{D_]~KiLwAeCsHqJmBlAmFuXe@{DcByIZIYiBxBwAc@eCcAl@y@aEdCcBVJpHsEyAeE")
-    for latlng in latlngs:
-        print str(latlng[0]) + "," + str(latlng[1])
+    """ Test """
+    encoded_points = "grkyHhpc@B[[_IYiLiEgj@a@q@yEoAGi@bEyH_@aHj@m@^qAB{@IkHi@cHcAkPSiMJqEj@s@CkFp@sDfB}Ex@iBj@S_AyIkCcUWgAaA_JUyAFk@{D_]~KiLwAeCsHqJmBlAmFuXe@{DcByIZIYiBxBwAc@eCcAl@y@aEdCcBVJpHsEyAeE"
+    latlngs = decode_line(encoded_points)
+    latlngs2 = decode_line(gpoly_encode(latlngs).get('points'))
+    for latlng in zip(latlngs, latlngs):
+        assert latlng[0][0]==latlng[1][0] and latlng[0][1]==latlng[1][1]
+    print "Test passed!"
+
+    #print gpoly_encode(latlngs)

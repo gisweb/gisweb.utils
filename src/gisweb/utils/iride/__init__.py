@@ -36,7 +36,7 @@ def lista_procedimenti(testinfo=False, ccp={}, **kw):
     """
     Estrazione dei procedimenti / Extraction of the proceedings of a subject.
 
-    ccp (dict): Custom connection parameters
+    ccp            (dict): Custom connection parameters
 
     Argomenti possibili:
     CodiceFiscale   (str): codice fiscale dell'utente;
@@ -57,6 +57,8 @@ def leggi_procedimento(IDProcedimento, testinfo=False, ccp={}, **kw):
     """
     Extracts detail data of proceedings
 
+    ccp               (dict): Custom connection parameters
+    
     Args:
         IDProcedimento (int): proceeding Iride idetifier
     """
