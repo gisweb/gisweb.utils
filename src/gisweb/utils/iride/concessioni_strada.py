@@ -232,8 +232,6 @@ def deep_normalize(d):
                 # per problemi di permessi sugli oggetti datetime trasformo
                 # in DateTime di Zope
                 d[k] = DateTime(v.isoformat())
-            elif hasattr(v, 'encode'):
-                d[k] = v.encode('utf-8', 'replace')
     return d
 
 class Iride():
