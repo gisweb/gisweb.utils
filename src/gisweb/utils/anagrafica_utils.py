@@ -13,6 +13,10 @@ def cf_build(surname, name, year, month, day, sex, municipality):
         -> RCCMNL83S18D969H
     """
     birthday = datetime.datetime(year, month, day)
+    if sex.upper() in ['MASCHILE','MASCHIO','UOMO','M']:
+        sex='M'
+    else:
+        sex='F'
 
     return cf.build(surname, name, birthday, sex, municipality)
 
