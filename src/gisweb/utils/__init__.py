@@ -191,7 +191,7 @@ from spezia_utils import protocolla_doc, protocolla
 
 ################################################################## IRIDE UTILS #
 
-from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti, leggi_documento, test_build
+from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti, leggi_documento
 
 
 ############################################################ GPOLYENCODE UTILS #
