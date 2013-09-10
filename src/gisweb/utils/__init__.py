@@ -36,6 +36,20 @@ from plomino_utils import getAllSubforms
 from plomino_utils import serialItem, serialDoc
 from plomino_utils import idx_createFieldIndex, getIndexType
 
+from xml.dom.minidom import getDOMImplementation, parseString
+import HTMLParser
+
+def exportElementAsXML(db, obj, isDatabase=False):
+    impl = getDOMImplementation()
+    xmldoc = impl.createDocument(None, "plominofield", None)
+    out = db.exportElementAsXML(xmldoc, obj, isDatabase=isDatabase)
+    return HTMLParser.HTMLParser().unescape(out.toxml())
+
+def importElementFromXML(xmldocument, container):
+    doc = parseString(xmldocument)
+    db = container.getParentDatabase()
+    db.importElementFromXML(container, doc.documentElement)
+
 ################################################################### JSON UTILS #
 
 from json_utils import json_dumps, json_loads
@@ -131,7 +145,7 @@ def strftime(date, format, custom_locale):
 
 ############################################################### WORKFLOW UTILS #
 
-from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny, getInfoFor, updateRoleMappingsFor, updateAllRoleMappingsFor
+from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny, getInfoFor, updateAllRoleMappingsFor
 
 
 ##################################################################### FS UTILS #
@@ -177,10 +191,15 @@ from spezia_utils import protocolla_doc, protocolla
 
 ################################################################## IRIDE UTILS #
 
-from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti, leggi_documento
+from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti, leggi_documento, test_build
 
 
 ############################################################ GPOLYENCODE UTILS #
 
 from gpolyencode_utils import gpoly_encode, decode_line
 
+#### TEST
+
+def pippo(x):
+    from collective.jsonify import get_item
+    return get_item(x)
