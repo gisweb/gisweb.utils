@@ -3,6 +3,8 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 
 import requests
 
+from json_utils import json_loads
+
 def requests_post(url, data=None, *args, **kwargs):
     
     args = list(set(['ok', 'text', 'status_code']+list(args)))
@@ -18,6 +20,20 @@ def requests_post(url, data=None, *args, **kwargs):
     
     return out
 
+def requests_get(url, params=None, methods_or_args=[]):
+
+    resp = requests.get(url, params=params)
+
+    args = list(set(['ok', 'text', 'status_code'] + list(methods_or_args)))
+    
+    out = dict()
+    for k in args:
+        if callable(getattr(resp, k)):
+            out[k] = getattr(resp, k)()
+        else:
+            out[k] = getattr(resp, k)
+
+    return out
 
 #def requests_post(url, data=None, **kwargs):
     #result = requests.post(url, data, **kwargs)
@@ -37,6 +53,9 @@ def requests_post(url, data=None, *args, **kwargs):
 
 def urllib_urlencode(query, doseq=0):
     return urllib.urlencode(query, doseq)
+
+def urllib_quote_plus(string):
+    return urllib.quote_plus(string)
 
 def proxy(request, url):
     
@@ -116,3 +135,14 @@ def proxy_script():
     url = '' # URL to mapserver
     
     return proxy(context.REQUEST, url)
+
+
+def geocode(**kw):
+    if not 'sensor' in kw:
+        kw['sensor'] = 'false'
+    raw = requests_get(
+        'http://maps.googleapis.com/maps/api/geocode/json',
+        params=kw)
+    res = json_loads(raw['text'])
+    return res
+

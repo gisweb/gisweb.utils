@@ -8,4 +8,3 @@ def os_listdir(path):
 
 def os_path_join(a, *b):
     return path_join(a, *b)
-    

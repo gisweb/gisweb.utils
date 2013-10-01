@@ -35,6 +35,7 @@ from plomino_utils import get_dataFor, get_gridDataFor, renderRaw
 from plomino_utils import getAllSubforms
 from plomino_utils import serialItem, serialDoc
 from plomino_utils import idx_createFieldIndex, getIndexType
+from plomino_utils import batch_saveDocument
 
 from xml.dom.minidom import getDOMImplementation, parseString
 import HTMLParser
@@ -73,7 +74,7 @@ from UnicodeDammit import getUnicodeFrom
 
 ################################################################## PRINT UTILS #
 
-from print_utils import plominoPrint
+from print_utils import plominoPrint, printToPdf
 
 
 #################################################################### PDF UTILS #
@@ -101,7 +102,7 @@ from anagrafica_utils import is_valid_cf, is_valid_piva, cf_build
 
 #################################################################### URL UTILS #
 
-from url_utils import proxy, urllib_urlencode, requests_post
+from url_utils import proxy, urllib_urlencode, requests_post, urllib_quote_plus, geocode
 
 from urllib import urlencode
 from urllib2 import urlopen
@@ -199,6 +200,8 @@ from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti
 from gpolyencode_utils import gpoly_encode, decode_line
 
 #### TEST
+
+from test_utils import rndgenerate, namegenerate, da_du_ma, dategenerate, numbergenerate, boolgenerate, rndselection, rndCodFisco, latlongenerate
 
 def pippo(x):
     from collective.jsonify import get_item

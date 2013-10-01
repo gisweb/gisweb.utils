@@ -1205,7 +1205,7 @@ class batch(object):
             form.readInputs(doc, REQUEST, process_attachments=True)
 
             # refresh computed values, run onSave, reindex
-            self.save(form, creation)
+            self.save(doc, form=form, creation=creation)
 
     def refresh(self, form=None, **kwargs):
         """ re-compute fields and re-index document
@@ -1389,9 +1389,3 @@ def getIndexType(plominoContext, key):
         return '%s' % indexes[key]
     except KeyError:
         return None
-    
-
-
-
-
-    

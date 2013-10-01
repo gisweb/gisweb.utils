@@ -12,6 +12,7 @@ def cf_build(surname, name, year, month, day, sex, municipality):
     eg: cf_build('Rocca', 'Emanuele', 1983, 11, 18, 'M', 'D969') 
         -> RCCMNL83S18D969H
     """
+
     birthday = datetime.datetime(year, month, day)
     if sex.upper() in ['MASCHILE','MASCHIO','UOMO','M']:
         sex='M'
@@ -20,10 +21,12 @@ def cf_build(surname, name, year, month, day, sex, municipality):
 
     return cf.build(surname, name, birthday, sex, municipality)
 
-def is_valid_cf(string):
-    ''' Verify the validity of an (italian) fiscal code 
+def is_valid_cf(string, validate=True):
+    """
+    Verify the validity of an (italian) fiscal code
     courtesy of: http://www.icosaedro.it/cf-pi/index.html
-    '''
+    more info: http://www.agenziaentrate.gov.it/wps/content/Nsilib/Nsi/Home/CosaDeviFare/Richiedere/Codice+fiscale+e+tessera+sanitaria/Richiesta+TS_CF/SchedaI/Informazioni+codificazione+pf/
+    """
 
     string = str(string)
 
@@ -60,14 +63,17 @@ def is_valid_cf(string):
     r = s%26
     
     r1 = alpha[r]
+
+    if validate:
+        return string[-1].upper()==r1
+    else:
+        return r1
     
-    return string[-1].upper()==r1
-    
-def is_valid_piva(piva):
-    ''' Vefify the validity of "partita IVA"  
+def is_valid_piva(piva, validate=True):
+    """
+    Vefify the validity of "partita IVA"
     courtesy of: http://www.icosaedro.it/cf-pi/index.html
-    '''
-    
+    """
     piva = str(piva)
     if len(piva) <> 11: return False
     
@@ -82,6 +88,9 @@ def is_valid_piva(piva):
     r = s%10
     
     c = str(10-r)[-1]
-    
-    return piva[-1]==c
+
+    if validate:
+        return piva[-1]==c
+    else:
+        return c
     

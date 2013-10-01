@@ -3,6 +3,7 @@
 import os
 import xhtml2pdf.pisa as xhtml2pdf
 from xhtml2pdf.default import DEFAULT_CSS as pisa_css
+from cStringIO import StringIO
 
 from UnicodeDammit import UnicodeDammit
 
@@ -57,16 +58,24 @@ def plominoPrint(plominoDocument, form_name=None, default_css=None, use_command=
     
     return xml
 
-def printToPdf(html='',default_css=None):
+def printToPdf(html='', default_css=None, content=True):
 #    if default_css:
 #        default_css = pisa_css + default_css
     u_html = UnicodeDammit(html)
     encoding = u_html.originalEncoding
+    
     pdf = xhtml2pdf.CreatePDF(
         html,
-#        default_css=pisa_css,
-#        encoding = encoding
+        #pdf_file = pdf_file,
+        default_css=pisa_css,
+        encoding = encoding
     )
-    xml = pdf.dest.getvalue()
-    return xml
+    
+    if content:
+        return pdf.dest.getvalue()
+    else:
+        pdf_file = file('/tmp/pippo.pdf', 'r+b')
+        pdf_file.write(pdf.dest.getvalue())
+        
+        return pdf_file
 
