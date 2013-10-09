@@ -37,8 +37,41 @@ def requests_get(url, params=None, methods_or_args=[]):
 
 def wsquery(url, method='GET', timeout=60, headers={}, **kw):
     """
-    method: method type (i.e. GET/POST ( and maybe PUT/DELETE/HEAD/OPTIONS.
-        But I've not tested))
+    url: url to contact;
+    method: method type (i.e. GET (default) or POST ( and maybe PUT/DELETE/HEAD/OPTIONS.
+        But I've not tested));
+
+    kw: parameters;
+
+    Code example:
+        >> import json
+        >> url = "https://maps.googleapis.com/maps/api/timezone/json"
+        >> res = wsquery(url, location="39.603,-119.682", timestamp="1331161200", sensor='false')
+        >> print json.dumps(res, indent=4)
+        {
+            "ok": true,
+            "links": {},
+            "encoding": "UTF-8",
+            "url": "https://maps.googleapis.com/maps/api/timezone/json?timestamp=1331161200&sensor=false&location=39.603%2C-119.682",
+            "status_code": 200,
+            "elapsed": "0:00:00.208581",
+            "content": "{\n   \"dstOffset\" : 0,\n   \"rawOffset\" : -28800,\n   \"status\" : \"OK\",\n   \"timeZoneId\" : \"America/Los_Angeles\",\n   \"timeZoneName\" : \"Pacific Standard Time\"\n}\n",
+            "headers": {
+                "alternate-protocol": "443:quic",
+                "x-xss-protection": "1; mode=block",
+                "transfer-encoding": "chunked",
+                "expires": "Fri, 01 Jan 1990 00:00:00 GMT",
+                "server": "mafe",
+                "pragma": "no-cache",
+                "cache-control": "no-cache, must-revalidate",
+                "date": "Wed, 09 Oct 2013 13:13:57 GMT",
+                "access-control-allow-origin": "*",
+                "content-type": "application/json; charset=UTF-8",
+                "x-frame-options": "SAMEORIGIN"
+            },
+            "reason": "OK",
+            "text": "{\n   \"dstOffset\" : 0,\n   \"rawOffset\" : -28800,\n   \"status\" : \"OK\",\n   \"timeZoneId\" : \"America/Los_Angeles\",\n   \"timeZoneName\" : \"Pacific Standard Time\"\n}\n"
+        }
     """
 
     params, files = dict(), dict()
@@ -76,6 +109,11 @@ def wsquery(url, method='GET', timeout=60, headers={}, **kw):
             'encoding',
             'url',
         )], headers = dict(response.headers))
+
+if __name__ == '__main__':
+    url = "https://maps.googleapis.com/maps/api/timezone/json"
+    from json_utils import json_dumps
+    print json_dumps(wsquery(url, location="39.603,-119.682", timestamp="1331161200", sensor='false'), indent=4)
 
 def urllib_urlencode(query, doseq=0):
     return urllib.urlencode(query, doseq)
