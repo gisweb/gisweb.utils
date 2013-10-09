@@ -35,21 +35,47 @@ def requests_get(url, params=None, methods_or_args=[]):
 
     return out
 
-#def requests_post(url, data=None, **kwargs):
-    #result = requests.post(url, data, **kwargs)
-    #return dict(
-        #text = result.text,
-        #error = result.error,
-        #headers = result.headers,
-        #status_code = result.status_code,
-        #reason = result.reason
-    #)
+def wsquery(url, method='GET', timeout=60, headers={}, **kw):
+    """
+    method: method type (i.e. GET/POST ( and maybe PUT/DELETE/HEAD/OPTIONS.
+        But I've not tested))
+    """
 
-#def get_request(target, data):
-#    return urllib2.Request(target, data)
+    params, files = dict(), dict()
+    for k,v in kw.items():
+        if isinstance(v, file):
+            files[k] = v
+        else:
+            params[k] = v
+    if files and method=='GET':
+        method = 'POST'
 
-#def get_response(request):
-#    return urllib2.urlopen(request)
+    def getvalue(o, n):
+        a = getattr(o, n)
+        if callable(a):
+            return a()
+        else:
+            return a
+
+    try:
+        response = requests.request(method, url, params=params, files=files, headers=headers, timeout=timeout)
+    except requests.exceptions.Timeout as error:
+        return dict(
+            ok = False,
+            reason = '%s' % error
+        )
+    else:
+        return dict([(k, getvalue(response, k)) for k in (
+            'elapsed',
+            'ok',
+            'status_code',
+            'reason',
+            'content',
+            'text',
+            'links',
+            'encoding',
+            'url',
+        )], headers = dict(response.headers))
 
 def urllib_urlencode(query, doseq=0):
     return urllib.urlencode(query, doseq)
