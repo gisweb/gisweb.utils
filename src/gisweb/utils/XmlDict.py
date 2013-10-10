@@ -29,6 +29,9 @@ except ImportError:
 except:
     logger.error("Undefined error")
 
+from gisweb.utils import json_dumps,json_loads
+
+
 class XmlListConfig(list):
     def __init__(self, aList):
         for element in aList:
@@ -97,6 +100,6 @@ class XmlDictConfig(dict):
 
 def parseXML(text):
     try:
-        return dict(xmltodict.parse(text))
+        return json_loads(json_dumps((xmltodict.parse(text))))
     except:
         return None
