@@ -97,6 +97,6 @@ class XmlDictConfig(dict):
 
 def parseXML(text):
     try:
-        return xmltodict.parse(text)
+        return dict(xmltodict.parse(text))
     except:
         return None
