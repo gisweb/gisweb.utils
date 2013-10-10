@@ -84,11 +84,15 @@ def wsquery(url, method='GET', timeout=60, headers={}, **kw):
         method = 'POST'
 
     def getvalue(o, n):
-        a = getattr(o, n)
-        if callable(a):
-            return a()
+        try:
+            a = getattr(o, n)
+        except AttributeError as err:
+            return ''
         else:
-            return a
+            if callable(a):
+                return a()
+            else:
+                return a
 
     try:
         response = requests.request(method, url, params=params, files=files, headers=headers, timeout=timeout)
@@ -111,9 +115,9 @@ def wsquery(url, method='GET', timeout=60, headers={}, **kw):
         )], headers = dict(response.headers))
 
 if __name__ == '__main__':
-    url = "https://maps.googleapis.com/maps/api/timezone/json"
-    from json_utils import json_dumps
-    print json_dumps(wsquery(url, location="39.603,-119.682", timestamp="1331161200", sensor='false'), indent=4)
+    url = "http://sit.spezianet.it/elabora/verifica_nucleo.php"
+    result = wsquery(url=url,codfisc='zzrfba64c09e463c')
+    print result
 
 def urllib_urlencode(query, doseq=0):
     return urllib.urlencode(query, doseq)
