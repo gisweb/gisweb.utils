@@ -102,7 +102,7 @@ from anagrafica_utils import is_valid_cf, is_valid_piva, cf_build
 
 #################################################################### URL UTILS #
 
-from url_utils import proxy, urllib_urlencode, requests_post, urllib_quote_plus, geocode
+from url_utils import proxy, urllib_urlencode, requests_post, urllib_quote_plus, geocode, wsquery
 
 from urllib import urlencode
 from urllib2 import urlopen
@@ -198,11 +198,3 @@ from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti
 ############################################################ GPOLYENCODE UTILS #
 
 from gpolyencode_utils import gpoly_encode, decode_line
-
-#### TEST
-
-from test_utils import rndgenerate, namegenerate, da_du_ma, dategenerate, numbergenerate, boolgenerate, rndselection, rndCodFisco, latlongenerate
-
-def pippo(x):
-    from collective.jsonify import get_item
-    return get_item(x)
