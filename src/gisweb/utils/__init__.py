@@ -198,11 +198,3 @@ from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti
 ############################################################ GPOLYENCODE UTILS #
 
 from gpolyencode_utils import gpoly_encode, decode_line
-
-#### TEST
-
-from test_utils import rndgenerate, namegenerate, da_du_ma, dategenerate, numbergenerate, boolgenerate, rndselection, rndCodFisco, latlongenerate
-
-def pippo(x):
-    from collective.jsonify import get_item
-    return get_item(x)
