@@ -22,6 +22,12 @@ except ImportError:
         except ImportError:
             logger.error("No ElementTree found")
 
+try:
+    import xmltodict
+except ImportError:
+    logger.error("No module xmltodict found")
+except:
+    logger.error("Undefined error")
 
 class XmlListConfig(list):
     def __init__(self, aList):
@@ -84,3 +90,13 @@ class XmlDictConfig(dict):
             # the text
             else:
                 self.update({element.tag: element.text})
+
+#################################################################################################################################################################################################
+#################################################################################################################################################################################################
+#################################################################################################################################################################################################
+
+def parseXML(text):
+    try:
+        return xmltodict.parse(text)
+    except:
+        return None
