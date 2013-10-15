@@ -14,29 +14,6 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-#try:
-#  from lxml import ElementTree
-#except ImportError:
-#  try:
-#    # Python 2.5
-#    import xml.etree.cElementTree as ElementTree
-#  except ImportError:
-#    try:
-#      # Python 2.5
-#      import xml.etree.ElementTree as ElementTree
-#    except ImportError:
-#      try:
-#        # normal cElementTree install
-#        import cElementTree as ElementTree
-#      except ImportError:
-#        try:
-#          # normal ElementTree install
-#          import elementtree.ElementTree as ElementTree
-#        except ImportError:
-#            logger.error("No ElementTree found")
-
-from XmlDict import ElementTree
-
 # *********
 # README
 # *********
@@ -238,7 +215,7 @@ def xml2obj(xml):
     di permessi di Plone.
     '''
 
-    root = ElementTree.XML(xml)
+    root = etree.XML(xml)
     out = dict()
     out.update(XmlDictConfig(root))
 

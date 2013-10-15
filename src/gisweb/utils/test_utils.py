@@ -93,8 +93,14 @@ def dategenerate(s=-100, e=100, format=None, type="DATE"):
         return date
 
 def numbergenerate(type='INTEGER', digits=5, negative=True, **kw):
-    l = kw.get('lower') or 10**(digits-1)
-    u = kw.get('upper') or 10**digits - 1
+    if 'lower' in kw:
+        l = kw.get('lower')
+    else:
+        l = 10**(digits-1)
+    if 'upper' in kw:
+        u = kw.get('upper')
+    else:
+        u = 10**digits - 1
     i = random.randint(l, u)
     if negative and l>0:
         i *= random.choice((1, -1, ))
@@ -130,9 +136,11 @@ def rndCodFisco(as_dict=False):
         return random.choice(CodFisco)
 
 def latlongenerate(tl=(45, 9), br=(44, 8)):
-    minlat = br[0]
-    maxlat = tl[0]
-    maxlon = tl[1]
-    minlon = br[1]
+    lats = (br[0], tl[0], )
+    lons = (br[1], tl[1] ,)
+    minlat = min(lats)
+    maxlat = max(lats)
+    maxlon = max(lons)
+    minlon = min(lons)
     return random.uniform(minlon,maxlon), random.uniform(minlat,maxlat)
     

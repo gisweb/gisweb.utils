@@ -93,7 +93,6 @@ def wsquery(url, method='GET', timeout=60, headers={}, **kw):
                 return a()
             else:
                 return a
-
     try:
         response = requests.request(method, url, params=params, files=files, headers=headers, timeout=timeout)
     except requests.exceptions.Timeout as error:
@@ -113,11 +112,6 @@ def wsquery(url, method='GET', timeout=60, headers={}, **kw):
             'encoding',
             'url',
         )], headers = dict(response.headers))
-
-if __name__ == '__main__':
-    url = "http://sit.spezianet.it/elabora/verifica_nucleo.php"
-    result = wsquery(url=url,codfisc='zzrfba64c09e463c')
-    print result
 
 def urllib_urlencode(query, doseq=0):
     return urllib.urlencode(query, doseq)
@@ -203,7 +197,6 @@ def proxy_script():
     url = '' # URL to mapserver
     
     return proxy(context.REQUEST, url)
-
 
 def geocode(**kw):
     if not 'sensor' in kw:

@@ -1,27 +1,4 @@
 # coutesy of: http://code.activestate.com/recipes/410469-xml-as-dictionary/download/1/
-#import cElementTree as ElementTree
-
-try:
-  from lxml import ElementTree
-except ImportError:
-  try:
-    # Python 2.5
-    import xml.etree.cElementTree as ElementTree
-  except ImportError:
-    try:
-      # Python 2.5
-      import xml.etree.ElementTree as ElementTree
-    except ImportError:
-      try:
-        # normal cElementTree install
-        import cElementTree as ElementTree
-      except ImportError:
-        try:
-          # normal ElementTree install
-          import elementtree.ElementTree as ElementTree
-        except ImportError:
-            logger.error("No ElementTree found")
-
 
 class XmlListConfig(list):
     def __init__(self, aList):
@@ -58,7 +35,7 @@ class XmlDictConfig(dict):
         if parent_element.items():
             self.update(dict(parent_element.items()))
         for element in parent_element:
-            if element:
+            if len(element) > 0:
                 # treat like dict - we assume that if the first two tags
                 # in a series are different, then they are all different.
                 if len(element) == 1 or element[0].tag != element[1].tag:

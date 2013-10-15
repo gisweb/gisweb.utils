@@ -129,6 +129,7 @@ def re_findall(what, where):
     return re.findall(r'%s' % what, where)
 
 from StringValidator import isEmail, isEmpty
+from XmlDict import XmlDictConfig
 
 ################################################################### DATE UTILS #
 
@@ -198,3 +199,20 @@ from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti
 ############################################################ GPOLYENCODE UTILS #
 
 from gpolyencode_utils import gpoly_encode, decode_line
+
+#### TEST
+
+from test_utils import rndgenerate, namegenerate, da_du_ma, dategenerate, numbergenerate
+from test_utils import boolgenerate, rndselection, rndCodFisco, latlongenerate
+
+from pprint import pprint
+
+def getErrorMessage(exception):
+    return dict(
+        type = type(exception),
+        message = exception.message
+    )
+
+def pippo(x):
+    from collective.jsonify import get_item
+    return get_item(x)

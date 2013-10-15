@@ -74,7 +74,7 @@ def printToPdf(html='', default_css=None, content=True):
     if content:
         return pdf.dest.getvalue()
     else:
-        pdf_file = file('/tmp/pippo.pdf', 'r+b')
+        pdf_file = file('/tmp/pippo.pdf', 'a+')
         pdf_file.write(pdf.dest.getvalue())
         
         return pdf_file
