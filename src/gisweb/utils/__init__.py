@@ -154,7 +154,9 @@ from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doAct
 
 from fs_utils import os_listdir, os_path_join
 
+################################################################### XML UTILS #
 
+from XmlDict import parseXML
 ################################################################### PLONE UTILS #
 
 from plone_utils import sendMail

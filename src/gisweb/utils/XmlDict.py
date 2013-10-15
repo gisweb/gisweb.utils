@@ -1,5 +1,7 @@
 # coutesy of: http://code.activestate.com/recipes/410469-xml-as-dictionary/download/1/
 
+from gisweb.utils import json_dumps,json_loads
+
 class XmlListConfig(list):
     def __init__(self, aList):
         for element in aList:
@@ -61,3 +63,10 @@ class XmlDictConfig(dict):
             # the text
             else:
                 self.update({element.tag: element.text})
+
+def parseXML(text):
+    try:
+        import xmltodict
+        return json_loads(json_dumps((xmltodict.parse(text))))
+    except:
+        return None
