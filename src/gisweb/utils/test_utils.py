@@ -3,7 +3,12 @@
 from misc import *
 import cPickle
 import random, re
-from DateTime import DateTime
+
+try:
+    from DateTime import DateTime
+except:
+    pass
+
 from decimal import Decimal
 
 class Learner:

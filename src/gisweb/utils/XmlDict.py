@@ -1,6 +1,6 @@
 # coutesy of: http://code.activestate.com/recipes/410469-xml-as-dictionary/download/1/
 
-from gisweb.utils import json_dumps,json_loads
+from json_utils import json_dumps,json_loads
 
 class XmlListConfig(list):
     def __init__(self, aList):
@@ -16,7 +16,6 @@ class XmlListConfig(list):
                 text = element.text.strip()
                 if text:
                     self.append(text)
-
 
 class XmlDictConfig(dict):
     '''

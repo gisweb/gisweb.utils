@@ -4,12 +4,23 @@ import json
 from decimal import Decimal
 import locale
 
+from print_utils import StringIO
+import lxml.etree as etree
+def xml_pprint(xml):
+    f = StringIO(xml)
+    try:
+        doc = etree.parse(f)
+    except:
+        return xml
+    else:
+        return etree.tostring(doc, pretty_print = True)
+
 try:
     locale.setlocale(locale.LC_TIME, 'it_IT.utf8')
 except:
     locale.setlocale(locale.LC_TIME, '')
 
-def handler(obj, format='ISO'):
+def handler(obj, format='ISO', prettyxml=False):
     # datetime and DateTime handling
     if hasattr(obj, 'strftime'):
         if format.upper() == 'ISO':
@@ -26,16 +37,19 @@ def handler(obj, format='ISO'):
     # Decimal handling
     elif isinstance(obj, Decimal):
         return float(obj)
+    # XML handling if you need pretty printing (mainly for visual debug)
+    elif prettyxml and isinstance(obj, basestring):
+        return xml_pprint(obj)
     # other...
     else:
         # I assume that return a string is better than raise an error
         return str(obj)
 
 
-def json_dumps(obj, customformat='%d/%m/%Y %H:%M:%S', **kwargs):
+def json_dumps(obj, customformat='%d/%m/%Y %H:%M:%S', prettyxml=False, **kwargs):
 
     kw = dict(
-        default=lambda o: handler(o, format=customformat),
+        default=lambda o: handler(o, prettyxml=prettyxml, format=customformat),
         **kwargs
     )
     
