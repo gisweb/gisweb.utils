@@ -67,5 +67,5 @@ def parseXML(text):
     try:
         import xmltodict
         return json_loads(json_dumps((xmltodict.parse(text))))
-    except:
-        return None
+    except Exception as error:
+        return error
