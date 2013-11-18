@@ -69,3 +69,28 @@ def sendMail(context, Object, msg, To, From='', as_script=False):
 #            kwargs[nk] = kwargs.pop(ok)
 #        
 #    return ploneBatch(**kwargs)
+
+import urllib, os
+from DateTime import DateTime
+from pkg_resources import resource_filename
+
+def importFromPortal(remoteAddress, objId, instance='client1'):
+    """
+    remoteAddress: example format 'http://<username>:<password>@<address>:<port>/<portalname>' (no slash at the end)
+    objId: Object Id to export
+    instance: local instance folder name containing the import folder
+    """
+    # 1. export
+    exportUrl = '%(remoteAddress)s/manage_exportObject?id=%(objId)s&download=1' % locals()
+    res = urllib.urlopen(exportUrl)
+    content = res.read()
+    timestamp = DateTime().ISO()
+    #import ipdb; ipdb.set_trace()
+    if '\0' in content:
+        lp = resource_filename(__name__, '').split('src')[0]
+        localPath = 'var/%s/import/' % instance
+        localFilePath = os.path.join(lp, localPath, '%s_%s.zexp' % (objId, timestamp, ))
+        with open(localFilePath, 'wb') as localFile:
+            localFile.write(content)
+        return localFilePath
+    return str(content)

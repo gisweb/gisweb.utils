@@ -159,7 +159,7 @@ from fs_utils import os_listdir, os_path_join
 from XmlDict import parseXML
 ################################################################### PLONE UTILS #
 
-from plone_utils import sendMail
+from plone_utils import sendMail, importFromPortal
 
 import os, subprocess
 
@@ -218,3 +218,5 @@ def getErrorMessage(exception):
 def pippo(x):
     from collective.jsonify import get_item
     return get_item(x)
+
+oVars = lambda o: vars(o)
