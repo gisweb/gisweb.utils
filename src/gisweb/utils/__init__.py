@@ -152,14 +152,14 @@ from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doAct
 
 ##################################################################### FS UTILS #
 
-from fs_utils import os_listdir, os_path_join
+from fs_utils import os_listdir, os_path_join, os_path_isfile
 
 ################################################################### XML UTILS #
 
 from XmlDict import parseXML
 ################################################################### PLONE UTILS #
 
-from plone_utils import sendMail, importFromPortal
+from plone_utils import sendMail, importFromPortal, forceDelete
 
 import os, subprocess
 
@@ -206,8 +206,6 @@ from gpolyencode_utils import gpoly_encode, decode_line
 
 from test_utils import rndgenerate, namegenerate, da_du_ma, dategenerate, numbergenerate
 from test_utils import boolgenerate, rndselection, rndCodFisco, latlongenerate
-
-from pprint import pprint
 
 def getErrorMessage(exception):
     return dict(

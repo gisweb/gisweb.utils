@@ -85,7 +85,7 @@ def importFromPortal(remoteAddress, objId, instance='client1'):
     res = urllib.urlopen(exportUrl)
     content = res.read()
     timestamp = DateTime().ISO()
-    #import ipdb; ipdb.set_trace()
+    # if binary
     if '\0' in content:
         lp = resource_filename(__name__, '').split('src')[0]
         localPath = 'var/%s/import/' % instance
@@ -94,3 +94,30 @@ def importFromPortal(remoteAddress, objId, instance='client1'):
             localFile.write(content)
         return localFilePath
     return str(content)
+
+def forceDelete(folder_content, *objIds):
+    """
+    In case you cannot remove an object because of integrity check test
+    courtesy of: http://developer.plone.org/content/deleting.html#bypassing-link-integrity-check
+    """
+    from zope.component import queryUtility
+    from Products.CMFCore.interfaces import IPropertiesTool
+
+    # We need to disable link integrity check,
+    # because it cannot handle several delete calls in
+    # one request
+    ptool = queryUtility(IPropertiesTool)
+    props = getattr(ptool, 'site_properties', None)
+    old_check = props.getProperty('enable_link_integrity_checks', False)
+    props.enable_link_integrity_checks = False
+
+    try:
+        folder_content.manage_delObjects(list(objIds))
+    except Exception as err:
+        msg = '%s' % err
+    else:
+        msg = 'Objects succefully removed'
+
+    props.enable_link_integrity_checks = old_check
+    return msg
+
