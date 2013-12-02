@@ -74,9 +74,13 @@ def decode_line(encoded):
 if __name__ == "__main__":
     """ Test """
     encoded_points = "grkyHhpc@B[[_IYiLiEgj@a@q@yEoAGi@bEyH_@aHj@m@^qAB{@IkHi@cHcAkPSiMJqEj@s@CkFp@sDfB}Ex@iBj@S_AyIkCcUWgAaA_JUyAFk@{D_]~KiLwAeCsHqJmBlAmFuXe@{DcByIZIYiBxBwAc@eCcAl@y@aEdCcBVJpHsEyAeE"
-    latlngs = decode_line(encoded_points)
-    latlngs2 = decode_line(gpoly_encode(latlngs).get('points'))
-    for latlng in zip(latlngs, latlngs):
+    latlon = decode_line(encoded_points)
+    #import ipdb; ipdb.set_trace()
+    lonlat = decode_line(gpoly_encode(latlngs).get('points'))
+    #import ipdb; ipdb.set_trace()
+    for pair in zip(latlon, lonlat):
+        #print latlng
+        print pair[0][0]-pair[1][1], pair[0][1]-pair[1][0]
         assert latlng[0][0]==latlng[1][0] and latlng[0][1]==latlng[1][1]
     print "Test passed!"
 
