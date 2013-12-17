@@ -64,7 +64,7 @@ def aq_base(obj):
 
 #################################################################### ACL UTILS #
 
-from acl_utils import get_users_info, getAllUserRoles, getUserPermissions
+from acl_utils import get_users_info, getAllUserRoles, getUserPermissions, getRolesOfPermission
 
 
 ################################################################ UNICODEDAMMIT #
@@ -218,3 +218,11 @@ def pippo(x):
     return get_item(x)
 
 oVars = lambda o: vars(o)
+
+def set_trace(context, *args, **kwargs):
+    import ipdb; ipdb.set_trace()
+    return None
+
+from zope.security import checkPermission
+def checkpermission(context, perm):
+    return checkPermission(perm, context)

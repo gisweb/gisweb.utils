@@ -3,6 +3,9 @@
 from Products.CMFCore.utils import getToolByName
 from zope.app.component.hooks import getSite
 
+def getRolesOfPermission(obj, permission):
+    out = obj.rolesOfPermission(permission)
+    return out
 
 def get_users_info(id_list, properties=('fullname', )):
     '''
@@ -65,7 +68,7 @@ def getUserPermissions(doc, user_id=''):
     """
     It returns the list of permissions of a user on a portal content
     """
-    
+
     mt = getToolByName(doc, 'portal_membership')
     if user_id:
         member = mt.getMemberById(user_id)
