@@ -1389,3 +1389,35 @@ def getIndexType(plominoContext, key):
         return '%s' % indexes[key]
     except KeyError:
         return None
+
+def fetchViewDocuments(view, start=1, limit=None, only_allowed=True, getObject=True,
+    fulltext_query=None, sortindex=None, reverse=None, **query):
+    """
+    courtesy of: https://github.com/silviot/Plomino/blob/github-main/Products/CMFPlomino/PlominoView.py#L305
+    """
+    index = view.getParentDatabase().getIndex()
+    if not sortindex:
+        sortindex = view.getSortColumn()
+        if sortindex=='':
+            sortindex=None
+        else:
+            sortindex=view.getIndexKey(sortindex)
+    if not reverse:
+        reverse = view.getReverseSorting()
+    query['PlominoViewFormula_'+view.getViewName()] = True
+    if fulltext_query:
+        query['SearchableText'] = fulltext_query
+    results=index.dbsearch(
+        query,
+        sortindex=sortindex,
+        reverse=reverse,
+        only_allowed=only_allowed)
+    if limit:
+        results = batch(
+                results,
+                pagesize=limit,
+                pagenumber=int(start/limit)+1)
+    if getObject:
+        return [r.getObject() for r in results]
+    else:
+        return results

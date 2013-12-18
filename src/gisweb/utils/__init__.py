@@ -35,7 +35,7 @@ from plomino_utils import get_dataFor, get_gridDataFor, renderRaw
 from plomino_utils import getAllSubforms
 from plomino_utils import serialItem, serialDoc
 from plomino_utils import idx_createFieldIndex, getIndexType
-from plomino_utils import batch_saveDocument
+from plomino_utils import batch_saveDocument, fetchViewDocuments
 
 from xml.dom.minidom import getDOMImplementation, parseString
 import HTMLParser
