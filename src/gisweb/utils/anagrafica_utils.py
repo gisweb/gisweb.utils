@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import codicefiscale as cf
@@ -44,7 +43,7 @@ def is_valid_cf(string, validate=True):
         'Q': 6, 'R': 8, 'S': 12, 'T': 14, 'U': 16, 'V': 10, 'W': 22, 'X': 25,
         'Y': 24, 'Z': 23
     }
-    
+
     even_conv = {
         '0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
         '8': 8, '9': 9,
@@ -53,22 +52,21 @@ def is_valid_cf(string, validate=True):
         'R': 17, 'S': 18, 'T': 19, 'U': 20, 'V': 21, 'W': 22, 'X': 23, 'Y': 24,
         'Z': 25
     }
-    
+
     s = 0
     for char in string[:-1][1::2]:
         s += even_conv[char.upper()]
     for char in string[:-1][::2]:
         s += odd_conv[char.upper()]
-        
-    r = s%26
-    
-    r1 = alpha[r]
 
+    r = s%26
+
+    r1 = alpha[r]
     if validate:
         return string[-1].upper()==r1
     else:
         return r1
-    
+
 def is_valid_piva(piva, validate=True):
     """
     Vefify the validity of "partita IVA"
@@ -76,7 +74,7 @@ def is_valid_piva(piva, validate=True):
     """
     piva = str(piva)
     if len(piva) <> 11: return False
-    
+
     s = 0
     for char in piva[:-1][::2]:
         s += int(char)
@@ -84,13 +82,12 @@ def is_valid_piva(piva, validate=True):
         x = 2*int(char)
         if x>9: x = x-9
         s += x
-    
+
     r = s%10
-    
+
     c = str(10-r)[-1]
 
     if validate:
         return piva[-1]==c
     else:
         return c
-    

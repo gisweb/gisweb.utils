@@ -38,6 +38,7 @@ setup(name='gisweb.utils',
           'dict2xml',
           'zope.app.component',
           'codicefiscale',
+          'ipdb'
           # -*- Extra requirements: -*-
       ],
       entry_points="""

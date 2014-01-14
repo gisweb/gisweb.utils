@@ -12,6 +12,11 @@ from xdocreport import report
 
 import re
 
+################################################################ PLOMINO PATCH #
+
+import plomino_patch
+
+
 ################################################################ PLOMINO UTILS #
 
 from plomino_utils import attachThis
@@ -32,6 +37,7 @@ def importElementFromXML(xmldocument, container):
     doc = parseString(xmldocument)
     db = container.getParentDatabase()
     db.importElementFromXML(container, doc.documentElement)
+
 
 ################################################################### JSON UTILS #
 

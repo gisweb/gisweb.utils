@@ -4,7 +4,6 @@ def gpoly_encode(points):
     Expose the encode method from gpolyencode library
 
     points (list): list of latlon 2-tuples.
-    
     """
     try:
         import gpolyencode
@@ -27,7 +26,6 @@ def decode_line(encoded):
     (http://unitstep.net/blog/2008/08/02/decoding-google-maps-encoded-polylines-using-php/)
 
     encoded (str): encoded latlon sequence.
-    
     """
 
     encoded_len = len(encoded)
@@ -70,18 +68,3 @@ def decode_line(encoded):
         array.append((lat * 1e-5, lng * 1e-5))
 
     return array
-
-if __name__ == "__main__":
-    """ Test """
-    encoded_points = "grkyHhpc@B[[_IYiLiEgj@a@q@yEoAGi@bEyH_@aHj@m@^qAB{@IkHi@cHcAkPSiMJqEj@s@CkFp@sDfB}Ex@iBj@S_AyIkCcUWgAaA_JUyAFk@{D_]~KiLwAeCsHqJmBlAmFuXe@{DcByIZIYiBxBwAc@eCcAl@y@aEdCcBVJpHsEyAeE"
-    latlon = decode_line(encoded_points)
-    #import ipdb; ipdb.set_trace()
-    lonlat = decode_line(gpoly_encode(latlngs).get('points'))
-    #import ipdb; ipdb.set_trace()
-    for pair in zip(latlon, lonlat):
-        #print latlng
-        print pair[0][0]-pair[1][1], pair[0][1]-pair[1][0]
-        assert latlng[0][0]==latlng[1][0] and latlng[0][1]==latlng[1][1]
-    print "Test passed!"
-
-    #print gpoly_encode(latlngs)
