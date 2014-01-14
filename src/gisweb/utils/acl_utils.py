@@ -66,7 +66,10 @@ def getPlominoPermissions():
 
 def getUserPermissions(doc, user_id=''):
     """
-    It returns the list of permissions of a user on a portal content
+    Returns the list of permissions of a user on the given content
+
+    doc: the plone content;
+    user_id: if not specified the logged user is used;
     """
 
     mt = getToolByName(doc, 'portal_membership')

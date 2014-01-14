@@ -4,8 +4,13 @@ import json
 from decimal import Decimal
 import locale
 
-from print_utils import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 import lxml.etree as etree
+
 def xml_pprint(xml):
     f = StringIO(xml)
     try:
@@ -52,7 +57,7 @@ def json_dumps(obj, customformat='%d/%m/%Y %H:%M:%S', prettyxml=False, **kwargs)
         default=lambda o: handler(o, prettyxml=prettyxml, format=customformat),
         **kwargs
     )
-    
+
     return json.dumps(obj, **kw)
 
 def json_loads(string, **kwargs):

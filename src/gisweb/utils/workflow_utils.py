@@ -10,12 +10,12 @@ def getChainFor(context):
 
 def updateAllRoleMappingsFor(doc, script=False):
     """ Changes the object permissions according to the current workflow states. """
-    
+
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
     changes = dict()
-    
+
     wf_ids = pw.getChainFor(doc)
-    
+
     # do precedenza al primo wf della catena
     for wf_id in reversed(wf_ids):
         wf = getToolByName(pw, wf_id)
@@ -25,11 +25,11 @@ def updateAllRoleMappingsFor(doc, script=False):
             if new_state:
                 changes[wf_id]['new_state'] = new_state.getId()
         changes[wf_id]['permissions'] = wf.updateRoleMappingsFor(doc)
-    
+
     if script:
         import transaction
         transaction.commit()
-    
+
     return changes
 
 
@@ -46,7 +46,7 @@ def getInfoFor(context, arg, *args, **kwargs):
 
     wf_id = kwargs.get('wf_id') or context.wf_statesInfo()[0]['wf_id']
     wf = getToolByName(pw, wf_id)
-    
+
     if args:
         args = set(i for i in (arg, )+args)
         if kwargs.get('as_list'):
@@ -108,7 +108,7 @@ def getInfos(From, default, *args):
         except AttributeError, err:
             if default:
                 info[k] = default
-    
+
     return info
 
 def getStatesInfo(doc, state_id='review_state', args=[], default=None, **kwargs):
@@ -122,9 +122,9 @@ def getStatesInfo(doc, state_id='review_state', args=[], default=None, **kwargs)
     """
 
     pw = getToolByName(doc.getParentDatabase(), 'portal_workflow')
-    
+
     args = set(['title']+args)
-    
+
     single = False
     if 'wf_id' in kwargs:
         wf_list = (kwargs['wf_id'], )
@@ -133,7 +133,7 @@ def getStatesInfo(doc, state_id='review_state', args=[], default=None, **kwargs)
         wf_list = kwargs['wf_ids']
     else:
         wf_list = getChainFor(doc)
-    
+
     infos = []
     for wf_id in wf_list:
         wf = getToolByName(pw, wf_id)
@@ -196,9 +196,9 @@ def getTransitionsInfo(doc, supported_only=True, state_id='review_state',
             if (state_id=='review_state' and supported_only \
                 and wf.isActionSupported(doc, tr_id)) or not supported_only:
                 transition = getToolByName(wf.transitions, tr_id)
-                
+
                 info = getInfos(transition, default, *set(['title']+args))
-                
+
                 info['id'] = transition.getId()
                 info.update(tr_def)
                 infos.append(info)

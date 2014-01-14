@@ -2,7 +2,6 @@ import requests
 import json
 from collections import namedtuple
 
-
 def report(url, template, data, template_engine, document_type, output_type=None):
     metadata = get_metadata(data)
     data = {
@@ -23,7 +22,6 @@ def report(url, template, data, template_engine, document_type, output_type=None
         raise RuntimeError()
     return result.content
 
-
 def get_metadata(data):
     result = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
               '<fields templateEngineKind="Freemarker">']
@@ -34,9 +32,8 @@ def get_metadata(data):
     result.append('</fields>')
     return '\n'.join(result)
 
-
 def get_info(data, path=[], islist='false'):
-    "data is a dictionary. Return info about all keys named as paths"
+    """ data is a dictionary. Return info about all keys named as paths """
     for key, value in data.items():
         currentpath = path + [key]
         if isinstance(value, dict):
@@ -47,6 +44,5 @@ def get_info(data, path=[], islist='false'):
                 yield info
         else:
             yield FieldInfo(name='.'.join(currentpath), list=islist)
-
 
 FieldInfo = namedtuple('FieldInfo', ['name', 'list'])

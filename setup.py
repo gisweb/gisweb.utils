@@ -36,7 +36,6 @@ setup(name='gisweb.utils',
           'setuptools',
           'requests',
           'dict2xml',
-          'xhtml2pdf',
           'zope.app.component',
           'codicefiscale',
           # -*- Extra requirements: -*-

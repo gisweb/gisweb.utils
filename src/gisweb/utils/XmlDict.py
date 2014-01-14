@@ -18,7 +18,7 @@ class XmlListConfig(list):
                     self.append(text)
 
 class XmlDictConfig(dict):
-    '''
+    """
     Example usage:
 
     >>> tree = ElementTree.parse('your_file.xml')
@@ -31,7 +31,7 @@ class XmlDictConfig(dict):
     >>> xmldict = XmlDictConfig(root)
 
     And then use xmldict for what it is... a dict.
-    '''
+    """
     def __init__(self, parent_element):
         if parent_element.items():
             self.update(dict(parent_element.items()))
