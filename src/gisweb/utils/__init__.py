@@ -158,7 +158,7 @@ from gpolyencode_utils import gpoly_encode, decode_line
 
 ######################################################################### TEST #
 
-from unittest_advance import runtests
+#from unittest_advance import runtests
 
 from test_utils import rndgenerate, namegenerate, da_du_ma, dategenerate, numbergenerate
 from test_utils import boolgenerate, rndselection, rndCodFisco, latlongenerate
