@@ -18,6 +18,9 @@ import Missing
 from json_utils import json_dumps
 
 import sys
+
+import lxml.etree as etree
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -572,3 +575,72 @@ def getRndFieldValues(form, only_mandatory=True):
                     sdm = form.getParentDatabase().session_data_manager
                     sd = sdm.getSessionData()
                     sd[fieldname] = result['file']
+
+
+def update2FieldDescription(el):
+    """ fieldDescription -> FieldDescription """
+    el.attrib['name'] = "FieldDescription"
+
+def update2HTMLAttributesFormula(el):
+    """ customAttributes -> HTMLAttributesFormula """
+    el.attrib['name'] = "HTMLAttributesFormula"
+    if el.text:
+        el.text = '"""%s"""' % el.text
+
+def update2DATETIME(el):
+    """ DATE -> DATETIME
+    Cambio i campi di tipo DATE a DATETIME con uso del widget JQUERY
+    """
+    fieldtype = el.find('FieldType')
+    fieldtype.text = "DATETIME"
+
+    newparams = etree.Element('params')
+    newparam = etree.SubElement(newparams, 'param')
+    newvalue = etree.SubElement(newparam, 'value')
+    newstruct = etree.SubElement(newvalue, 'struct')
+    newmember = etree.SubElement(newstruct, 'member')
+
+    memname = etree.SubElement(newmember, 'name', text='widget')
+    memvalue = etree.SubElement(newmember, 'value')
+    valstring = etree.SubElement(memvalue, 'string', text='JQUERY')
+
+    params = el.find('params')
+    if params is None:
+        el.append(newparams)
+    else:
+        members = filter(
+            lambda i: i.findtext('name')=='widget',
+            el.findall("params/param/value/struct/member"))
+        if not members:
+            struct = el.find("params/param/value/struct")
+            struct.append(newmember)
+        else:
+            member = el.find("params/param/value/struct/member")
+            member = newmember
+
+def update2FieldTemplate(el):
+    """ Rimuovo i template custom in uso """
+    if el.text and el.text.startswith('bootstrap') and \
+        any(filter(lambda i: el.text.endswith(i), ('Edit', 'Read', 'Picker'))):
+        el.text = None
+
+def updateXML(filepath):
+    tree = etree.parse(filepath, etree.XMLParser(strip_cdata=False))
+    root = tree.getroot()
+
+    descriptions = root.findall(".//field[@name='fieldDescription']")
+    map(update2FieldDescription, descriptions)
+
+    attributes = root.findall(".//field[@name='customAttributes']")
+    map(update2HTMLAttributesFormula, attributes)
+
+    dateelements = filter(
+        lambda el: el.findtext("FieldType", default='').startswith('DATE'),
+        root.findall(".//element[@type='PlominoField']"))
+    map(update2DATETIME, dateelements)
+
+    fieldtemplates = root.findall(".//element/FieldReadTemplate") + \
+        root.findall(".//element/FieldEditTemplate")
+    map(update2FieldTemplate, fieldtemplates)
+
+    tree.write(filepath)
