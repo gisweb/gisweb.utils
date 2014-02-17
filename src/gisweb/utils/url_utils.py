@@ -120,9 +120,9 @@ def urllib_quote_plus(string):
     return urllib.quote_plus(string)
 
 def proxy(request, url):
-    
+
     allowedHosts = []
-    
+
     allowed_content_types = (
         "image/png",
         "image/jpeg",
@@ -138,11 +138,11 @@ def proxy(request, url):
         "application/vnd.ogc.sld+xml",          # SLD
         "application/vnd.google-earth.kml+xml", # KML
     )
-    
+
     method = request.method
     params = request.form
     query_string = request.QUERY_STRING
-    
+
     if "HTTP_X_FORWARDED_FOR" in request.environ:
         # Virtual host
         host = request.environ["HTTP_X_FORWARDED_FOR"]
@@ -151,18 +151,18 @@ def proxy(request, url):
         host = request.environ["REMOTE_ADDR"]
     else:
         host = ''
-    
+
     if not host or (allowedHosts and not host in allowedHosts):
         short, msg = BaseHTTPRequestHandler.responses[403]
         raise urllib2.HTTPError(url, 403, msg)
-    
+
     if url.startswith("http://") or url.startswith("https://"):
         try:
             if query_string:
                 url = '?'.join([url, query_string])
-        
+
             res = urllib2.urlopen(url)
-        
+
             # Check for allowed content types
             i = res.info()
             if i.has_key("Content-Type"):
@@ -181,10 +181,10 @@ def proxy(request, url):
             # Required for WMS Browser to work in IE
             # response.headers["Content-Type"] = "text/xml"
             return msg
-    
+
         except Exception as err:
             raise urllib2.HTTPError(url, 500, "Some unexpected error occurred. Error text was: %s" % err)
-    
+
     else:
         # Bad Request
         short, msg = BaseHTTPRequestHandler.responses[400]
@@ -195,7 +195,7 @@ def proxy_script():
     from gisweb.utils import proxy
 
     url = '' # URL to mapserver
-    
+
     return proxy(context.REQUEST, url)
 
 def geocode(**kw):

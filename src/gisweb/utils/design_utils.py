@@ -7,17 +7,6 @@ import xmlrpclib
 from zope import component
 from Products.CMFPlomino.interfaces import IXMLImportExportSubscriber
 
-#def exportElementAsXML(form, prefix=''):
-
-#    db = form.getParentDatabase()
-
-#    impl = getDOMImplementation()
-#    xmlform = impl.createDocument(None, "plominoform", None)
-
-#    xml = db.exportElementAsXML(xmlform, form, isDatabase=False)
-
-#    return xml
-
 def rename(instring, **kw):
     outstring = ''
     for k,v in kw.items():
@@ -39,11 +28,11 @@ def duplicateForm(form, xmldoc, **kw):
 def exportElementAsXML(obj, xmldoc=None):
     """
     """
-    
+
     if not xmldoc:
         impl = getDOMImplementation()
         xmldoc = impl.createDocument(None, "plominoform", None)
-    
+
     isDatabase=False
     if isDatabase:
         node = xmldoc.createElement('dbsettings')
@@ -84,7 +73,7 @@ def exportElementAsXML(obj, xmldoc=None):
                     text = xmldoc.createTextNode(str(f.get(obj)))
                 fieldNode.appendChild(text)
             node.appendChild(fieldNode)
-#        
+
     if obj.Type() == "PlominoField":
         adapt = obj.getSettings()
         if adapt is not None:
@@ -136,5 +125,3 @@ def exportElementAsXML(obj, xmldoc=None):
         wrapper.appendChild(customnode)
         node.appendChild(wrapper)
     return node
-
-

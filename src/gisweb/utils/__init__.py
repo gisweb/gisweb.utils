@@ -12,14 +12,11 @@ from xdocreport import report
 
 import re
 
-################################################################ PLOMINO PATCH #
-
-import plomino_patch
-
-
 ################################################################ PLOMINO UTILS #
 
 from plomino_utils import attachThis
+
+from plomino_utils import batch_saveDocument, batch_createDocument, getRndFieldValues
 
 from plomino_utils import StartDayofMonth
 from plomino_utils import LastDayofMonth, addToDate
@@ -160,6 +157,8 @@ from gpolyencode_utils import gpoly_encode, decode_line
 
 
 ######################################################################### TEST #
+
+from unittest_advance import runtests
 
 from test_utils import rndgenerate, namegenerate, da_du_ma, dategenerate, numbergenerate
 from test_utils import boolgenerate, rndselection, rndCodFisco, latlongenerate

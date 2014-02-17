@@ -1,6 +1,10 @@
 #!../../../../../bin/zopepy
 # -*- coding: utf-8 -*-
 
+"""
+Tests in this section only needs zopepy environment.
+"""
+
 import unittest
 
 class Test_anagrafica_utils(unittest.TestCase):
@@ -44,6 +48,53 @@ class Test_gpolyencode_utils(unittest.TestCase):
         result = all(map(test, zip(latlon, lonlat)))
         self.assertTrue(result)
 
+class Test_url_utils(unittest.TestCase):
+
+    def test_wsquery(self):
+        from gisweb.utils import wsquery
+        result = wsquery('http://localhost')['status_code']
+        self.assertEqual(result, 200)
+
+class Test_plomino_utils(unittest.TestCase):
+    """ """
+
+    def test_StartDayofMonth(self):
+        from Products.CMFPlomino.PlominoUtils import StringToDate
+        from gisweb.utils import StartDayofMonth
+        in_date = StringToDate('2000.05.05', '%Y.%m.%d')
+        expected = StringToDate('2000.05.01', '%Y.%m.%d')
+        result = StartDayofMonth(in_date)
+        self.assertEqual(expected, result)
+
+    def test_LastDayofMonth(self):
+        from gisweb.utils import LastDayofMonth
+        from Products.CMFPlomino.PlominoUtils import StringToDate
+        in_date = StringToDate('2000.05.05', '%Y.%m.%d')
+        expected = StringToDate('2000.06.01', '%Y.%m.%d')-1
+        result = LastDayofMonth(in_date)
+        self.assertEqual(expected, result)
+
+    def test_addToDate(self):
+        from gisweb.utils import addToDate
+        from Products.CMFPlomino.PlominoUtils import StringToDate
+        in_date = StringToDate('2000.05.05', '%Y.%m.%d')
+        result = addToDate(in_date, 2, units='months', start=1)
+        expected = StringToDate('2000.07.04', '%Y.%m.%d')
+        self.assertEqual(expected, result)
+
+    def test_guessType(self):
+        from gisweb.utils import guessType
+        htmlcontent = """<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Page title</title>
+  </head>
+  <body>
+  </body>
+</html>"""
+        result = guessType(htmlcontent, 'plain.html')['contenttype']
+        self.assertEqual('text/html', result)
 
 if __name__ == "__main__":
     unittest.main()
