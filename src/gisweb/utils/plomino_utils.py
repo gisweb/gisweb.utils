@@ -618,13 +618,24 @@ def update2DATETIME(el):
             member = el.find("params/param/value/struct/member")
             member = newmember
 
-def update2FieldTemplate(el):
-    """ Rimuovo i template custom in uso """
-    if el.text and el.text.startswith('bootstrap') and \
-        any(filter(lambda i: el.text.endswith(i), ('Edit', 'Read', 'Picker'))):
+def update2TitleAsLabel(el, value=True):
+
+    newelement = etree.Element('TitleAsLabel', type='Products.Archetypes.Field.BooleanField')
+    newelement.text = 'True'
+    TitleAsLabel = el.find('TitleAsLabel')
+
+    if TitleAsLabel is None :
+        el.append(newelement)
+    else:
+        TitleAsLabel.text = 'True'
+
+
+def update2FieldTemplate(context, el):
+    """ Rimuovo i riferimenti ai teplate rimossi """
+    if el.text and not hasattr(context, el.text):
         el.text = None
 
-def updateXML(filepath):
+def updateXML(context, filepath):
     tree = etree.parse(filepath, etree.XMLParser(strip_cdata=False))
     root = tree.getroot()
 
@@ -641,6 +652,13 @@ def updateXML(filepath):
 
     fieldtemplates = root.findall(".//element/FieldReadTemplate") + \
         root.findall(".//element/FieldEditTemplate")
-    map(update2FieldTemplate, fieldtemplates)
+    map(lambda ft: update2FieldTemplate(context, ft), fieldtemplates)
+
+    plominofields = root.findall(".//element[@type='PlominoField']")
+    map(update2TitleAsLabel, plominofields)
 
     tree.write(filepath)
+
+def updateAllXML(context, path):
+    xmls = map(lambda xml: os.path.join(path, xml), filter(lambda fn: fn.endswith('.xml'), os.listdir(path)))
+    map(lambda xml: updateXML(context, xml), xmls)
