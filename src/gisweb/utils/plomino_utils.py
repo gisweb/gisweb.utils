@@ -585,7 +585,9 @@ def update2HTMLAttributesFormula(el):
     """ customAttributes -> HTMLAttributesFormula """
     el.attrib['name'] = "HTMLAttributesFormula"
     if el.text:
-        el.text = '"""%s"""' % el.text
+        newtext = el.text.replace("'", "\\'")
+        newtext = newtext.replace('data-plugin="datepicker" ', '')
+        el.text = "'%s'" % newtext
 
 def update2DATETIME(el):
     """ DATE -> DATETIME
@@ -600,9 +602,11 @@ def update2DATETIME(el):
     newstruct = etree.SubElement(newvalue, 'struct')
     newmember = etree.SubElement(newstruct, 'member')
 
-    memname = etree.SubElement(newmember, 'name', text='widget')
+    memname = etree.SubElement(newmember, 'name')
+    memname.text='widget'
     memvalue = etree.SubElement(newmember, 'value')
-    valstring = etree.SubElement(memvalue, 'string', text='JQUERY')
+    valstring = etree.SubElement(memvalue, 'string')
+    valstring.text = 'JQUERY'
 
     params = el.find('params')
     if params is None:
@@ -613,7 +617,7 @@ def update2DATETIME(el):
             el.findall("params/param/value/struct/member"))
         if not members:
             struct = el.find("params/param/value/struct")
-            struct.append(newmember)
+            struct.insert(0, newmember)
         else:
             member = el.find("params/param/value/struct/member")
             member = newmember
