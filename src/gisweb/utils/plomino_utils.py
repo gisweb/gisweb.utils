@@ -587,6 +587,7 @@ def update2HTMLAttributesFormula(el):
     if el.text:
         newtext = el.text.replace("'", "\\'")
         newtext = newtext.replace('data-plugin="datepicker" ', '')
+        newtext = newtext.replace('dynamicHidewhen', 'data-dhw="true"')
         el.text = "'%s'" % newtext
 
 def update2DATETIME(el):
