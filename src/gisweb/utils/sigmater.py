@@ -2,7 +2,7 @@ from suds.client import Client
 from suds.sax.text import Raw
 serviceUrl = "http://10.11.132.2:8080/PdDProvinciaLaSpezia/PD/SPCProvinciaLaSpezia/SPCRegioneLiguria"
 
-def ricercaTitolaritaSoggetto(body='',usr='',pwd=''):
+def ricercaTitolaritaSoggetto(query='',usr='',pwd=''):
 	method="SPCConsultazioneSoggettiWebService/eseguiRicercaSoggetti?wsdl";
 	url="%s/%s" %(serviceUrl,method)
 	client = Client(url)
@@ -11,12 +11,17 @@ def ricercaTitolaritaSoggetto(body='',usr='',pwd=''):
 		<soapenv:Header/>
 			<soapenv:Body>
 				<s3:eseguiRicercaTitolaritaSoggetto>
+					<ricercaTitolaritaSoggetto>
 					%s
+					</ricercaTitolaritaSoggetto>
 					<username>%s</username>
 					<password>%s</password>
 				</s3:eseguiRicercaTitolaritaSoggetto>
 		</soapenv:Body>
 	</soapenv:Envelope>
 	''' %(body,usr,pwd) )
-	return client.service.OpenSPCoop_PD(__inject={'msg': xml})
+	ret = dict(client.service.OpenSPCoop_PD(__inject={'msg': xml}))
+	if ret['return']:
+		return ret['return']
+	return ret 
 	
