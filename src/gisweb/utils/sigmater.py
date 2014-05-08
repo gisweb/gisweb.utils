@@ -4,7 +4,7 @@ serviceUrl = "http://10.11.132.2:8080/PdDProvinciaLaSpezia/PD/SPCProvinciaLaSpez
 
 def ricercaTitolaritaSoggetto(body='',usr='',pwd=''):
 	method="SPCConsultazioneSoggettiWebService/eseguiRicercaSoggetti?wsdl";
-	url="%s/s" %(serviceUrl,method)
+	url="%s/%s" %(serviceUrl,method)
 	client = Client(url)
 	xml=Raw('''
 	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s3="http://s3.webservices.sigmater.org/">
