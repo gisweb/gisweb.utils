@@ -19,7 +19,7 @@ def ricercaTitolaritaSoggetto(query='',usr='',pwd=''):
 				</s3:eseguiRicercaTitolaritaSoggetto>
 		</soapenv:Body>
 	</soapenv:Envelope>
-	''' %(body,usr,pwd) )
+	''' %(query,usr,pwd) )
 	ret = dict(client.service.OpenSPCoop_PD(__inject={'msg': xml}))
 	if ret['return']:
 		return ret['return']
