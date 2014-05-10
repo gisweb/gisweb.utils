@@ -1,10 +1,35 @@
 from suds.client import Client
 from suds.sax.text import Raw
-serviceUrl = "http://10.11.132.2:8080/PdDProvinciaLaSpezia/PD/SPCProvinciaLaSpezia/SPCRegioneLiguria"
 
-def ricercaTitolaritaSoggetto(query='',usr='',pwd=''):
+BASE_URL = "http://10.11.132.2:8080/PdDProvinciaLaSpezia/PD/SPCProvinciaLaSpezia/SPCRegioneLiguria"
+
+def ricercaSoggetti(query='',usr='',pwd=''):
 	method="SPCConsultazioneSoggettiWebService/eseguiRicercaSoggetti?wsdl";
-	url="%s/%s" %(serviceUrl,method)
+	url="%s/%s" %(BASE_URL,method)
+	client = Client(url)
+	xml=Raw('''
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s3="http://s3.webservices.sigmater.org/">
+		<soapenv:Header/>
+			<soapenv:Body>
+				<s3:eseguiRicercaSoggetti>
+					<ricercaSoggetti>
+					%s
+					</ricercaSoggetti>
+					<username>%s</username>
+					<password>%s</password>
+				</s3:eseguiRicercaSoggetti>
+		</soapenv:Body>
+	</soapenv:Envelope>
+	''' %(query,usr,pwd) )
+	ret = dict(client.service.OpenSPCoop_PD(__inject={'msg': xml}))
+	if ret['return']:
+		return ret['return']
+	return ret 
+
+	
+def ricercaTitolaritaSoggetto(query='',usr='',pwd=''):
+	method="SPCConsultazioneSoggettiWebService/eseguiRicercaTitolaritaSoggetto?wsdl";
+	url="%s/%s" %(BASE_URL,method)
 	client = Client(url)
 	xml=Raw('''
 	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s3="http://s3.webservices.sigmater.org/">
@@ -24,4 +49,52 @@ def ricercaTitolaritaSoggetto(query='',usr='',pwd=''):
 	if ret['return']:
 		return ret['return']
 	return ret 
+	
+def ricercaPerIdCat(query='',usr='',pwd=''):
+	method="SPCConsultazioneTerreniWebService/eseguiRicercaTerreno?wsdl";
+	url="%s/%s" %(BASE_URL,method)
+	client = Client(url)
+	xml=Raw('''
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s3="http://s3.webservices.sigmater.org/">
+		<soapenv:Header/>
+			<soapenv:Body>
+				<s3:eseguiRicercaTerreno>
+					<ricercaPerIdCat>
+					%s
+					</ricercaPerIdCat>
+					<username>%s</username>
+					<password>%s</password>
+				</s3:eseguiRicercaTerreno>
+		</soapenv:Body>
+	</soapenv:Envelope>
+	''' %(query,usr,pwd) )
+	ret = dict(client.service.OpenSPCoop_PD(__inject={'msg': xml}))
+	if ret['return']:
+		return ret['return']
+	return ret 
+
+def dettaglioPerIdCat(query='',usr='',pwd=''):
+	method="SPCConsultazioneTerreniWebService/caricaDettaglioTerreno?wsdl";
+	url="%s/%s" %(BASE_URL,method)
+	client = Client(url)
+	xml=Raw('''
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s3="http://s3.webservices.sigmater.org/">
+		<soapenv:Header/>
+			<soapenv:Body>
+				<s3:caricaDettaglioTerreno>
+					<ricercaPerIdCat>
+					%s
+					</ricercaPerIdCat>
+					<username>%s</username>
+					<password>%s</password>
+				</s3:caricaDettaglioTerreno>
+		</soapenv:Body>
+	</soapenv:Envelope>
+	''' %(query,usr,pwd) )
+	ret = dict(client.service.OpenSPCoop_PD(__inject={'msg': xml}))
+	if ret['return']:
+		return ret['return']
+	return ret 
+
+
 	
