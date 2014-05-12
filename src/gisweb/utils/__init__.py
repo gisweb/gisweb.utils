@@ -194,7 +194,7 @@ from spezia_utils import protocolla_doc, protocolla
 
 ################################################################# SIGMATER UTILS #
 
-from sigmater import ricercaTitolaritaSoggetto
+from sigmater import ricercaSoggetti, ricercaTitolaritaSoggetto, ricercaPerIdCat, dettaglioPerIdCat
 
 ################################################################## IRIDE UTILS #
 
