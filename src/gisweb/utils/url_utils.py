@@ -1,5 +1,7 @@
 import urllib, urllib2
+import socket
 from BaseHTTPServer import BaseHTTPRequestHandler
+from urllib2 import HTTPError
 
 import requests
 
@@ -35,6 +37,42 @@ def requests_get(url, params=None, methods_or_args=[]):
 
     return out
 
+def myproxy(url):
+	req = urllib2.Request(url)
+	try:
+
+		# Important or if the remote server is slow
+		# all our web server threads get stuck here
+		# But this is UGLY as Python does not provide per-thread
+		# or per-socket timeouts thru urllib
+		orignal_timeout = socket.getdefaulttimeout()
+		try:
+			socket.setdefaulttimeout(60)
+
+			response = urllib2.urlopen(req)
+		finally:
+			# restore orignal timeoout
+			socket.setdefaulttimeout(orignal_timeout)
+
+		# XXX: How to stream respone through Zope
+		# AFAIK - we cannot do it currently
+
+		return response.read()
+
+	except HTTPError, e:
+		# Have something more useful to log output as plain urllib exception
+		# using Python logging interface
+		# http://docs.python.org/library/logging.html
+		logger.error("Server did not return HTTP 200 when calling remote proxy URL:" + url)
+		for key, value in params.items():
+			logger.error(key + ": "  + value)
+
+		# Print the server-side stack trace / error page
+		logger.error(e.read())
+
+		raise e
+
+	
 def wsquery(url, method='GET', timeout=60, headers={}, **kw):
     """
     url: url to contact;
