@@ -98,3 +98,50 @@ def dettaglioPerIdCat(query='',usr='',pwd=''):
 
 
 	
+def ricercaPerUIU(query='',usr='',pwd=''):
+	method="SPCConsultazioneUIUWebService/eseguiRicercaUIU?wsdl";
+	url="%s/%s" %(BASE_URL,method)
+        client = Client(url)
+        xml=Raw('''
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s3="http://s3.webservices.sigmater.org/">
+                <soapenv:Header/>
+                        <soapenv:Body>
+				 <s3:eseguiRicercaUIU>
+                                        <ricercaPerIdCat>
+                                        %s
+                                        </ricercaPerIdCat>
+                                        <username>%s</username>
+                                        <password>%s</password>
+                                </s3:eseguiRicercaUIU>
+		</soapenv:Body>
+        </soapenv:Envelope>
+        ''' %(query,usr,pwd) )
+        ret = dict(client.service.OpenSPCoop_PD(__inject={'msg': xml}))
+       	if ret['return']:
+                return ret['return']
+        return ret
+
+
+def dettaglioPerIdUIU(query='',usr='',pwd=''):
+        method="SPCConsultazioneUIUWebService/caricaDettaglioUIU?wsdl";
+        url="%s/%s" %(BASE_URL,method)
+        client = Client(url)
+        xml=Raw('''
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s3="http://s3.webservices.sigmater.org/">
+                <soapenv:Header/>
+                        <soapenv:Body>
+                                <s3:caricaDettaglioUIU>
+                                        <ricercaPerIdCat>
+                                        %s
+                                        </ricercaPerIdCat>
+                                        <username>%s</username>
+                                        <password>%s</password>
+                                </s3:caricaDettaglioUIU>
+                </soapenv:Body>
+        </soapenv:Envelope>
+        ''' %(query,usr,pwd) )
+        ret = dict(client.service.OpenSPCoop_PD(__inject={'msg': xml}))
+        if ret['return']:
+                return ret['return']
+        return ret
+ 
