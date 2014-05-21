@@ -4,8 +4,6 @@ from AccessControl import allow_module, ModuleSecurityInfo
 #from z3c.saconfig import named_scoped_session
 
 allow_module('gisweb.utils')
-allow_module('gisweb.utils.iride')
-allow_module('gisweb.utils.iride.concessioni_strada')
 allow_module('gisweb.utils.plominoKin')
 
 def initialize(con):
@@ -175,7 +173,7 @@ def isRepoUpToDate(path):
     command = 'git diff-index HEAD --quiet'
     p = subprocess.Popen(command.split(' '), cwd=fullpath)
     return '%s' % p.wait()
-    
+
 def getRepoRemotes(path):
     """
     returns the list of repositories you can get with "git remote -v"
@@ -191,13 +189,6 @@ def getRepoRemotes(path):
 ################################################################# SPEZIA UTILS #
 
 from spezia_utils import protocolla_doc, protocolla
-
-################################################################# SIGMATER UTILS #
-
-from sigmater import ricercaSoggetti, ricercaTitolaritaSoggetto, ricercaPerIdCat, dettaglioPerIdCat, ricercaPerUIU, dettaglioPerIdUIU
-################################################################## IRIDE UTILS #
-
-from iride import procedimento_pratica, inserisci_protocollo, lista_procedimenti, leggi_documento
 
 
 ############################################################ GPOLYENCODE UTILS #
