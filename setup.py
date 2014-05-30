@@ -35,8 +35,6 @@ setup(name='gisweb.utils',
       install_requires=[
           'setuptools',
           'requests',
-          'dict2xml',
-          'xhtml2pdf',
           'zope.app.component',
           'suds',
           'codicefiscale',

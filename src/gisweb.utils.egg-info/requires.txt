@@ -1,0 +1,5 @@
+setuptools
+requests
+zope.app.component
+suds
+codicefiscale

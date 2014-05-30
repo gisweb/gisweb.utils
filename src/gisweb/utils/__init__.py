@@ -9,8 +9,6 @@ allow_module('gisweb.utils.plominoKin')
 def initialize(con):
     "Being a Zope2 Product we ensure this file will be imported at startup"
 
-from xdocreport import report
-
 import re
 
 ################################################################ PLOMINO ADDONS #
@@ -68,29 +66,6 @@ from acl_utils import get_users_info, getAllUserRoles, getUserPermissions, getRo
 ################################################################ UNICODEDAMMIT #
 
 from UnicodeDammit import getUnicodeFrom
-
-
-################################################################## PRINT UTILS #
-
-from print_utils import plominoPrint, printToPdf
-
-
-#################################################################### PDF UTILS #
-
-from pdf_utils import generate_pdf
-
-
-##################################################################### DB UTILS #
-
-try:
-    import sqlalchemy
-    import z3c.saconfig
-except ImportError:
-    pass
-else:
-    # We're ok without those in case sqlalchemy is not available
-    from db_utils import get_session, get_soup, plominoSqlSync, execute_sql
-    from db_utils import suggestFromTable
 
 
 ############################################################### CF P.IVA UTILS #
@@ -184,11 +159,6 @@ def getRepoRemotes(path):
     result = [i.strip() for i in p.stdout.readlines()]
     p.wait()
     return result
-
-
-################################################################# SPEZIA UTILS #
-
-from spezia_utils import protocolla_doc, protocolla
 
 
 ############################################################ GPOLYENCODE UTILS #

@@ -4,7 +4,7 @@ import json
 from decimal import Decimal
 import locale
 
-from print_utils import StringIO
+from cStringIO import StringIO
 import lxml.etree as etree
 def xml_pprint(xml):
     f = StringIO(xml)
