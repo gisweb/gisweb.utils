@@ -38,7 +38,7 @@ setup(name='gisweb.utils',
           'dict2xml',
           'zope.app.component',
           'codicefiscale',
-          'ipdb'
+          'beautifulsoup4'
           # -*- Extra requirements: -*-
       ],
       entry_points="""
