@@ -21,6 +21,7 @@ from plomino_utils import batch_saveDocument, batch_createDocument, getRndFieldV
 from plomino_utils import StartDayofMonth
 from plomino_utils import LastDayofMonth, addToDate
 from plomino_utils import updateAllXML
+from plomino_utils import addLabelsField
 
 def exportElementAsXML(db, obj, isDatabase=False):
     from xml.dom.minidom import getDOMImplementation

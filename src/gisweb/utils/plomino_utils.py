@@ -3,10 +3,12 @@
 
 from Products.CMFPlomino.interfaces import IPlominoDatabase
 from Products.CMFPlomino.PlominoDocument import PlominoDocument
+from bs4 import BeautifulSoup
 
 import cStringIO
 
 from Products.CMFPlomino.PlominoUtils import DateToString, StringToDate, htmlencode, asList
+from Products.CMFCore.utils import getToolByName
 
 from DateTime import DateTime
 from DateTime.interfaces import DateError
@@ -254,9 +256,7 @@ class batch(object):
         if REQUEST is None:
             REQUEST = doc.REQUEST
         form = db.getForm(REQUEST.get('Form', '')) or db.getForm(doc.getItem('Form'))
-
         errors = form.validateInputs(REQUEST, doc=doc)
-
         # execute the beforeSave code of the form
         error = None
         try:
@@ -589,6 +589,8 @@ def update2HTMLAttributesFormula(el):
         newtext = newtext.replace('data-plugin="datepicker" ', '')
         newtext = newtext.replace('dynamicHidewhen', 'data-dhw="true"')
         el.text = "'%s'" % newtext
+    else:
+ 	el.text = ""
 
 def update2DATETIME(el):
     """ DATE -> DATETIME
@@ -634,6 +636,16 @@ def update2TitleAsLabel(el, value=True):
     else:
         TitleAsLabel.text = 'True'
 
+def update2DescriptionHTML5Attribute(el):
+    descriptionObj = el.findall(".//field[@name='fieldDescription']")[0]
+    description = descriptionObj.text
+    if not description is None:
+		attribute = el.findall(".//field[@name='HTMLAttributesFormula']")[0]
+		original = attribute.text[1:-1] 
+		original = (original + ' data-field-description="%s"' %(description)).strip()
+		attribute.text = "'%s'" % original 
+    extensionfields = el.findall(".//extensionfields")[0]
+    extensionfields.remove(descriptionObj)    
 
 def update2FieldTemplate(context, el):
     """ Rimuovo i riferimenti ai teplate rimossi """
@@ -644,11 +656,11 @@ def updateXML(context, filepath):
     tree = etree.parse(filepath, etree.XMLParser(strip_cdata=False))
     root = tree.getroot()
 
-    descriptions = root.findall(".//field[@name='fieldDescription']")
-    map(update2FieldDescription, descriptions)
-
     attributes = root.findall(".//field[@name='customAttributes']")
     map(update2HTMLAttributesFormula, attributes)
+   
+    fields = root.findall(".//element[@type='PlominoField']")
+    map(update2DescriptionHTML5Attribute, fields)
 
     dateelements = filter(
         lambda el: el.findtext("FieldType", default='').startswith('DATE'),
@@ -667,3 +679,24 @@ def updateXML(context, filepath):
 def updateAllXML(context, path):
     xmls = map(lambda xml: os.path.join(path, xml), filter(lambda fn: fn.endswith('.xml'), os.listdir(path)))
     map(lambda xml: updateXML(context, xml), xmls)
+    
+def _update_html_content(html):
+	soup = BeautifulSoup(html)
+	test = len(soup.select(".plominoLabelClass"))>0
+	if not test:
+		for field in soup.select(".plominoFieldClass"):
+			tag=soup.new_tag('span')
+			tag['class']='plominoLabelClass'
+			tag.string=field.string
+			field.insert_before(tag)
+	return str(soup)
+	
+	
+def addLabelsField(self):
+	plone_tools = getToolByName(self, 'plone_utils')
+	encoding = plone_tools.getSiteEncoding()
+	layout = self.getField('FormLayout')
+	html_content = layout.getRaw(self).decode(encoding).replace('\n', '')
+	new_html = _update_html_content(html_content)
+	
+	layout.set(self,new_html)
