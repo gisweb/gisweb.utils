@@ -57,3 +57,11 @@ def json_dumps(obj, customformat='%d/%m/%Y %H:%M:%S', prettyxml=False, **kwargs)
 
 def json_loads(string, **kwargs):
     return json.loads(string, **kwargs)
+
+
+def is_json(myjson):
+  try:
+    json_object = json.loads(myjson)
+  except ValueError, e:
+    return False
+  return True    

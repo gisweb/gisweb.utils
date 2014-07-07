@@ -53,7 +53,7 @@ def importElementFromXML(xmldocument, container):
 
 ################################################################### JSON UTILS #
 
-from json_utils import json_dumps, json_loads
+from json_utils import json_dumps, json_loads, is_json
 
 
 ################################################################### ZOPE UTILS #
