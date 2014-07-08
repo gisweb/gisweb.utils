@@ -60,8 +60,8 @@ def json_loads(string, **kwargs):
 
 
 def is_json(myjson):
-  try:
-    json_object = json.loads(myjson)
-  except ValueError, e:
-    return False
-  return True    
+    try:
+        json_object = json.loads(myjson)
+    except ValueError, e:
+        return False
+    return True    
