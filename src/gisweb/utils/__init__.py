@@ -102,7 +102,7 @@ from anagrafica_utils import is_valid_cf, is_valid_piva, cf_build
 
 #################################################################### URL UTILS #
 
-from url_utils import proxy, urllib_urlencode, requests_post, urllib_quote_plus, geocode, wsquery,requests_get, myproxy, encode_64, decode_b64
+from url_utils import proxy, urllib_urlencode, requests_post, urllib_quote_plus, geocode, wsquery,requests_get, myproxy, encode_b64, decode_b64
 
 from urllib import urlencode
 from urllib2 import urlopen
