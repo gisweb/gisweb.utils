@@ -2,7 +2,7 @@ import urllib, urllib2
 import socket
 from BaseHTTPServer import BaseHTTPRequestHandler
 from urllib2 import HTTPError
-
+import base64
 import requests
 
 from json_utils import json_loads
@@ -245,3 +245,8 @@ def geocode(**kw):
     res = json_loads(raw['text'])
     return res
 
+def encode_b64(text=''):
+    return base64.b64encode(text)
+
+def decode_b64(text=''):
+    return base64.b64decode(text)    
