@@ -37,6 +37,10 @@ def requests_get(url, params=None, methods_or_args=[]):
 
     return out
 
+def get_headers(h):
+    return dict(h)
+    
+    
 def myproxy(url):
 	req = urllib2.Request(url)
 	try:
