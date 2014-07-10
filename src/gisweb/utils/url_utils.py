@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import urllib, urllib2
 import socket
 from BaseHTTPServer import BaseHTTPRequestHandler
@@ -7,40 +8,92 @@ import requests
 
 from json_utils import json_loads
 
-def requests_post(url, data=None, *args, **kwargs):
-    
-    args = list(set(['ok', 'text', 'status_code']+list(args)))
-    
-    resp = requests.post(url, data, **kwargs)
-    
-    out = dict()
-    for k in args:
-        if callable(getattr(resp, k)):
-            out[k] = getattr(resp, k)()
+import logging
+logger = logging.getLogger("GISWEB.UTILS.URL")
+
+class Requests(object):
+
+    @staticmethod
+    def _post(url, data, **kw):
+        return requests.post(url, data=data, **kw)
+
+    @staticmethod
+    def _get(url, params, **_):
+        return requests.get(url, params=params)
+
+    def rawcall(self, url, data=None, method='post', **kw):
+
+        if method.lower()=='post':
+            call = self._post
+        elif method.lower()=='get':
+            call = self._get
         else:
-            out[k] = getattr(resp, k)
-    
-    return out
+            # WARNING: needs to be tested!
+            call = lambda url, data, **kw: requests.request(method.lower(), data=data, **kw)
+        return call(url, data, **kw)
+
+    @staticmethod
+    def _reduce(response, *args):
+
+        out = dict(errors=False)
+
+        args = list(set(('ok', 'text', 'status_code', 'headers', )+args))
+        for key in args:
+            if hasattr(response, key):
+                attr = getattr(response, key)
+                if not callable(attr):
+                    out[key] = attr
+                else:
+                    try:
+                        value = attr()
+                    except Exception as err:
+                        out['errors'] = True
+                        logger.warn("Expected attribute not found: %s (%s: %s)" % (key, type(err), err))
+                    else:
+                        # WARNING: qui devo distinguere ciò che è renderizzabile come dizionario
+                        # per ora il controllo sull'attributo keys mi pare funzioni
+                        if hasattr(value, 'keys') and not isinstance(value, dict):
+                            try:
+                                out[key] = dict(value)
+                            except Exception as err:
+                                out['errors'] = True
+                                # WARNING: this should not happen. Why did it happen?
+                                logger.warn("%s Attribute value of type %s cannot be reducted to a dictionary." % (key, type(value)))
+                                logger.error("%s: %s" % (type(err), err))
+                        else:
+                            out[key] = value
+            else:
+                out['errors'] = True
+                logger.warn("Expected attribute not found: %s" % key)
+
+        return out
+
+    def __call__(self, url, data=None, method='POST', args=None, **kw):
+        """
+        args {list/tuple}: list of arguments to be requested
+                           (defaults are: 'ok', 'text', 'status_code', 'headers').
+        """
+        if args is None:
+            args = []
+        elif not isinstance(args, (tuple, list, )):
+            # for backward compatibility
+            args = [args]
+
+        res = self.rawcall(url, data, method, **kw)
+        return self._reduce(res, *args)
+
+def requests_post(url, data=None, args=None, **kwargs):
+    r = Requests()
+    return r(url, data, method='POST', args=args, **kwargs)
 
 def requests_get(url, params=None, methods_or_args=[]):
-
-    resp = requests.get(url, params=params)
-
-    args = list(set(['ok', 'text', 'status_code'] + list(methods_or_args)))
-    
-    out = dict()
-    for k in args:
-        if callable(getattr(resp, k)):
-            out[k] = getattr(resp, k)()
-        else:
-            out[k] = getattr(resp, k)
-
-    return out
+    r = Requests()
+    return r(url, params, method='GET', args=methods_or_args)
 
 def get_headers(h):
+    """ DEPRECATED """
     return dict(h)
-    
-    
+
 def myproxy(url):
 	req = urllib2.Request(url)
 	try:
