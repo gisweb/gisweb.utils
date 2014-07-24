@@ -1,6 +1,10 @@
 # coutesy of: http://code.activestate.com/recipes/410469-xml-as-dictionary/download/1/
 
-from json_utils import json_dumps,json_loads
+try:
+    from Products.CMFPlomino.PlominoUtils import json_loads, json_dumps
+except ImportError:
+    from json import dumps as json_dumps
+    from json import loads as json_loads
 
 class XmlListConfig(list):
     def __init__(self, aList):

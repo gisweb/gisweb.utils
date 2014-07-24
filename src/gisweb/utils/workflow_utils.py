@@ -212,7 +212,7 @@ def doActionIfAny(doc, wf_var='transition_on_save', args=[]):
     salvataggio della pratica.
     wf_var: nome della variabile di workflow contenente la lista delle
         transizioni abilitate. Se valutata come falsa le transizioni
-        disponibili sono considerate tutte da eseguire.
+        disponibili sono considerate arbitrariamente tutte da eseguire.
     """
 
     pw = getToolByName(doc, 'portal_workflow')

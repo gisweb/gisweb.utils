@@ -4,43 +4,21 @@ from AccessControl import allow_module, ModuleSecurityInfo
 #from z3c.saconfig import named_scoped_session
 
 allow_module('gisweb.utils')
+allow_module('gisweb.utils.dev_utils.utils')
+allow_module('gisweb.utils.plomino_utils.dev')
+
 
 def initialize(con):
     "Being a Zope2 Product we ensure this file will be imported at startup"
 
-from xdocreport import report
-
-import re
 
 ################################################################ PLOMINO UTILS #
 
-from plomino_utils import attachThis
+from plomino_utils.utils import attachThis
+from plomino_utils.misc import addToDate, LastDayofMonth, is_json
 
-from plomino_utils import batch_saveDocument, batch_createDocument, getRndFieldValues
-
-from plomino_utils import StartDayofMonth
-from plomino_utils import LastDayofMonth, addToDate
-from plomino_utils import updateAllXML
-from plomino_utils import addLabelsField
-
-def exportElementAsXML(db, obj, isDatabase=False):
-    from xml.dom.minidom import getDOMImplementation
-    import HTMLParser
-    impl = getDOMImplementation()
-    xmldoc = impl.createDocument(None, "plominofield", None)
-    out = db.exportElementAsXML(xmldoc, obj, isDatabase=isDatabase)
-    return HTMLParser.HTMLParser().unescape(out.toxml())
-
-def importElementFromXML(xmldocument, container):
-    from xml.dom.minidom import parseString
-    doc = parseString(xmldocument)
-    db = container.getParentDatabase()
-    db.importElementFromXML(container, doc.documentElement)
-
-
-################################################################### JSON UTILS #
-
-from json_utils import json_dumps, json_loads
+from plomino_utils.design import updateAllXML, addLabelsField
+from plomino_utils.design import exportElementAsXML, importElementFromXML
 
 
 ################################################################### ZOPE UTILS #
@@ -59,19 +37,6 @@ from acl_utils import get_users_info, getAllUserRoles, getUserPermissions, getRo
 from UnicodeDammit import getUnicodeFrom
 
 
-##################################################################### DB UTILS #
-
-try:
-    import sqlalchemy
-    import z3c.saconfig
-except ImportError:
-    pass
-else:
-    # We're ok without those in case sqlalchemy is not available
-    from db_utils import get_session, get_soup, plominoSqlSync, execute_sql
-    from db_utils import suggestFromTable
-
-
 ############################################################### CF P.IVA UTILS #
 
 from anagrafica_utils import is_valid_cf, is_valid_piva, cf_build
@@ -79,11 +44,13 @@ from anagrafica_utils import is_valid_cf, is_valid_piva, cf_build
 
 #################################################################### URL UTILS #
 
-from url_utils import proxy, urllib_urlencode, requests_post, urllib_quote_plus, geocode, wsquery
+from url_utils import proxy, urllib_urlencode, requests_post,get_headers
+from url_utils import urllib_quote_plus, geocode, wsquery,requests_get, myproxy
+from url_utils import encode_b64, decode_b64
 
-from urllib import urlencode
-from urllib2 import urlopen
 def openUrl(url, timeout=None, **kwargs):
+    from urllib import urlencode
+    from urllib2 import urlopen
     data = urlencode(kwargs)
     error = ''
     try:
@@ -101,7 +68,8 @@ def Type(arg):
     return '%s' % type(arg)
 
 def re_findall(what, where):
-    return re.findall(r'%s' % what, where)
+    from re import findall
+    return findall(r'%s' % what, where)
 
 from StringValidator import isEmail, isEmpty
 from XmlDict import XmlDictConfig
@@ -109,7 +77,8 @@ from XmlDict import XmlDictConfig
 
 ############################################################### WORKFLOW UTILS #
 
-from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo, doActionIfAny, getInfoFor, updateAllRoleMappingsFor
+from workflow_utils import getChainFor, getStatesInfo, getTransitionsInfo
+from workflow_utils import doActionIfAny, getInfoFor, updateAllRoleMappingsFor
 
 
 ##################################################################### FS UTILS #
@@ -160,11 +129,6 @@ from gpolyencode_utils import gpoly_encode, decode_line
 
 ######################################################################### TEST #
 
-#from unittest_advance import runtests
-
-from test_utils import rndgenerate, namegenerate, da_du_ma, dategenerate, numbergenerate
-from test_utils import boolgenerate, rndselection, rndCodFisco, latlongenerate
-
 def getErrorMessage(exception):
     return dict(
         type = type(exception),
@@ -174,10 +138,12 @@ def getErrorMessage(exception):
 oVars = lambda o: vars(o)
 
 def set_trace(context, *args, **kwargs):
-    import ipdb; ipdb.set_trace()
-    return None
+    """ """
+    try:
+        import pdb; pdb.set_trace()
+    except ImportError:
+        import ipdb; ipdb.set_trace()
 
 from zope.security import checkPermission
 def checkpermission(context, perm):
     return checkPermission(perm, context)
-

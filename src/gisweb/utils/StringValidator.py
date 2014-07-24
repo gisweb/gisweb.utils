@@ -65,13 +65,15 @@ def isEmail(string):
 def isEmpty(string):
     return StringValidator(string).isEmpty()
 
+####################################
 # example usage
+# ----------------------------------
 
-#sv1 = StringValidator("joe@testmail.com")
-#sv2 = StringValidator("rw__343")
+# sv1 = StringValidator("joe@testmail.com")
+# sv2 = StringValidator("rw__343")
 
-#if sv1.isEmail(): print sv1.validateString + " is a valid e-mail address"
-#else: print sv1.validateString + " is not a valid e-mail address"
+# if sv1.isEmail(): print sv1.validateString + " is a valid e-mail address"
+# else: print sv1.validateString + " is not a valid e-mail address"
 
-#if sv2.isAlphaNumeric(): print sv2.validateString + " is a valid alpha-numeric string"
-#else: print sv2.validateString + "i is not a valid alpha-numeric string"
+# if sv2.isAlphaNumeric(): print sv2.validateString + " is a valid alpha-numeric string"
+# else: print sv2.validateString + "i is not a valid alpha-numeric string"
