@@ -37,7 +37,6 @@ setup(name='gisweb.utils',
           'requests',
           'dict2xml',
           'zope.app.component',
-          'suds',
           'codicefiscale',
           'beautifulsoup4'
           # -*- Extra requirements: -*-
