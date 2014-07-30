@@ -145,109 +145,6 @@ def importElementFromXML(xmldocument, container):
     doc = parseString(xmldocument)
     db = container.getParentDatabase()
     db.importElementFromXML(container, doc.documentElement)
-
-def update2FieldDescription(el):
-    """ fieldDescription -> FieldDescription """
-    el.attrib['name'] = "FieldDescription"
-
-def update2HTMLAttributesFormula(el):
-    """ customAttributes -> HTMLAttributesFormula """
-    el.attrib['name'] = "HTMLAttributesFormula"
-    if el.text:
-        newtext = el.text.replace("'", "\\'")
-        newtext = newtext.replace('data-plugin="datepicker" ', '')
-        newtext = newtext.replace('dynamicHidewhen', 'data-dhw="true"')
-        el.text = "'%s'" % newtext
-    else:
-        el.text = ""
-
-def update2DATETIME(el):
-    """ DATE -> DATETIME
-    Cambio i campi di tipo DATE a DATETIME con uso del widget JQUERY
-    """
-    fieldtype = el.find('FieldType')
-    fieldtype.text = "DATETIME"
-
-    newparams = etree.Element('params')
-    newparam = etree.SubElement(newparams, 'param')
-    newvalue = etree.SubElement(newparam, 'value')
-    newstruct = etree.SubElement(newvalue, 'struct')
-    newmember = etree.SubElement(newstruct, 'member')
-
-    memname = etree.SubElement(newmember, 'name')
-    memname.text='widget'
-    memvalue = etree.SubElement(newmember, 'value')
-    valstring = etree.SubElement(memvalue, 'string')
-    valstring.text = 'JQUERY'
-
-    params = el.find('params')
-    if params is None:
-        el.append(newparams)
-    else:
-        members = filter(
-            lambda i: i.findtext('name')=='widget',
-            el.findall("params/param/value/struct/member"))
-        if not members:
-            struct = el.find("params/param/value/struct")
-            struct.insert(0, newmember)
-        else:
-            member = el.find("params/param/value/struct/member")
-            member = newmember
-
-def update2TitleAsLabel(el, value=True):
-
-    newelement = etree.Element('TitleAsLabel', type='Products.Archetypes.Field.BooleanField')
-    newelement.text = 'True'
-    TitleAsLabel = el.find('TitleAsLabel')
-
-    if TitleAsLabel is None :
-        el.append(newelement)
-    else:
-        TitleAsLabel.text = 'True'
-
-def update2DescriptionHTML5Attribute(el):
-    descriptionObj = el.findall(".//field[@name='fieldDescription']")[0]
-    description = descriptionObj.text
-    if not description is None:
-        attribute = el.findall(".//field[@name='HTMLAttributesFormula']")[0]
-        original = attribute.text[1:-1] 
-        original = (original + ' data-field-description="%s"' %(description)).strip()
-        attribute.text = "'%s'" % original 
-    extensionfields = el.findall(".//extensionfields")[0]
-    extensionfields.remove(descriptionObj)    
-
-def update2FieldTemplate(context, el):
-    """ Rimuovo i riferimenti ai teplate rimossi """
-    if el.text and not hasattr(context, el.text):
-        el.text = None
-
-def updateXML(context, filepath):
-    tree = etree.parse(filepath, etree.XMLParser(strip_cdata=False))
-    root = tree.getroot()
-
-    attributes = root.findall(".//field[@name='customAttributes']")
-    map(update2HTMLAttributesFormula, attributes)
-   
-    fields = root.findall(".//element[@type='PlominoField']")
-    map(update2DescriptionHTML5Attribute, fields)
-
-    dateelements = filter(
-        lambda el: el.findtext("FieldType", default='').startswith('DATE'),
-        root.findall(".//element[@type='PlominoField']"))
-    map(update2DATETIME, dateelements)
-
-    fieldtemplates = root.findall(".//element/FieldReadTemplate") + \
-        root.findall(".//element/FieldEditTemplate")
-    map(lambda ft: update2FieldTemplate(context, ft), fieldtemplates)
-
-    plominofields = root.findall(".//element[@type='PlominoField']")
-    map(update2TitleAsLabel, plominofields)
-
-    tree.write(filepath)
-
-def updateAllXML(context, path):
-    xmls = map(lambda xml: os.path.join(path, xml), filter(lambda fn: fn.endswith('.xml'), os.listdir(path)))
-    map(lambda xml: updateXML(context, xml), xmls)
     
 def _update_html_content(html):
     soup = BeautifulSoup(html)
@@ -268,3 +165,150 @@ def addLabelsField(self):
     new_html = _update_html_content(html_content)
     
     layout.set(self,new_html)
+
+class UpdateForm(object):
+    
+    class base(object):
+        @classmethod
+        def apply_to_all(cls, root, context):
+            """ Applica le modifiche alla selezione di elementi XML """
+            map(lambda el: cls.modify(el, context), cls.select(root))
+
+    class label(base):
+        @staticmethod
+        def select(root):
+            return root.findall(".//element/FormLayout")
+        @staticmethod
+        def modify(el, context):
+            if not 'plominoLabelClass' in el.text:
+                if not context is None:
+                    plone_tools = getToolByName(context, 'plone_utils')
+                    encoding = plone_tools.getSiteEncoding()
+                else:
+                    encoding = 'utf8'
+                body = BeautifulSoup(el.text)
+                for field in body.select("span.plominoFieldClass"):
+                    label = body.new_tag("span")
+                    label["class"] = "plominoLabelClass"
+                    label.string = field.string
+                    field.insert_before(label)
+                el.text = etree.CDATA(str(body).decode(encoding))
+
+    class datetime(base):
+        """ Cerco tutti i PlominoField di tipo DATE e sostituisco
+        il valore del parametro FildType con il valore DATETIME
+        """
+
+        @staticmethod
+        def select(root):
+            """ Selezione di tutti gli elementi di tipo PlominoField """
+            return filter(
+                lambda el: el.findtext("FieldType", default='').startswith('DATE'),
+                root.findall(".//element[@type='PlominoField']"))
+
+        @staticmethod
+        def modify(el, _):
+            """ Sostituzione del valore """
+            fieldtype = el.find('FieldType')
+            fieldtype.text = "DATETIME"
+
+            newparams = etree.Element('params')
+            newparam = etree.SubElement(newparams, 'param')
+            newvalue = etree.SubElement(newparam, 'value')
+            newstruct = etree.SubElement(newvalue, 'struct')
+            newmember = etree.SubElement(newstruct, 'member')
+
+            memname = etree.SubElement(newmember, 'name')
+            memname.text='widget'
+            memvalue = etree.SubElement(newmember, 'value')
+            valstring = etree.SubElement(memvalue, 'string')
+            valstring.text = 'JQUERY'
+
+            params = el.find('params')
+            if params is None:
+                el.append(newparams)
+            else:
+                members = filter(
+                    lambda i: i.findtext('name')=='widget',
+                    el.findall("params/param/value/struct/member"))
+                if not members:
+                    struct = el.find("params/param/value/struct")
+                    struct.insert(0, newmember)
+                else:
+                    member = el.find("params/param/value/struct/member")
+                    member = newmember
+
+
+    class template(base):
+
+        @staticmethod
+        def select(root):
+            return root.findall(".//element/FieldReadTemplate") + \
+                root.findall(".//element/FieldEditTemplate")
+        @staticmethod
+        def modify(el, context):
+            """ Rimuovo i riferimenti ai teplate rimossi """
+            if not context is None and el.text and not hasattr(context, el.text):
+                el.text = None
+
+    class htmlattribute(base):
+        @staticmethod
+        def select(root):
+            return root.findall(".//field[@name='customAttributes']")
+        @staticmethod
+        def modify(el, _):
+            """ customAttributes -> HTMLAttributesFormula """
+            el.attrib['name'] = "HTMLAttributesFormula"
+            if el.text:
+                newtext = el.text.replace("'", "\\'").\
+                    replace('data-plugin="datepicker" ', '').\
+                    replace('dynamicHidewhen', 'data-dhw="true"')
+                el.text = "'%s'" % newtext
+            else:
+                el.text = ""
+
+    class description(base):
+        @staticmethod
+        def select(root):
+            return root.findall(".//element[@type='PlominoField']")
+        @staticmethod
+        def modify(el, _):
+            """ Aggiungo la descrizione agli attributi HTML5 del campo
+            e rimuovo il tag fieldDescription
+            """
+            descriptionObj = el.findall(".//field[@name='fieldDescription']")[0]
+            description = descriptionObj.text
+            if not description is None:
+                attribute = el.findall(".//field[@name='HTMLAttributesFormula']")[0]
+                original = attribute.text[1:-1] 
+                original = (original + ' data-field-description="%s"' %(description)).strip()
+                attribute.text = "'%s'" % original 
+            extensionfields = el.findall(".//extensionfields")[0]
+            extensionfields.remove(descriptionObj)
+
+    @classmethod
+    def update(cls, context, filepath):
+        tree = etree.parse(filepath, etree.XMLParser(strip_cdata=False))
+        root = tree.getroot()
+
+        # DECOMMENTA QUI LE SOSTITUZIONI NON VOLUTE
+        wizard = [
+            cls.htmlattribute, # 1. customAttributes -> HTMLAttributesFormula
+            cls.description,   # 2. fieldDescription -> HTMLAttributesFormula
+            cls.datetime,      # 3. DATE -> DATETIME
+            cls.template,      # 4. - read/edit templates
+            cls.label,         # 5. + plominoLabelClass
+        ]
+        
+        for u in wizard:
+            u.apply_to_all(root, context)
+
+        tree.write(filepath)
+    
+    @classmethod
+    def updateall(cls, context, path):
+        xmls = map(lambda xml: os.path.join(path, xml), filter(lambda fn: fn.endswith('.xml'), os.listdir(path)))
+        map(lambda xml: cls.update(context, xml), xmls)
+
+def updateAllXML(path, context=None):
+    UpdateForm.updateall(context, path)
