@@ -180,7 +180,7 @@ class UpdateForm(object):
             return root.findall(".//element/FormLayout")
         @staticmethod
         def modify(el, context):
-            if not 'plominoLabelClass' in el.text:
+            if el.text and not 'plominoLabelClass' in el.text:
                 if not context is None:
                     plone_tools = getToolByName(context, 'plone_utils')
                     encoding = plone_tools.getSiteEncoding()
@@ -248,7 +248,8 @@ class UpdateForm(object):
         @staticmethod
         def modify(el, context):
             """ Rimuovo i riferimenti ai teplate rimossi """
-            if not context is None and el.text and not hasattr(context, el.text):
+            #if not context is None and el.text and not hasattr(context, el.text):
+            if el.text:
                 el.text = None
 
     class htmlattribute(base):
@@ -262,7 +263,9 @@ class UpdateForm(object):
             if el.text:
                 newtext = el.text.replace("'", "\\'").\
                     replace('data-plugin="datepicker" ', '').\
-                    replace('dynamicHidewhen', 'data-dhw="true"')
+                    replace('uppercase', '').\
+                    replace('data-plugin="elencocomuni" ', 'iolElencoComuni').\
+                    replace('dynamicHidewhen', 'data-dhw=1')
                 el.text = "'%s'" % newtext
             else:
                 el.text = ""
