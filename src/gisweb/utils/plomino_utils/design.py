@@ -174,6 +174,15 @@ class UpdateForm(object):
             """ Applica le modifiche alla selezione di elementi XML """
             map(lambda el: cls.modify(el, context), cls.select(root))
 
+    class cssresources(base):
+        @staticmethod
+        def select(root):
+            return [root.find(".//element")]
+        @staticmethod
+        def modify(el, context):
+            newtag = etree.Element('ResourcesCSS')
+            el.append(newtag)
+
     class label(base):
         @staticmethod
         def select(root):
@@ -264,7 +273,7 @@ class UpdateForm(object):
                 newtext = el.text.replace("'", "\\'").\
                     replace('data-plugin="datepicker" ', '').\
                     replace('uppercase', '').\
-                    replace('data-plugin="elencocomuni" ', 'iolElencoComuni').\
+                    replace('data-plugin="elencocomuni"', 'data-plugin="iolElencoComuni"').\
                     replace('dynamicHidewhen', 'data-dhw=1')
                 el.text = "'%s'" % newtext
             else:
@@ -305,6 +314,13 @@ class UpdateForm(object):
         
         for u in wizard:
             u.apply_to_all(root, context)
+
+
+        parent = root.find(".//element")
+        newElem = etree.Element('ResourcesCSS')
+        parent.insert(-2,newElem)
+        newElem.attrib['type'] = "Products.Archetypes.Field.TextField"
+        newElem.text = etree.CDATA(str('iol.css\nbootstrap.css\nbootstrap-responsive.css')) 
 
         tree.write(filepath)
     
