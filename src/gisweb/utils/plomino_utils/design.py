@@ -13,6 +13,16 @@ from xml.parsers.expat import ExpatError
 from Products.CMFPlomino.PlominoUtils import escape_xml_illegal_chars
 from Products.CMFCore.utils import getToolByName
 
+
+def getIndexType(plominoContext, key):
+    """
+    """
+    indexes = plominoContext.getParentDatabase().getIndex().Indexes
+    try:
+        return '%s' % indexes[key]
+    except KeyError:
+        return None
+        
 def rename(instring, **kw):
     outstring = ''
     for k,v in kw.items():

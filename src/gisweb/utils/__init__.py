@@ -10,7 +10,7 @@ allow_module('gisweb.utils.plomino_utils.dev')
 
 def initialize(con):
     "Being a Zope2 Product we ensure this file will be imported at startup"
-    
+
 ################################################################ PLOMINO ADDONS #
 
 import plomino_addons
@@ -18,10 +18,13 @@ import plomino_addons
 ################################################################ PLOMINO UTILS #
 
 from plomino_utils.utils import attachThis
+from plomino_utils.utils import serialItem, serialDoc
+
 from plomino_utils.misc import addToDate, LastDayofMonth, is_json
 
 from plomino_utils.design import updateAllXML, addLabelsField
 from plomino_utils.design import exportElementAsXML, importElementFromXML
+from plomino_utils.design import getIndexType
 
 
 ################################################################### ZOPE UTILS #
