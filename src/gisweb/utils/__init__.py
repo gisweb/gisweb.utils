@@ -10,7 +10,10 @@ allow_module('gisweb.utils.plomino_utils.dev')
 
 def initialize(con):
     "Being a Zope2 Product we ensure this file will be imported at startup"
+    
+################################################################ PLOMINO ADDONS #
 
+import plomino_addons
 
 ################################################################ PLOMINO UTILS #
 
