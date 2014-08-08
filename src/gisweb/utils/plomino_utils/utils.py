@@ -17,6 +17,16 @@ except:
     from plone.app.content.batching import Batch
     batch = Batch
 
+
+def getIndexType(plominoContext, key):
+    """
+    """
+    indexes = plominoContext.getParentDatabase().getIndex().Indexes
+    try:
+        return '%s' % indexes[key]
+    except KeyError:
+        return None
+        
 def attachThis(plominoDocument, submittedValue, itemname, filename='', overwrite=True):
     """
     Funcion with the aim to simplify the setting of a file as an attachment of a plominoDocument
