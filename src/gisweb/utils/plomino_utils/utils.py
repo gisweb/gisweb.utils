@@ -1,8 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from Products.CMFPlomino.PlominoUtils import json_dumps
 
 import os
 import tempfile
+from copy import deepcopy
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -260,3 +263,6 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[], render=T
         return dict2xml(dict(res))
     else:
         return res
+        
+def getItems(doc):
+    return dict(deepcopy(doc.items))
