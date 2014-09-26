@@ -25,7 +25,7 @@ from plomino_utils.misc import addToDate, LastDayofMonth, is_json
 from plomino_utils.design import updateAllXML, addLabelsField
 from plomino_utils.design import exportElementAsXML, importElementFromXML
 
-
+from xdocreport import report
 ################################################################### ZOPE UTILS #
 
 def aq_base(obj):

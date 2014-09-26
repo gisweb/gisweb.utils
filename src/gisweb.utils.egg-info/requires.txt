@@ -1,0 +1,6 @@
+setuptools
+requests
+dict2xml
+zope.app.component
+codicefiscale
+beautifulsoup4
