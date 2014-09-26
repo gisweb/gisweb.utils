@@ -199,3 +199,17 @@ def getRndFieldValues(form, only_mandatory=True):
                     sdm = form.getParentDatabase().session_data_manager
                     sd = sdm.getSessionData()
                     sd[fieldname] = result['file']
+
+def idx_createFieldIndex(plominoIndex, fieldname, fieldtype='TEXT', **args):
+    """
+    Espongo il metodo protetto createFieldIndex
+    
+    definizione:
+    createFieldIndex(self, fieldname, fieldtype, refresh=True, indextype='DEFAULT')
+    """
+    
+    if not hasattr(plominoIndex, 'createFieldIndex'):
+        plominoIndex = plominoIndex.getParentDatabase().getIndex()
+    
+    if not fieldname in plominoIndex.indexes():
+        plominoIndex.createFieldIndex(fieldname, fieldtype, **args)                    

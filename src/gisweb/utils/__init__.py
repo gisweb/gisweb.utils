@@ -18,10 +18,10 @@ import plomino_addons
 ################################################################ PLOMINO UTILS #
 
 from plomino_utils.utils import attachThis, getIndexType
-from plomino_utils.utils import serialItem, serialDoc
+from plomino_utils.utils import serialItem, serialDoc, getItems
 
 from plomino_utils.misc import addToDate, LastDayofMonth, is_json
-
+from plomino_utils.misc import idx_createFieldIndex
 from plomino_utils.design import updateAllXML, addLabelsField
 from plomino_utils.design import exportElementAsXML, importElementFromXML
 
