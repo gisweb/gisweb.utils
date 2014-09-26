@@ -25,7 +25,7 @@ from plomino_utils.misc import idx_createFieldIndex
 from plomino_utils.design import updateAllXML, addLabelsField
 from plomino_utils.design import exportElementAsXML, importElementFromXML
 
-from xdocreport import report
+from plomino_report import report
 ################################################################### ZOPE UTILS #
 
 def aq_base(obj):
