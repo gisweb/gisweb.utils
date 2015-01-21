@@ -266,3 +266,32 @@ def serialDoc(doc, nest_datagrid=True, serial_as='json', field_list=[], render=T
         
 def getItems(doc):
     return dict(deepcopy(doc.items))
+
+def serialDatagridItem(doc, obj ):
+    result = list()
+    itemvalue = doc.getItem(obj['name'])
+    for el in itemvalue:
+        i = 0
+        res = dict()
+        for fld in obj['field_list']:
+            res[fld]= el[i]
+            i+=1
+        result.append(res)
+    return result
+
+def getPlominoValues(doc):
+    results = dict(deepcopy(doc.items))
+    frm = doc.getForm()
+    fieldnames = []
+    for i in frm.getFormFields(includesubforms=True, doc=None, applyhidewhen=False):
+        if i.getFieldType()=='DATAGRID':
+            fieldnames.append(dict(field=i,name=i.getId(),form=i.getSettings().associated_form,field_list=i.getSettings().field_mapping.split(',')))
+    try:
+        for f in fieldnames:
+            if f['name'] in results:
+                del results[f['name']]
+            results[f['name']]=serialDatagridItem(doc,f)
+    except:
+        results[f['name']]= []
+        #api.portal.show_message(message='Errore nel campo %s' %f['name'], request=doc.REQUEST)
+    return json.loads(json.dumps(result, default=DateTime.DateTime.ISO,use_decimal=True ))
