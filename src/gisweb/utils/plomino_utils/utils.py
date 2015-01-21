@@ -296,4 +296,4 @@ def getPlominoValues(doc):
     except:
         results[f['name']]= []
         #api.portal.show_message(message='Errore nel campo %s' %f['name'], request=doc.REQUEST)
-    return json.loads(json.dumps(result, default=DateTime.DateTime.ISO,use_decimal=True ))
+    return json.loads(json.dumps(results, default=DateTime.DateTime.ISO,use_decimal=True ))
