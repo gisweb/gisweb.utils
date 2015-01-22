@@ -126,6 +126,9 @@ def getRepoRemotes(path):
     p.wait()
     return result
 
+################################################################# SPEZIA UTILS #
+
+from spezia_utils import protocolla_doc, protocolla
 
 ############################################################ GPOLYENCODE UTILS #
 
