@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from AccessControl import allow_module, ModuleSecurityInfo
 #from z3c.saconfig import named_scoped_session
-
+allow_module('simplejson')
 allow_module('gisweb.utils')
 allow_module('gisweb.utils.dev_utils.utils')
 allow_module('gisweb.utils.plomino_utils.dev')
