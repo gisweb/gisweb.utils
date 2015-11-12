@@ -34,14 +34,15 @@ def sendMail(context, Object, msg, To, From='', as_script=False):
     
     messages = []
     mail_host = getToolByName(context, 'MailHost')
+    sender = From or mail_host.getProperty('email_from_address')
     try:
-        mail_host.send(msg, To, From or mail_host.getProperty('email_from_address'), Object)
+        mail_host.send(msg, To, sender, Object)
     except Exception as err:
         err_msg = '%s: %s' % (type(err), err)
         err = (unicode(err_msg, errors='replace'), 'error')
         wrn_msg = 'ATTENZIONE! Non è stato possibile inviare la mail con oggetto: %s' % Object
         wrn = (unicode(wrn_msg, errors='replace'), 'warning')
-        messages.append(err)
+        #messages.append(err)
         messages.append(wrn)
     else:
         success = 1
